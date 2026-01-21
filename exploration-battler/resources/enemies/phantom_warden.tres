@@ -7,6 +7,7 @@ script = ExtResource("1")
 enemy_id = &"phantom_warden"
 display_name = "Phantom Warden"
 max_life = 15
+base_attack = 3
 difficulty_stars = 2
 ai_behavior_type = 0
 deck_list = []

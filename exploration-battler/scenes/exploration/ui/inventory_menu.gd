@@ -48,10 +48,18 @@ func _input(event: InputEvent) -> void:
 		# Card collection menu is open, don't process inventory input
 		return
 	
+	# Handle Tab key directly to prevent UI focus navigation from consuming it
+	if event is InputEventKey and event.pressed:
+		if event.physical_keycode == KEY_TAB:  # KEY_TAB = 4194305
+			toggle_inventory()
+			get_viewport().set_input_as_handled()
+			return
+		# Block Esc key from opening inventory (but allow it to propagate for mouse mode toggle)
+		if event.physical_keycode == KEY_ESCAPE:  # KEY_ESCAPE = 4194306
+			return
+	
 	if event.is_action_pressed("inventory"):
 		toggle_inventory()
-	elif event.is_action_pressed("ui_cancel") and _is_open:
-		close_inventory()
 
 func toggle_inventory() -> void:
 	if _is_open:

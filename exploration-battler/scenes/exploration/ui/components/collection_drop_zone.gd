@@ -2,7 +2,7 @@ extends GridContainer
 
 ## Drop zone for collection grid - accepts cards from deck (removes from deck).
 
-func can_drop_data(position: Vector2, data: Variant) -> bool:
+func _can_drop_data(_position: Vector2, data: Variant) -> bool:
 	# Allow dropping deck cards back to collection (removes from deck)
 	if data is Dictionary:
 		var drag_data: Dictionary = data as Dictionary
@@ -10,7 +10,7 @@ func can_drop_data(position: Vector2, data: Variant) -> bool:
 		return source == "deck"
 	return false
 
-func drop_data(position: Vector2, data: Variant) -> void:
+func _drop_data(_position: Vector2, data: Variant) -> void:
 	# Handle card drop into collection (removes from deck)
 	if data is Dictionary:
 		var drag_data: Dictionary = data as Dictionary

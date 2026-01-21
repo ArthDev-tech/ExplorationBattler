@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"grey_shieldbearer"
+display_name = "Shieldbearer"
+cost = 2
+cost_red = 0
+cost_blue = 0
+cost_green = 0
+card_type = 0
+rarity = 0
+attack = 1
+health = 6
+tribe = 3
+keywords = [&"Guard", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "A neutral guard for any line."
+is_token = false
+sacrifice_value = 1
+

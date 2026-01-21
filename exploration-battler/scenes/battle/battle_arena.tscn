@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://db3hgx6g8vmhe"]
+[gd_scene load_steps=14 format=3 uid="uid://db3hgx6g8vmhe"]
 
 [ext_resource type="Script" uid="uid://c5rktfg8kh7xg" path="res://scripts/battle/battle_manager.gd" id="1"]
 [ext_resource type="Script" uid="uid://cwkwi5euadvxa" path="res://scripts/battle/combat_resolver.gd" id="2"]
@@ -8,6 +8,11 @@
 [ext_resource type="PackedScene" path="res://scenes/battle/ui/hand_area.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/battle/ui/turn_indicator.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://scenes/battle/ui/test_controls.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/battle/ui/energy_pick_panel.tscn" id="9"]
+[ext_resource type="Texture2D" uid="uid://bbc46gpfhm0r3" path="res://Imports/plareBase.jpg" id="10"]
+[ext_resource type="Texture2D" uid="uid://kmlit0dwxqv5" path="res://Imports/BaseEnemy.jpg" id="11"]
+[ext_resource type="Script" uid="uid://uyw4lc4lxs2h" path="res://scenes/battle/ui/player_card_avatar.gd" id="12"]
+[ext_resource type="Script" uid="uid://7hn52tjsryoy" path="res://scenes/battle/ui/enemy_card_avatar.gd" id="13"]
 
 [node name="BattleArena" type="Node2D"]
 process_mode = 4
@@ -20,7 +25,6 @@ script = ExtResource("2")
 layer = 10
 
 [node name="BackgroundOverlay" type="ColorRect" parent="UI"]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -29,51 +33,14 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.85)
 
-[node name="EnemyHeader" type="Control" parent="UI"]
-layout_mode = 3
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -200.0
-offset_top = 50.0
-offset_right = 200.0
-offset_bottom = 150.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="HeaderContainer" type="HBoxContainer" parent="UI/EnemyHeader"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -753.0
-offset_top = -31.0
-offset_right = -850.0
-offset_bottom = 7.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 10
-
-[node name="EnemyPortrait" type="Label" parent="UI/EnemyHeader/HeaderContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Enemy"
-
-[node name="EnemyLifeBar" parent="UI/EnemyHeader/HeaderContainer" instance=ExtResource("3")]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="EnemyEnergyDisplay" parent="UI/EnemyHeader/HeaderContainer" instance=ExtResource("4")]
-layout_mode = 2
-
 [node name="EnemySide" type="HBoxContainer" parent="UI"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -211.0
-offset_top = 117.0
-offset_right = 929.0
-offset_bottom = 417.0
+offset_left = -300.0
+offset_top = 44.835
+offset_right = 380.00012
+offset_bottom = 344.835
 grow_horizontal = 2
 theme_override_constants/separation = 10
 
@@ -89,52 +56,87 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Lane4" parent="UI/EnemySide" instance=ExtResource("5")]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Lane5" parent="UI/EnemySide" instance=ExtResource("5")]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="PlayerHeader" type="Control" parent="UI"]
+[node name="EnemyCard" type="Control" parent="UI"]
 layout_mode = 3
-anchors_preset = 7
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 1.0
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = -150.0
-offset_right = 200.0
-offset_bottom = -50.0
+offset_left = 405.0
+offset_top = 20.000004
+offset_right = 625.0
+offset_bottom = 320.0
 grow_horizontal = 2
-grow_vertical = 0
+script = ExtResource("13")
 
-[node name="HeaderContainer" type="HBoxContainer" parent="UI/PlayerHeader"]
+[node name="Frame" type="ColorRect" parent="UI/EnemyCard"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -748.0
-offset_top = -420.0
-offset_right = -834.0
-offset_bottom = -385.0
+offset_top = 0.9999962
+offset_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.08, 0.1, 0.95)
+
+[node name="Portrait" type="TextureRect" parent="UI/EnemyCard/Frame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("11")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="EnemyHeader" type="Control" parent="UI/EnemyCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -18.0
+offset_top = -30.000004
+offset_right = -18.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeaderContainer" type="HBoxContainer" parent="UI/EnemyCard/EnemyHeader"]
+z_index = 6
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="PlayerPortrait" type="Label" parent="UI/PlayerHeader/HeaderContainer"]
+[node name="EnemyPortrait" type="Label" parent="UI/EnemyCard/EnemyHeader/HeaderContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "Player"
+text = "Enemy"
 
-[node name="PlayerLifeBar" parent="UI/PlayerHeader/HeaderContainer" instance=ExtResource("3")]
+[node name="EnemyLifeBar" parent="UI/EnemyCard/EnemyHeader/HeaderContainer" instance=ExtResource("3")]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="PlayerEnergyDisplay" parent="UI/PlayerHeader/HeaderContainer" instance=ExtResource("4")]
-layout_mode = 2
+[node name="AttackLabel" type="Label" parent="UI/EnemyCard"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -30.0
+offset_right = 100.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 18
+text = "ATK: 0"
 
 [node name="PlayerSide" type="HBoxContainer" parent="UI"]
 anchors_preset = 7
@@ -142,10 +144,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -203.0
-offset_top = -585.0
-offset_right = 937.0
-offset_bottom = -285.0
+offset_left = -300.0
+offset_top = -702.35
+offset_right = 380.0
+offset_bottom = -402.34998
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 10
@@ -162,13 +164,107 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Lane4" parent="UI/PlayerSide" instance=ExtResource("5")]
-layout_mode = 2
-size_flags_horizontal = 3
+[node name="PlayerCard" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 416.00012
+offset_top = -576.0
+offset_right = 636.0001
+offset_bottom = -276.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("12")
 
-[node name="Lane5" parent="UI/PlayerSide" instance=ExtResource("5")]
+[node name="AttackBorder" type="Panel" parent="UI/PlayerCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Frame" type="ColorRect" parent="UI/PlayerCard"]
+light_mask = 4
+visibility_layer = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.08, 0.1, 0.95)
+
+[node name="Portrait" type="TextureRect" parent="UI/PlayerCard/Frame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("10")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="PlayerHeader" type="Control" parent="UI/PlayerCard"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -133.00012
+offset_top = -337.0
+offset_right = 86.99988
+offset_bottom = -37.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="HeaderContainer" type="HBoxContainer" parent="UI/PlayerCard/PlayerHeader"]
+z_index = 4
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -57.0
+offset_bottom = -44.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="PlayerPortrait" type="Label" parent="UI/PlayerCard/PlayerHeader/HeaderContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Player"
+
+[node name="PlayerLifeBar" parent="UI/PlayerCard/PlayerHeader/HeaderContainer" instance=ExtResource("3")]
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="AttackLabel" type="Label" parent="UI/PlayerCard"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -30.0
+offset_right = 100.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 18
+text = "ATK: 0"
 
 [node name="HandArea" parent="UI" instance=ExtResource("6")]
 custom_minimum_size = Vector2(0, 240)
@@ -176,12 +272,53 @@ anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
-offset_left = -602.0
-offset_top = -247.0
-offset_right = 598.0
-offset_bottom = -7.0
+offset_left = -344.0
+offset_top = -383.0
+offset_right = 363.0
+offset_bottom = -143.0
 grow_horizontal = 2
 grow_vertical = 0
+
+[node name="PlayerEnergyPreviewBackdrop" type="ColorRect" parent="UI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 726.0
+offset_top = -500.0
+offset_right = 906.0
+offset_bottom = -430.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0, 0, 0, 0.35)
+
+[node name="PlayerEnergyPreview" parent="UI/PlayerEnergyPreviewBackdrop" instance=ExtResource("4")]
+layout_mode = 1
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OpponentEnergyPreviewBackdrop" type="ColorRect" parent="UI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 746.0
+offset_top = 71.0
+offset_right = 926.0
+offset_bottom = 131.0
+grow_horizontal = 2
+color = Color(0, 0, 0, 0.35)
+
+[node name="OpponentEnergyPreview" parent="UI/OpponentEnergyPreviewBackdrop" instance=ExtResource("4")]
+layout_mode = 1
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TurnIndicator" parent="UI" instance=ExtResource("7")]
 anchors_preset = 8
@@ -189,10 +326,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -860.0
-offset_top = -224.0
-offset_right = -660.0
-offset_bottom = -124.0
+offset_left = 738.0
+offset_top = -283.0
+offset_right = 938.0
+offset_bottom = -183.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -202,13 +339,17 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -150.0
-offset_top = -100.0
-offset_right = -50.0
-offset_bottom = -50.0
+offset_left = -176.0
+offset_top = -649.0
+offset_right = -28.0
+offset_bottom = -571.0
 grow_horizontal = 0
 grow_vertical = 0
 text = "End Turn"
+
+[node name="EnergyPickPanel" parent="UI" instance=ExtResource("9")]
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TestControls" parent="UI" instance=ExtResource("8")]
 offset_left = 10.0

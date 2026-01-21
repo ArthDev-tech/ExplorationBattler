@@ -1,0 +1,21 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"enemy_avatar"
+display_name = "Enemy"
+cost = 0
+cost_red = 0
+cost_blue = 0
+cost_green = 0
+card_type = 0
+rarity = 0
+attack = 0
+health = 999
+tribe = 0
+keywords = []
+description = "Enemy avatar. Damage dealt to this goes to their life total."
+is_token = false
+sacrifice_value = 0

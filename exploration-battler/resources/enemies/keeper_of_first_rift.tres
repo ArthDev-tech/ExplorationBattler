@@ -8,6 +8,7 @@ script = ExtResource("1")
 enemy_id = &"keeper_of_first_rift"
 display_name = "Keeper of the First Rift"
 max_life = 50
+base_attack = 5
 difficulty_stars = 4
 ai_behavior_type = 3
 deck_list = []

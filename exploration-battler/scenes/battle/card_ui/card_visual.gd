@@ -17,6 +17,7 @@ var _mouse_press_pos: Vector2 = Vector2.ZERO
 @onready var _artwork: ColorRect = $VBox/ArtworkPlaceholder
 @onready var _name_label: Label = $VBox/NameLabel
 @onready var _tribe_label: Label = $VBox/TribeLabel
+@onready var _keywords_label: Label = $VBox/KeywordsLabel
 @onready var _description_label: Label = $VBox/DescriptionLabel
 @onready var _stats_label: Label = $VBox/Footer/StatsLabel
 @onready var _swirl_overlay: ColorRect = $SwirlOverlay
@@ -39,15 +40,27 @@ var _type_icons: Dictionary = {
 var _tribe_names: Array[String] = ["None", "Phantom", "Beast", "Construct", "Cultist", "Nature"]
 
 var _battle_manager: Node = null
+var _background_style: StyleBoxFlat = null
+
+const _COLOR_GREY: Color = Color(0.5, 0.5, 0.5, 1.0)      # Medium grey (colorless)
+const _COLOR_RED: Color = Color(0.5, 0.15, 0.15, 1.0)     # Dark red
+const _COLOR_BLUE: Color = Color(0.15, 0.25, 0.5, 1.0)    # Dark blue
+const _COLOR_GREEN: Color = Color(0.15, 0.4, 0.2, 1.0)    # Dark green
 
 func _ready() -> void:
-	mouse_filter = 2  # MOUSE_FILTER_STOP - Ensure cards receive mouse input
+	mouse_filter = Control.MOUSE_FILTER_STOP  # Ensure cards receive mouse input
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	_click_timer = 0.0
+	_mouse_press_pos = Vector2.ZERO
 	# REMOVED: gui_input connection - it was preventing drag-and-drop from working
 	# Use _unhandled_input for click-to-select instead
 	# Cache battle manager reference - try multiple paths
 	_battle_manager = _get_battle_manager()
+	# Allow lanes to receive clicks during targeting
+	EventBus.targeting_started.connect(_on_targeting_started)
+	EventBus.targeting_cancelled.connect(_on_targeting_cancelled)
+	_update_mouse_filter_for_targeting()
 	# Listen for card selection
 	EventBus.card_selected.connect(_on_card_selected)
 	EventBus.card_deselected.connect(_on_card_deselected)
@@ -75,9 +88,12 @@ func set_card(instance: CardInstance) -> void:
 	var data: CardData = card_instance.data
 	if not data:
 		return
+
+	_ensure_unique_background_style()
 	
 	# Cost
-	_cost_label.text = str(data.cost)
+	_cost_label.text = _format_cost_text(data)
+	_apply_cost_color_theme(data)
 	
 	# Type icon
 	_type_label.text = _type_icons.get(data.card_type, "?")
@@ -91,6 +107,19 @@ func set_card(instance: CardInstance) -> void:
 	else:
 		_tribe_label.text = ""
 	
+	# Keywords
+	if _keywords_label:
+		var keyword_list: Array[String] = []
+		for kw in data.keywords:
+			if kw != &"":
+				keyword_list.append(String(kw))
+		if keyword_list.size() > 0:
+			_keywords_label.text = " | ".join(keyword_list)
+			_keywords_label.visible = true
+		else:
+			_keywords_label.text = ""
+			_keywords_label.visible = false
+	
 	# Description
 	_description_label.text = data.description
 	
@@ -103,9 +132,8 @@ func set_card(instance: CardInstance) -> void:
 	
 	# Rarity border color
 	if _background:
-		var style: StyleBoxFlat = _background.get_theme_stylebox("panel", "Panel") as StyleBoxFlat
-		if style:
-			style.border_color = _rarity_colors.get(data.rarity, Color(0.2, 0.2, 0.2, 1))
+		if _background_style:
+			_background_style.border_color = _rarity_colors.get(data.rarity, Color(0.2, 0.2, 0.2, 1))
 	
 	# Artwork placeholder color (based on tribe)
 	if data.is_creature():
@@ -133,26 +161,99 @@ func update_visual_state() -> void:
 		_stats_label.text = str(card_instance.current_attack) + "/" + str(card_instance.current_health)
 	
 	# Update playable state
-	var current_energy: int = _get_current_energy()
-	_is_playable = card_instance.data.cost <= current_energy
+	var battle_state: BattleState = _get_battle_state()
+	if battle_state:
+		_is_playable = battle_state.can_afford_player_cost(card_instance.data)
+	else:
+		var current_energy: int = _get_current_energy()
+		_is_playable = card_instance.data.cost <= current_energy
 	
 	# Apply visual state
 	_apply_visual_state()
 	# Update summoning sickness overlay
 	_update_summoning_sickness_visual()
 
+func _ensure_unique_background_style() -> void:
+	if not _background:
+		return
+	if _background_style:
+		return
+	var style: StyleBox = _background.get_theme_stylebox("panel", "Panel")
+	if style and style is StyleBoxFlat:
+		_background_style = (style as StyleBoxFlat).duplicate() as StyleBoxFlat
+		_background.add_theme_stylebox_override("panel", _background_style)
+
+func _format_cost_text(data: CardData) -> String:
+	var generic: int = maxi(0, data.cost)
+	var r: int = maxi(0, data.cost_red)
+	var b: int = maxi(0, data.cost_blue)
+	var g: int = maxi(0, data.cost_green)
+	var text: String = ""
+	if generic > 0:
+		text += str(generic)
+	if r > 0:
+		text += "R".repeat(r)
+	if b > 0:
+		text += "B".repeat(b)
+	if g > 0:
+		text += "G".repeat(g)
+	if text.is_empty():
+		return "0"
+	return text
+
+func _get_dominant_pip_color(data: CardData) -> int:
+	var r: int = maxi(0, data.cost_red)
+	var b: int = maxi(0, data.cost_blue)
+	var g: int = maxi(0, data.cost_green)
+	var max_pips: int = maxi(r, maxi(b, g))
+	if max_pips <= 0:
+		return -1
+	var winners: int = 0
+	if r == max_pips:
+		winners += 1
+	if b == max_pips:
+		winners += 1
+	if g == max_pips:
+		winners += 1
+	if winners != 1:
+		return -1
+	if r == max_pips:
+		return 0
+	if b == max_pips:
+		return 1
+	return 2
+
+func _apply_cost_color_theme(data: CardData) -> void:
+	# Grey for no pips or ties. Otherwise tint by dominant pip color.
+	if not _background_style:
+		return
+	var dominant: int = _get_dominant_pip_color(data)
+	match dominant:
+		0:
+			_background_style.bg_color = _COLOR_RED
+		1:
+			_background_style.bg_color = _COLOR_BLUE
+		2:
+			_background_style.bg_color = _COLOR_GREEN
+		_:
+			_background_style.bg_color = _COLOR_GREY
+
 func _get_current_energy() -> int:
+	var battle_state: BattleState = _get_battle_state()
+	if battle_state:
+		return battle_state.get_player_energy_total()
+	return 0
+
+func _get_battle_state() -> BattleState:
 	# Query battle state via BattleManager
 	if not _battle_manager:
 		_battle_manager = _get_battle_manager()
-	if _battle_manager:
-		# Access battle_state property directly (it's a public var in BattleManager)
-		# Use get() to safely access property, returns null if doesn't exist
-		var battle_state = _battle_manager.get("battle_state")
-		if battle_state:
-			# BattleState is a RefCounted, access player_energy directly
-			return battle_state.player_energy
-	return 0
+	if not _battle_manager:
+		return null
+	var state_variant: Variant = _battle_manager.get("battle_state")
+	if state_variant and state_variant is BattleState:
+		return state_variant as BattleState
+	return null
 
 func _apply_visual_state() -> void:
 	if not card_instance:
@@ -179,9 +280,11 @@ func _apply_visual_state() -> void:
 
 func _on_mouse_entered() -> void:
 	if card_instance:
-		scale = Vector2(1.15, 1.15)
-		z_index = 20
-		# Add glow effect
+		# Only apply scale/z_index for cards not in hand (hand_area handles those)
+		if not _is_in_hand():
+			scale = Vector2(1.15, 1.15)
+			z_index = 20
+		# Always add glow effect
 		if _background:
 			var style: StyleBoxFlat = _background.get_theme_stylebox("panel", "Panel") as StyleBoxFlat
 			if style:
@@ -189,15 +292,60 @@ func _on_mouse_entered() -> void:
 				style.shadow_color = Color(0.5, 0.5, 1.0, 0.5)
 
 func _on_mouse_exited() -> void:
-	scale = Vector2(1.0, 1.0)
-	z_index = 0
-	# Remove glow effect
+	# Only reset scale/z_index for cards not in hand
+	if not _is_in_hand():
+		scale = Vector2(1.0, 1.0)
+		z_index = 0
+	# Always remove glow effect
 	if _background:
 		var style: StyleBoxFlat = _background.get_theme_stylebox("panel", "Panel") as StyleBoxFlat
 		if style:
 			style.shadow_size = 4
 			style.shadow_color = Color(0, 0, 0, 0.3)
 	_apply_visual_state()
+
+func _is_in_hand() -> bool:
+	# Cards in hand are children of CardContainer in HandArea
+	var parent_node: Node = get_parent()
+	if not parent_node:
+		return false
+	if parent_node.name == "CardContainer":
+		var grandparent = parent_node.get_parent()
+		if grandparent and grandparent.name == "HandArea":
+			return true
+	return false
+
+func _is_in_lane() -> bool:
+	# Cards in hand are in hand_area; cards in lanes are in lane's CardSlot.
+	var parent_node: Node = get_parent()
+	if not parent_node:
+		return false
+	if parent_node.name == "CardSlot":
+		return true
+	if parent_node.get_parent() and parent_node.get_parent().has_method("place_card"):
+		return true
+	return false
+
+func _is_targeting_mode() -> bool:
+	if not _battle_manager:
+		_battle_manager = _get_battle_manager()
+	if not _battle_manager:
+		return false
+	return _battle_manager.get("_targeting_mode") == true
+
+func _update_mouse_filter_for_targeting() -> void:
+	# Lane cards should not block lane input (click targeting + drag-drop targeting).
+	# Hand cards should still consume input for selection/drag.
+	if _is_in_lane():
+		mouse_filter = Control.MOUSE_FILTER_PASS
+	else:
+		mouse_filter = Control.MOUSE_FILTER_STOP
+
+func _on_targeting_started(_card: CardInstance) -> void:
+	_update_mouse_filter_for_targeting()
+
+func _on_targeting_cancelled() -> void:
+	_update_mouse_filter_for_targeting()
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Handle click-to-play for spells/relics, click-to-select for creatures
@@ -259,12 +407,12 @@ func _get_drag_data(_position: Vector2) -> Variant:
 	
 	# Reset all transform properties that might have been modified by hover effects
 	preview.scale = Vector2(1.0, 1.0)
-	preview.z_index = 0
+	preview.z_index = 100  # High z_index to ensure drag preview appears above all cards
 	preview.modulate = Color(1.0, 1.0, 1.0, 0.8)  # Slightly transparent
 	# Use custom_minimum_size (base size) not current size (which may be scaled)
 	preview.custom_minimum_size = Vector2(200, 280)
 	preview.size = Vector2(200, 280)  # Explicit size
-	preview.mouse_filter = 0  # MOUSE_FILTER_IGNORE - preview should not receive mouse input
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE  # preview should not receive mouse input
 	set_drag_preview(preview)
 	
 	# Return card instance as drag data
@@ -316,3 +464,7 @@ func _exit_tree() -> void:
 		EventBus.card_deselected.disconnect(_on_card_deselected)
 	if EventBus.card_stats_changed.is_connected(_on_card_stats_changed):
 		EventBus.card_stats_changed.disconnect(_on_card_stats_changed)
+	if EventBus.targeting_started.is_connected(_on_targeting_started):
+		EventBus.targeting_started.disconnect(_on_targeting_started)
+	if EventBus.targeting_cancelled.is_connected(_on_targeting_cancelled):
+		EventBus.targeting_cancelled.disconnect(_on_targeting_cancelled)

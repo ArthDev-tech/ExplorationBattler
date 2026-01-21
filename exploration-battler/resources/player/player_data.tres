@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="PlayerData" load_steps=2 format=3 uid="uid://cnqhmbhj8qqw7"]
+
+[ext_resource type="Script" uid="uid://dth13etd7sn8m" path="res://scripts/core/player_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+max_life = 50
+base_attack = 15

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"grey_scout"
+display_name = "Scout"
+cost = 1
+cost_red = 0
+cost_blue = 0
+cost_green = 0
+card_type = 0
+rarity = 0
+attack = 2
+health = 2
+tribe = 0
+keywords = [&"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "A quick neutral body."
+is_token = false
+sacrifice_value = 1
+

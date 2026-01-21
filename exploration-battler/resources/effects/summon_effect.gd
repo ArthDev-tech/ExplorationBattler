@@ -15,16 +15,17 @@ func execute(context: EffectContext) -> void:
 	for i in range(count):
 		var token_instance: CardInstance = CardInstance.new(token_card_data)
 		var lane: int = target_lane
+		var lane_count: int = context.battle_state.player_lanes.size() if context.is_player else context.battle_state.enemy_lanes.size()
 		
 		# Find empty lane if not specified
 		if lane < 0:
 			var lanes: Array = context.battle_state.player_lanes if context.is_player else context.battle_state.enemy_lanes
-			for j in range(5):
+			for j in range(lane_count):
 				if lanes[j] == null:
 					lane = j
 					break
 		
-		if lane >= 0 and lane < 5:
+		if lane >= 0 and lane < lane_count:
 			if context.is_player:
 				context.battle_state.player_lanes[lane] = token_instance
 			else:

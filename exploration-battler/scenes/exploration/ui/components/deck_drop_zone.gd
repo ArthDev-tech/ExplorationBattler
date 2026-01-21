@@ -2,7 +2,7 @@ extends VBoxContainer
 
 ## Drop zone for deck list - accepts cards from collection.
 
-func can_drop_data(position: Vector2, data: Variant) -> bool:
+func _can_drop_data(_position: Vector2, data: Variant) -> bool:
 	# Allow dropping collection cards into deck
 	if data is Dictionary:
 		var drag_data: Dictionary = data as Dictionary
@@ -10,7 +10,7 @@ func can_drop_data(position: Vector2, data: Variant) -> bool:
 		return source == "collection"
 	return false
 
-func drop_data(position: Vector2, data: Variant) -> void:
+func _drop_data(_position: Vector2, data: Variant) -> void:
 	# Handle card drop into deck
 	if data is Dictionary:
 		var drag_data: Dictionary = data as Dictionary

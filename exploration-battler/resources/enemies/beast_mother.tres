@@ -8,6 +8,7 @@ script = ExtResource("1")
 enemy_id = &"beast_mother"
 display_name = "The Beast Mother"
 max_life = 30
+base_attack = 4
 difficulty_stars = 3
 ai_behavior_type = 4
 deck_list = []

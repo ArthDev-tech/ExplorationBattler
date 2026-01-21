@@ -6,7 +6,10 @@
 script = ExtResource("1")
 card_id = &"forest_whelp"
 display_name = "Forest Whelp"
-cost = 1
+cost = 0
+cost_red = 0
+cost_blue = 0
+cost_green = 1
 card_type = 0
 rarity = 0
 attack = 2

@@ -7,6 +7,7 @@ script = ExtResource("1")
 enemy_id = &"rusted_sentinel"
 display_name = "Rusted Sentinel"
 max_life = 20
+base_attack = 3
 difficulty_stars = 2
 ai_behavior_type = 2
 deck_list = []

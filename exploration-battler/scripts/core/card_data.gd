@@ -29,7 +29,12 @@ enum Rarity {
 
 @export var card_id: StringName = &""
 @export var display_name: String = ""
+## Generic (colorless) cost. Can be paid by any color energy.
 @export var cost: int = 1
+## Colored pip costs.
+@export var cost_red: int = 0
+@export var cost_blue: int = 0
+@export var cost_green: int = 0
 @export var card_type: CardType = CardType.CREATURE
 @export var rarity: Rarity = Rarity.COMMON
 
@@ -57,3 +62,18 @@ func is_creature() -> bool:
 
 func has_keyword(keyword: StringName) -> bool:
 	return keywords.has(keyword)
+
+func get_generic_cost() -> int:
+	return maxi(0, cost)
+
+func get_red_pips() -> int:
+	return maxi(0, cost_red)
+
+func get_blue_pips() -> int:
+	return maxi(0, cost_blue)
+
+func get_green_pips() -> int:
+	return maxi(0, cost_green)
+
+func get_total_cost() -> int:
+	return get_generic_cost() + get_red_pips() + get_blue_pips() + get_green_pips()

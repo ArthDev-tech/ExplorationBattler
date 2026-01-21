@@ -17,6 +17,7 @@ enum AIBehaviorType {
 @export var enemy_id: StringName = &""
 @export var display_name: String = ""
 @export var max_life: int = 10
+@export var base_attack: int = 3  # Enemy avatar attack value
 @export var difficulty_stars: int = 1  # 1-4 stars
 @export var ai_behavior_type: AIBehaviorType = AIBehaviorType.BASIC
 

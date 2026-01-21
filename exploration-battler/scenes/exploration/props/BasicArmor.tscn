@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6o56b8r2cfy7"]
+
+[ext_resource type="ArrayMesh" uid="uid://ne0x8qn77m4e" path="res://Imports/ArmorMesh.res" id="1_w36hx"]
+[ext_resource type="Script" uid="uid://bo7o5rjaeniov" path="res://scenes/exploration/props/Item.gd" id="2_nanyq"]
+
+[node name="BasicArmor" type="Node3D"]
+
+[node name="ArmorMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(119.99999, 0, 0, 0, -5.245366e-06, 119.99999, 0, -119.99999, -5.245366e-06, 0, 0, 0)
+mesh = ExtResource("1_w36hx")
+script = ExtResource("2_nanyq")

@@ -18,9 +18,9 @@ func make_turn_decision() -> Dictionary:
 	
 	# Try to play cards (use all energy)
 	for card in battle_state.enemy_hand:
-		if card.data.cost <= battle_state.enemy_energy:
+		if card and card.data and battle_state.can_afford_enemy_cost(card.data):
 			# Find empty lane
-			for lane in range(5):
+			for lane in range(battle_state.enemy_lanes.size()):
 				if battle_state.enemy_lanes[lane] == null:
 					return {
 						"type": "play_card",
@@ -31,3 +31,7 @@ func make_turn_decision() -> Dictionary:
 	# No more cards to play, end turn
 	# Attacks will happen automatically in combat resolution
 	return {"type": "end_turn"}
+
+func choose_energy_color() -> int:
+	# Random for now - override in subclasses for specific enemy behaviors
+	return randi() % 3

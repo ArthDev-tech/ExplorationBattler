@@ -6,7 +6,10 @@
 script = ExtResource("1")
 card_id = &"wandering_soul"
 display_name = "Wandering Soul"
-cost = 1
+cost = 0
+cost_red = 0
+cost_blue = 1
+cost_green = 0
 card_type = 0
 rarity = 0
 attack = 1

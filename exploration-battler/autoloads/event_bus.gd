@@ -12,6 +12,7 @@ signal card_played(card_instance: RefCounted, lane: int, is_player: bool)
 signal card_drawn(card_instance: RefCounted, is_player: bool)
 signal combat_resolved(results: Array)
 signal energy_changed(current: int, max_energy: int, is_player: bool)
+signal energy_colors_changed(current_r: int, current_b: int, current_g: int, max_r: int, max_b: int, max_g: int, is_player: bool)
 signal life_changed(current: int, max_life: int, is_player: bool)
 
 # Exploration Signals
@@ -35,9 +36,21 @@ signal targeting_started(card: CardInstance)
 signal targeting_cancelled()
 signal target_selected(target: CardInstance, lane: int, is_player: bool)
 
+# Energy Pick Signals
+signal energy_color_pick_requested(is_player: bool)
+signal energy_color_picked(color: int, is_player: bool)
+
+# Card Draw Signals
+signal draw_cards_requested(count: int, is_player: bool)
+
 # Card State Signals
 signal card_stats_changed(card: CardInstance)
 signal card_died(card: CardInstance, lane: int, is_player: bool)
+
+# Avatar Signals
+signal avatar_clicked(is_player: bool)
+signal avatar_attacked(attacker_is_player: bool, target_is_player: bool, damage: int)
+signal avatar_stats_changed(is_player: bool, attack: int)
 
 # Game State Signals
 signal scene_transition_requested(scene_path: String)

@@ -6,7 +6,10 @@
 script = ExtResource("1")
 card_id = &"vengeful_spirit"
 display_name = "Vengeful Spirit"
-cost = 2
+cost = 1
+cost_red = 0
+cost_blue = 1
+cost_green = 0
 card_type = 0
 rarity = 0
 attack = 2

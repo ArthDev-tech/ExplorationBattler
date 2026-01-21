@@ -11,6 +11,7 @@ var is_player_lane: bool = true
 var _card_visual: Control = null
 var _is_drag_over: bool = false
 var _dragged_card: CardInstance = null
+var _is_avatar_attack_drag: bool = false
 
 @onready var _background: Panel = $Background
 @onready var _lane_label: Label = $LaneLabel
@@ -139,6 +140,7 @@ func _on_gui_input(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			if not event.is_echo():
 				_handle_targeting_click()
+				accept_event()
 				return
 	
 	# Only handle clicks if not during a drag operation
@@ -163,38 +165,51 @@ func _get_battle_manager() -> Node:
 	return null
 
 func _can_drop_data(_position: Vector2, data: Variant) -> bool:
+	# Reset state
+	_dragged_card = null
+	_is_avatar_attack_drag = false
+	_is_drag_over = false
+	
+	# Check for avatar attack data (Dictionary with type "avatar_attack")
+	if data is Dictionary:
+		var dict_data: Dictionary = data as Dictionary
+		if dict_data.get("type") == "avatar_attack" and dict_data.get("is_player") == true:
+			# Avatar attacks can only target enemy lanes with creatures
+			if not is_player_lane and current_card != null and current_card.is_alive():
+				_is_avatar_attack_drag = true
+				_is_drag_over = true
+				_update_drag_visual()
+				return true
+			_update_drag_visual()
+			return false
+	
 	# Check if data is a CardInstance - use proper type checking
 	if data == null or not data is CardInstance:
-		_dragged_card = null
-		_is_drag_over = false
 		_update_drag_visual()
 		return false
 	
 	var card: CardInstance = data as CardInstance
 	if not card or not card.data:
-		_dragged_card = null
-		_is_drag_over = false
 		_update_drag_visual()
 		return false
 	
 	var battle_manager = _get_battle_manager()
 	if not battle_manager:
-		_dragged_card = null
-		_is_drag_over = false
 		_update_drag_visual()
 		return false
 	
 	var battle_state = battle_manager.get("battle_state")
 	if not battle_state:
-		_dragged_card = null
-		_is_drag_over = false
 		_update_drag_visual()
 		return false
 	
-	# Check if player has enough energy
-	if battle_state.player_energy < card.data.cost:
-		_dragged_card = null
-		_is_drag_over = false
+	# Block plays until player picks start-of-turn energy color.
+	if battle_manager.get("_awaiting_energy_pick") == true:
+		_update_drag_visual()
+		return false
+	
+	# Check if player can afford this card (generic + colored pips).
+	if not battle_state.can_afford_player_cost(card.data):
 		_update_drag_visual()
 		return false
 	
@@ -227,10 +242,27 @@ func _can_drop_data(_position: Vector2, data: Variant) -> bool:
 	return can_drop
 
 func _drop_data(_position: Vector2, data: Variant) -> void:
+	var was_avatar_attack: bool = _is_avatar_attack_drag
+	
 	# Reset drag visual state
 	_dragged_card = null
 	_is_drag_over = false
+	_is_avatar_attack_drag = false
 	_update_drag_visual()
+	
+	var battle_manager = _get_battle_manager()
+	if not battle_manager:
+		return
+	
+	# Handle avatar attack drop
+	if was_avatar_attack and data is Dictionary:
+		var dict_data: Dictionary = data as Dictionary
+		if dict_data.get("type") == "avatar_attack" and dict_data.get("is_player") == true:
+			# Player avatar attacks creature in this lane
+			if not is_player_lane and current_card != null and current_card.is_alive():
+				if battle_manager.has_method("player_avatar_attack_creature"):
+					battle_manager.player_avatar_attack_creature(lane_index)
+			return
 	
 	# Verify data is CardInstance
 	if data == null or not data is CardInstance:
@@ -238,10 +270,6 @@ func _drop_data(_position: Vector2, data: Variant) -> void:
 	
 	var card: CardInstance = data as CardInstance
 	if not card:
-		return
-	
-	var battle_manager = _get_battle_manager()
-	if not battle_manager:
 		return
 	
 	# Handle creatures: play in lane
@@ -391,18 +419,26 @@ func _update_drag_visual() -> void:
 	if not style:
 		return
 	
-	if _is_drag_over and _dragged_card:
-		# Highlight valid drop target with green border
-		style.border_color = Color(0.2, 1.0, 0.4, 1.0)  # Green highlight
-		style.border_width_left = 4
-		style.border_width_top = 4
-		style.border_width_right = 4
-		style.border_width_bottom = 4
-	else:
-		# Reset to normal state
-		style.border_color = Color(0.5, 0.5, 0.5, 0.5)
-		style.border_width_left = 1
-		style.border_width_top = 1
+	if _is_drag_over:
+		if _is_avatar_attack_drag:
+			# Red border for avatar attack target
+			style.border_color = Color(1.0, 0.3, 0.3, 1.0)  # Red highlight
+			style.border_width_left = 4
+			style.border_width_top = 4
+			style.border_width_right = 4
+			style.border_width_bottom = 4
+		elif _dragged_card:
+			# Highlight valid drop target with green border
+			style.border_color = Color(0.2, 1.0, 0.4, 1.0)  # Green highlight
+			style.border_width_left = 4
+			style.border_width_top = 4
+			style.border_width_right = 4
+			style.border_width_bottom = 4
+		else:
+			# Reset to normal state
+			style.border_color = Color(0.5, 0.5, 0.5, 0.5)
+			style.border_width_left = 1
+			style.border_width_top = 1
 		style.border_width_right = 1
 		style.border_width_bottom = 1
 

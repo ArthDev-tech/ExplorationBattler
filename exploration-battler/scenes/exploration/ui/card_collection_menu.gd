@@ -41,18 +41,15 @@ func _init() -> void:
 	$MenuPanel/BottomBar/ManaFilters/Filter7Plus
 ]
 
-var _dragging_card: Dictionary = {}  # Track current drag operation
-
-# Quantity tracking - maps CardData resource path to count in starter deck
-var _collection_quantities: Dictionary = {}
+var _dragging_card: Dictionary = {}  # Track current drag operation (reserved)
 
 func _ready() -> void:
 	_menu_panel.visible = false
 	if _background_overlay:
 		_background_overlay.visible = false
+	_dragging_card.clear()
 	
 	_setup_collection()
-	_initialize_collection_quantities()
 	_setup_mana_filters()
 	_setup_search()
 	_setup_deck_name()
@@ -109,12 +106,26 @@ func _input(event: InputEvent) -> void:
 
 func close_menu() -> void:
 	_menu_panel.visible = false
-	# Keep overlay visible and game paused since we're returning to inventory
-	# Return to inventory menu
+	# IMPORTANT: Always hide our overlay when closing this menu.
+	# Inventory menu has its own overlay and will manage dimming.
+	if _background_overlay:
+		_background_overlay.visible = false
+	
+	# Return to inventory menu (keep game paused).
 	var inventory_menu: Node = get_tree().current_scene.get_node_or_null("UI/InventoryMenu")
 	if inventory_menu:
-		inventory_menu.get_node("MenuPanel").visible = true
-		# Ensure overlay stays visible (inventory menu manages it)
+		var inv_panel: CanvasItem = inventory_menu.get_node_or_null("MenuPanel")
+		if inv_panel:
+			inv_panel.visible = true
+		
+		# Ensure inventory overlay is visible while inventory is open.
+		var inv_overlay: CanvasItem = inventory_menu.get_node_or_null("BackgroundOverlay")
+		if inv_overlay:
+			inv_overlay.visible = true
+	else:
+		# Fallback: if inventory isn't present, ensure we don't leave the game stuck paused.
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		get_tree().paused = false
 
 func _setup_collection() -> void:
 	# Collection will be populated from GameManager.player_card_collection
@@ -228,42 +239,17 @@ func _apply_filters() -> void:
 	# Reset to first page when filters change
 	_current_page = 1
 
-func _initialize_collection_quantities() -> void:
-	# Initialize quantity tracking based on starter deck structure
-	# Load cards and map them to quantities
-	var card_paths: Dictionary = {
-		"res://resources/cards/starter/wandering_soul.tres": 3,
-		"res://resources/cards/starter/forest_whelp.tres": 2,
-		"res://resources/cards/starter/stone_sentry.tres": 2,
-		"res://resources/cards/starter/soul_strike.tres": 2,
-		"res://resources/cards/starter/vengeful_spirit.tres": 1,
-		"res://resources/cards/starter/thornback_wolf.tres": 1,
-		"res://resources/cards/starter/hollow_knight.tres": 1,
-		"res://resources/cards/starter/mend.tres": 1,
-		"res://resources/cards/starter/spectral_surge.tres": 1,
-		"res://resources/cards/starter/cracked_lantern.tres": 1
-	}
-	
-	# Map CardData objects to quantities
-	_collection_quantities.clear()
-	for path in card_paths:
-		var card: CardData = load(path) as CardData
-		if card:
-			_collection_quantities[card] = card_paths[path]
-
 func _get_collection_count(card_data: CardData) -> int:
-	# Get the quantity of this card in the collection (starter deck quantities)
+	# Get the quantity of this card in the persistent collection.
 	if not card_data:
 		return 0
+	if not GameManager:
+		return 0
 	
-	# Try direct lookup
-	if _collection_quantities.has(card_data):
-		return _collection_quantities[card_data]
-	
-	# Fallback: try to match by card_id
-	for card in _collection_quantities:
-		if card and card.card_id == card_data.card_id:
-			return _collection_quantities[card]
+	# Prefer the persistent quantity map in GameManager (by card_id).
+	var cid: StringName = card_data.card_id
+	if GameManager.player_card_quantities.has(cid):
+		return int(GameManager.player_card_quantities.get(cid, 0))
 	
 	return 0
 
@@ -277,8 +263,9 @@ func _get_deck_count(card_data: CardData) -> int:
 		return 0
 	
 	var count: int = 0
+	var target_id: StringName = card_data.card_id if card_data else &""
 	for card_instance in deck.cards:
-		if card_instance and card_instance.data == card_data:
+		if card_instance and card_instance.data and card_instance.data.card_id == target_id:
 			count += 1
 	
 	return count
@@ -335,7 +322,7 @@ func _refresh_collection_display() -> void:
 			_collection_grid.set_script(drop_zone_script)
 	
 	# Display cards for current page
-	var displayed_count: int = 0
+	var _displayed_count: int = 0
 	for i in range(start_index, end_index):
 		var card_data: CardData = _collection_cards[i]
 		if not card_data:
@@ -367,7 +354,7 @@ func _refresh_collection_display() -> void:
 		
 		# Add to scene tree
 		_collection_grid.add_child(card_wrapper)
-		displayed_count += 1
+		_displayed_count += 1
 	
 	_update_page_indicator()
 
@@ -401,7 +388,7 @@ func _on_next_page_pressed() -> void:
 		_current_page += 1
 		_refresh_collection_display()
 
-func _create_card_with_quantity(card_visual: Control, card_instance: CardInstance, collection_count: int, deck_count: int, available_count: int) -> Control:
+func _create_card_with_quantity(card_visual: Control, card_instance: CardInstance, _collection_count: int, _deck_count: int, available_count: int) -> Control:
 	# Create a wrapper Control that contains the card visual and quantity indicator
 	# Load draggable wrapper script
 	var wrapper_script: GDScript = load("res://scenes/exploration/ui/components/draggable_card_wrapper.gd")
@@ -513,8 +500,9 @@ func _remove_card_from_deck(card_data: CardData) -> bool:
 	
 	var deck: Deck = GameManager.player_deck as Deck
 	# Find first matching card instance
+	var target_id: StringName = card_data.card_id if card_data else &""
 	for card_instance in deck.cards:
-		if card_instance and card_instance.data == card_data:
+		if card_instance and card_instance.data and card_instance.data.card_id == target_id:
 			deck.remove_card(card_instance)
 			_refresh_collection_display()
 			_refresh_deck_display()
@@ -539,15 +527,18 @@ func _refresh_deck_display() -> void:
 			_deck_size_label.text = "0/30 Cards"
 		return
 	
-	# Count cards by CardData (group duplicates)
-	var deck_card_counts: Dictionary = {}  # {CardData: count}
+	# Count cards by card_id (group duplicates robustly)
+	var deck_card_counts: Dictionary = {}  # {StringName: count}
+	var deck_card_data_by_id: Dictionary = {}  # {StringName: CardData}
 	for card_instance in deck.cards:
 		if card_instance and card_instance.data:
 			var card_data: CardData = card_instance.data
-			if deck_card_counts.has(card_data):
-				deck_card_counts[card_data] += 1
+			var cid: StringName = card_data.card_id
+			if deck_card_counts.has(cid):
+				deck_card_counts[cid] += 1
 			else:
-				deck_card_counts[card_data] = 1
+				deck_card_counts[cid] = 1
+				deck_card_data_by_id[cid] = card_data
 	
 	# Load compact card visual scene
 	var compact_card_scene: PackedScene = load("res://scenes/exploration/ui/components/compact_card_visual.tscn")
@@ -557,8 +548,10 @@ func _refresh_deck_display() -> void:
 	
 	# Sort cards by mana cost
 	var sorted_cards: Array[CardData] = []
-	for card_data in deck_card_counts:
-		sorted_cards.append(card_data)
+	for cid in deck_card_counts:
+		var cd: CardData = deck_card_data_by_id.get(cid, null)
+		if cd:
+			sorted_cards.append(cd)
 	
 	# Sort by mana cost, then by name
 	sorted_cards.sort_custom(func(a: CardData, b: CardData) -> bool:
@@ -568,9 +561,9 @@ func _refresh_deck_display() -> void:
 	)
 	
 	# Display each unique card in deck with count
-	var displayed_count: int = 0
+	var _displayed_count: int = 0
 	for card_data in sorted_cards:
-		var count: int = deck_card_counts[card_data]
+		var count: int = int(deck_card_counts.get(card_data.card_id, 1))
 		var card_instance: CardInstance = CardInstance.new(card_data)
 		var compact_card: Control = compact_card_scene.instantiate()
 		
@@ -588,7 +581,7 @@ func _refresh_deck_display() -> void:
 		if compact_card.has_signal("card_removed"):
 			compact_card.card_removed.connect(_on_compact_card_removed)
 		
-		displayed_count += 1
+		_displayed_count += 1
 	
 	# Update deck size label
 	if _deck_size_label:
@@ -649,3 +642,8 @@ func _on_close_button_pressed() -> void:
 
 func _on_back_button_pressed() -> void:
 	close_menu()
+
+func _exit_tree() -> void:
+	# Safety: never leave the screen dimmed if this node exits unexpectedly.
+	if _background_overlay:
+		_background_overlay.visible = false

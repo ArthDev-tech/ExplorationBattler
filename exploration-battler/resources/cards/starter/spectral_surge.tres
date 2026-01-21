@@ -6,7 +6,10 @@
 script = ExtResource("1")
 card_id = &"spectral_surge"
 display_name = "Spectral Surge"
-cost = 2
+cost = 1
+cost_red = 0
+cost_blue = 1
+cost_green = 0
 card_type = 1
 rarity = 0
 attack = 0

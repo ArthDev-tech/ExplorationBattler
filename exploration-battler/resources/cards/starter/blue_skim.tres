@@ -1,0 +1,28 @@
+[gd_resource type="Resource" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+[ext_resource type="Script" path="res://resources/effects/draw_cards_effect.gd" id="2"]
+
+[sub_resource type="Resource" id="Resource_1"]
+script = ExtResource("2")
+count = 3
+
+[resource]
+script = ExtResource("1")
+card_id = &"blue_skim"
+display_name = "Skim"
+cost = 1
+cost_red = 0
+cost_blue = 1
+cost_green = 0
+card_type = 1
+rarity = 1
+attack = 0
+health = 0
+tribe = 0
+keywords = [&"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+on_play_effect = SubResource("Resource_1")
+description = "Draw 3 cards."
+is_token = false
+sacrifice_value = 0
+

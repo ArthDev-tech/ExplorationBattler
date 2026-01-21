@@ -7,18 +7,30 @@ extends Node
 const CardDataScript = preload("res://scripts/core/card_data.gd")
 const EnemyDataScript = preload("res://scripts/core/enemy_data.gd")
 const ItemDataScript = preload("res://scripts/core/item_data.gd")
+const PlayerDataScript = preload("res://scripts/core/player_data.gd")
 const PlayerStatsScript = preload("res://scripts/core/player_stats.gd")
 const InventoryScript = preload("res://scripts/core/inventory.gd")
 const DeckScript = preload("res://scripts/core/deck.gd")
 
+# Player data resource - loaded dynamically to ensure class is registered first
+var _player_data: Resource = null
+
 var current_scene: Node = null
 var player_deck: RefCounted = null
-var player_max_life: int = 20
 var current_zone: StringName = &""
+
+# Computed from _player_data for easy access
+var player_max_life: int:
+	get:
+		var value = _player_data.get("max_life") if _player_data else null
+		return value if value != null else 20
 
 var player_stats: PlayerStats = null
 var player_inventory: Inventory = null
 var player_card_collection: Array[CardData] = []
+## Persistent collection quantities keyed by `CardData.card_id`.
+## This drives deckbuilding availability (how many copies you own).
+var player_card_quantities: Dictionary = {}  # {StringName: int}
 var equipped_items: Dictionary = {}  # {ItemData.ItemType: ItemInstance}
 var player_currency: int = 0
 
@@ -26,8 +38,12 @@ func _ready() -> void:
 	current_scene = get_tree().current_scene
 	EventBus.scene_transition_requested.connect(_on_scene_transition_requested)
 	
+	# Load player data resource - must happen in _ready() to ensure class is registered
+	_player_data = load("res://resources/player/player_data.tres")
+	
 	# Initialize player systems
 	player_stats = PlayerStats.new()
+	player_stats.initialize(_player_data)
 	player_inventory = Inventory.new()
 	equipped_items = {
 		ItemData.ItemType.WEAPON: null,
@@ -38,6 +54,7 @@ func _ready() -> void:
 	# Initialize starter deck and card collection
 	_initialize_starter_deck()
 	_initialize_card_collection()
+	_rebuild_collection_quantities_from_deck()
 
 func _on_scene_transition_requested(scene_path: String) -> void:
 	transition_to_scene(scene_path)
@@ -68,81 +85,88 @@ func add_currency(amount: int) -> void:
 	player_currency = maxi(0, player_currency + amount)
 	EventBus.currency_changed.emit(player_currency)
 
+func add_card_to_collection(card: CardData, amount: int = 1) -> void:
+	var add_amount: int = maxi(0, amount)
+	if add_amount <= 0:
+		return
+	if not card:
+		return
+	
+	# Ensure the card is in the visible collection list.
+	var cid: StringName = card.card_id
+	var has_card: bool = false
+	for existing in player_card_collection:
+		if existing and existing.card_id == cid:
+			has_card = true
+			break
+	if not has_card:
+		player_card_collection.append(card)
+	
+	# Increase owned quantity.
+	var current: int = int(player_card_quantities.get(cid, 0))
+	player_card_quantities[cid] = current + add_amount
+
+func _rebuild_collection_quantities_from_deck() -> void:
+	player_card_quantities.clear()
+	var deck: Deck = player_deck as Deck
+	if deck:
+		for inst in deck.cards:
+			if inst and inst.data:
+				var cid: StringName = inst.data.card_id
+				player_card_quantities[cid] = int(player_card_quantities.get(cid, 0)) + 1
+	
+	# Ensure every unlocked collection card has at least 1 quantity entry (even if not in deck).
+	for cd in player_card_collection:
+		if not cd:
+			continue
+		if not player_card_quantities.has(cd.card_id):
+			player_card_quantities[cd.card_id] = 1
+
 func initialize_player_deck(deck: RefCounted) -> void:
 	player_deck = deck
 
 func _initialize_starter_deck() -> void:
-	# Create starter deck with the same structure as battle_manager.gd
+	# Create starter deck with one of each starter card
+	var starter_card_paths: Array[String] = [
+		# Original starter cards
+		"res://resources/cards/starter/wandering_soul.tres",
+		"res://resources/cards/starter/forest_whelp.tres",
+		"res://resources/cards/starter/stone_sentry.tres",
+		"res://resources/cards/starter/soul_strike.tres",
+		"res://resources/cards/starter/vengeful_spirit.tres",
+		"res://resources/cards/starter/thornback_wolf.tres",
+		"res://resources/cards/starter/hollow_knight.tres",
+		"res://resources/cards/starter/mend.tres",
+		"res://resources/cards/starter/spectral_surge.tres",
+		"res://resources/cards/starter/cracked_lantern.tres",
+		# Green energy cards
+		"res://resources/cards/starter/green_breath.tres",
+		"res://resources/cards/starter/green_bloom_guardian.tres",
+		"res://resources/cards/starter/green_restore.tres",
+		"res://resources/cards/starter/green_rejuvenate.tres",
+		# Blue energy cards
+		"res://resources/cards/starter/blue_ponder.tres",
+		"res://resources/cards/starter/blue_study.tres",
+		"res://resources/cards/starter/blue_skim.tres",
+		"res://resources/cards/starter/blue_insight.tres",
+		# Red energy cards
+		"res://resources/cards/starter/red_uppercut.tres",
+		"res://resources/cards/starter/red_rampage.tres",
+		"res://resources/cards/starter/red_bash.tres",
+		"res://resources/cards/starter/red_strike.tres",
+		# Grey energy cards
+		"res://resources/cards/starter/grey_scout.tres",
+		"res://resources/cards/starter/grey_shieldbearer.tres",
+		"res://resources/cards/starter/grey_strike.tres"
+	]
+	
 	var starter_cards: Array[CardData] = []
-	
-	# Load card resources
-	var wandering_soul: CardData = load("res://resources/cards/starter/wandering_soul.tres") as CardData
-	if not wandering_soul:
-		push_error("Failed to load wandering_soul card")
-	
-	var forest_whelp: CardData = load("res://resources/cards/starter/forest_whelp.tres") as CardData
-	if not forest_whelp:
-		push_error("Failed to load forest_whelp card")
-	
-	var stone_sentry: CardData = load("res://resources/cards/starter/stone_sentry.tres") as CardData
-	if not stone_sentry:
-		push_error("Failed to load stone_sentry card")
-	
-	var soul_strike: CardData = load("res://resources/cards/starter/soul_strike.tres") as CardData
-	if not soul_strike:
-		push_error("Failed to load soul_strike card")
-	
-	# Add cards with proper quantities
-	if wandering_soul:
-		for i in range(3):
-			starter_cards.append(wandering_soul)
-	if forest_whelp:
-		for i in range(2):
-			starter_cards.append(forest_whelp)
-	if stone_sentry:
-		for i in range(2):
-			starter_cards.append(stone_sentry)
-	
-	# Add single copies
-	var vengeful_spirit: CardData = load("res://resources/cards/starter/vengeful_spirit.tres") as CardData
-	if vengeful_spirit:
-		starter_cards.append(vengeful_spirit)
-	else:
-		push_error("Failed to load vengeful_spirit card")
-	
-	var thornback_wolf: CardData = load("res://resources/cards/starter/thornback_wolf.tres") as CardData
-	if thornback_wolf:
-		starter_cards.append(thornback_wolf)
-	else:
-		push_error("Failed to load thornback_wolf card")
-	
-	var hollow_knight: CardData = load("res://resources/cards/starter/hollow_knight.tres") as CardData
-	if hollow_knight:
-		starter_cards.append(hollow_knight)
-	else:
-		push_error("Failed to load hollow_knight card")
-	
-	if soul_strike:
-		for i in range(2):
-			starter_cards.append(soul_strike)
-	
-	var mend: CardData = load("res://resources/cards/starter/mend.tres") as CardData
-	if mend:
-		starter_cards.append(mend)
-	else:
-		push_error("Failed to load mend card")
-	
-	var spectral_surge: CardData = load("res://resources/cards/starter/spectral_surge.tres") as CardData
-	if spectral_surge:
-		starter_cards.append(spectral_surge)
-	else:
-		push_error("Failed to load spectral_surge card")
-	
-	var cracked_lantern: CardData = load("res://resources/cards/starter/cracked_lantern.tres") as CardData
-	if cracked_lantern:
-		starter_cards.append(cracked_lantern)
-	else:
-		push_error("Failed to load cracked_lantern card")
+	for card_path in starter_card_paths:
+		var card: CardData = load(card_path) as CardData
+		if card:
+			starter_cards.append(card)
+		else:
+			push_error("Failed to load card from path: " + card_path)
 	
 	# Create deck
 	if not starter_cards.is_empty():
@@ -153,6 +177,7 @@ func _initialize_starter_deck() -> void:
 func _initialize_card_collection() -> void:
 	# Add starter cards to collection (one of each unique card)
 	var starter_cards: Array[String] = [
+		# Original starter cards
 		"res://resources/cards/starter/wandering_soul.tres",
 		"res://resources/cards/starter/forest_whelp.tres",
 		"res://resources/cards/starter/stone_sentry.tres",
@@ -162,7 +187,26 @@ func _initialize_card_collection() -> void:
 		"res://resources/cards/starter/hollow_knight.tres",
 		"res://resources/cards/starter/mend.tres",
 		"res://resources/cards/starter/spectral_surge.tres",
-		"res://resources/cards/starter/cracked_lantern.tres"
+		"res://resources/cards/starter/cracked_lantern.tres",
+		# Green energy cards
+		"res://resources/cards/starter/green_breath.tres",
+		"res://resources/cards/starter/green_bloom_guardian.tres",
+		"res://resources/cards/starter/green_restore.tres",
+		"res://resources/cards/starter/green_rejuvenate.tres",
+		# Blue energy cards
+		"res://resources/cards/starter/blue_ponder.tres",
+		"res://resources/cards/starter/blue_study.tres",
+		"res://resources/cards/starter/blue_skim.tres",
+		"res://resources/cards/starter/blue_insight.tres",
+		# Red energy cards
+		"res://resources/cards/starter/red_uppercut.tres",
+		"res://resources/cards/starter/red_rampage.tres",
+		"res://resources/cards/starter/red_bash.tres",
+		"res://resources/cards/starter/red_strike.tres",
+		# Grey energy cards
+		"res://resources/cards/starter/grey_scout.tres",
+		"res://resources/cards/starter/grey_shieldbearer.tres",
+		"res://resources/cards/starter/grey_strike.tres"
 	]
 	
 	player_card_collection.clear()
