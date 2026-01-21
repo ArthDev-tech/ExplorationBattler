@@ -1,13 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3 uid="uid://djkbdle8ag1vj"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3 uid="uid://djkbdle8ag1vj"]
 
 [ext_resource type="Script" uid="uid://bd4nkr6yq183v" path="res://scripts/core/enemy_data.gd" id="1"]
-[ext_resource type="Resource" path="res://resources/cards/starter/wandering_soul.tres" id="2"]
-[ext_resource type="Resource" path="res://resources/cards/starter/forest_whelp.tres" id="3"]
-[ext_resource type="Resource" path="res://resources/cards/common/rusty_automaton.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
 enemy_id = &"lost_wanderer"
 display_name = "Lost Wanderer"
 max_life = 25
-deck_list = Array[Resource]([ExtResource("2"), ExtResource("2"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4")])
+deck_json_path = "res://resources/enemies/decks/lost_wanderer.json"

@@ -5,6 +5,4 @@
 [resource]
 resource_name = "model"
 vertex_color_use_as_albedo = true
-albedo_color = Color(0, 0, 0, 1)
-emission_enabled = true
-emission_texture = ExtResource("1_xrmnl")
+albedo_texture = ExtResource("1_xrmnl")

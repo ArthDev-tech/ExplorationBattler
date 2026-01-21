@@ -1,18 +1,21 @@
-[gd_scene load_steps=28 format=3 uid="uid://bbckhx202xkna"]
+[gd_scene load_steps=33 format=3 uid="uid://bbckhx202xkna"]
 
-[ext_resource type="PackedScene" path="res://scenes/exploration/player/player_controller.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b15kp0tx43v6a" path="res://scenes/exploration/enemies/enemy_patrol.tscn" id="2"]
 [ext_resource type="Script" uid="uid://8k4110w7gjp4" path="res://scenes/exploration/enemies/levels/test_room.gd" id="3"]
-[ext_resource type="Material" uid="uid://b648sdbegosnh" path="res://materials/materials/rotating_pattern_material.tres" id="3_exiqo"]
 [ext_resource type="Script" uid="uid://cgmy3vwljghat" path="res://scripts/components/mesh_collision_sync.gd" id="4"]
-[ext_resource type="PackedScene" uid="uid://b6o56b8r2cfy7" path="res://scenes/exploration/props/BasicArmor.tscn" id="6_dj340"]
+[ext_resource type="Material" uid="uid://cbukb51f6xa5" path="res://materials/materials/pulsing_glow_material.tres" id="5_38e7r"]
+[ext_resource type="PackedScene" uid="uid://b6o56b8r2cfy7" path="res://Imports/props/BasicArmor.tscn" id="6_dj340"]
+[ext_resource type="Script" uid="uid://bo7o5rjaeniov" path="res://Imports/props/Item.gd" id="6_o6cdt"]
+[ext_resource type="Material" uid="uid://b8yu6xaa8r3u" path="res://materials/materials/glass_refraction_material.tres" id="7_g4wn3"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/environment/static_hdri_environment.tscn" id="7_j65ic"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="8"]
-[ext_resource type="PackedScene" uid="uid://btwockurhrmtj" path="res://scenes/exploration/props/currency_pickup.tscn" id="9"]
-[ext_resource type="PackedScene" uid="uid://dolxiqf3te0co" path="res://scenes/exploration/props/Hammer.tscn" id="9_mh5es"]
+[ext_resource type="PackedScene" uid="uid://btwockurhrmtj" path="res://Imports/props/currency_pickup.tscn" id="9"]
+[ext_resource type="PackedScene" uid="uid://dolxiqf3te0co" path="res://Imports/props/Hammer.tscn" id="9_mh5es"]
+[ext_resource type="Script" uid="uid://bkg8npc403ars" path="res://scripts/components/background_music.gd" id="10_bgmusic"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_1"]
-size = Vector2(100, 100)
+[sub_resource type="BoxMesh" id="BoxMesh_301dv"]
+size = Vector3(100.57, 1, 100.2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.7, 0.7, 0.7, 1)
@@ -38,14 +41,12 @@ size = Vector3(0.3, 4, 100)
 [sub_resource type="BoxShape3D" id="BoxShape3D_4"]
 size = Vector3(150, 1, 150)
 
-[sub_resource type="BoxMesh" id="BoxMesh_3"]
-size = Vector3(6, 0.3, 3)
+[sub_resource type="BoxMesh" id="BoxMesh_o6cdt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
 albedo_color = Color(0.4, 0.6, 0.3, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5"]
-size = Vector3(6, 0.3, 3)
+[sub_resource type="BoxShape3D" id="BoxShape3D_g4wn3"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_4"]
 size = Vector3(4, 0.5, 4)
@@ -59,6 +60,15 @@ size = Vector3(4, 0.5, 4)
 [sub_resource type="BoxMesh" id="BoxMesh_j65ic"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_exiqo"]
+size = Vector3(20, 1, 30)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_o6cdt"]
+material = ExtResource("7_g4wn3")
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_g4wn3"]
+custom_solver_bias = 1.0
+height = 1.019043
+radius = 12.608398
 
 [node name="TestRoom" type="Node3D"]
 script = ExtResource("3")
@@ -69,26 +79,26 @@ script = ExtResource("3")
 script = ExtResource("4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Floor"]
-mesh = SubResource("PlaneMesh_1")
+mesh = SubResource("BoxMesh_301dv")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Floor"]
 shape = SubResource("BoxShape3D_1")
 
 [node name="CurrencyPickup" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.432789, 0.64999926, -24.535063)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.432789, 1.5021702, -24.535063)
 
 [node name="CurrencyPickup2" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.841547, 0.64999926, -13.849327)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.841547, 1.5021702, -13.849327)
 
 [node name="CurrencyPickup3" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.60102, 8.19337, -0.89322853)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.60102, 9.045541, -0.89322853)
 
 [node name="CurrencyPickup4" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.458963, 7.873533, -19.150976)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.458963, 8.725704, -19.150976)
 
 [node name="CurrencyPickup5" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.754786, 7.873533, -4.830291)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.754786, 8.725704, -4.830291)
 
 [node name="WallNorth" type="StaticBody3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -50)
@@ -112,17 +122,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_2")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WallSouth"]
 shape = SubResource("BoxShape3D_2")
 
-[node name="WallEast" type="StaticBody3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 2, 0)
-script = ExtResource("4")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/WallEast"]
-mesh = SubResource("BoxMesh_2")
-surface_material_override/0 = SubResource("StandardMaterial3D_2")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WallEast"]
-shape = SubResource("BoxShape3D_3")
-
 [node name="WallWest" type="StaticBody3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 2, 0)
 script = ExtResource("4")
@@ -139,35 +138,35 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
 monitorable = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/KillZone"]
+transform = Transform3D(11.126199, 0, 0, 0, 1, 0, 0, 0, 9.713882, 0, -32.587715, 0)
 shape = SubResource("BoxShape3D_4")
 
 [node name="Lighting" type="DirectionalLight3D" parent="Environment"]
-transform = Transform3D(-0.91232723, -0.4094598, 0.0013834164, 0.40479723, -0.90141964, 0.1535647, -0.06163152, 0.14066127, 0.9881379, -10.583021, 10, 0)
-light_color = Color(0.81974185, 0.56419015, 0.6618662, 1)
-light_energy = 0.467
+transform = Transform3D(-0.9123271, -0.40945977, 0.0013834282, 0.40479717, -0.9014195, 0.1535647, -0.061631512, 0.14066125, 0.98813766, 0, 27.70203, 0)
+light_color = Color(0.6241424, 0.3624398, 0.38844866, 1)
+light_energy = 0.272
+light_indirect_energy = 1.325
+light_volumetric_fog_energy = 1.185
 shadow_enabled = true
 
 [node name="JumpPuzzle" type="Node3D" parent="Environment"]
 
 [node name="Ramp" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 0.9063078, 0.4226183, 0, -0.4226183, 0.9063078, 35, 1.5, -33)
-script = ExtResource("4")
+transform = Transform3D(30.78, 0, 0, 0, 0.557492, -4.564249, 0, 0.2475938, 10.277044, 34.20636, 1.934258, -31.631454)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Ramp"]
-transform = Transform3D(3.1, 0, 0, 0, 2.0626929, -2.7856226, 0, 1.863786, 3.0829098, -0.47956085, -1.4926004, 1.8121929)
-mesh = SubResource("BoxMesh_3")
+mesh = SubResource("BoxMesh_o6cdt")
 surface_material_override/0 = SubResource("StandardMaterial3D_3")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/Ramp"]
-transform = Transform3D(3.1, 0, 0, 0, 2.0626929, -2.7856226, 0, 1.863786, 3.0829098, -0.47956085, -1.4926004, 1.8121929)
-shape = SubResource("BoxShape3D_5")
+shape = SubResource("BoxShape3D_g4wn3")
 
 [node name="Platform1" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 3, -38)
-script = ExtResource("4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.84101, 5.449301, -40.1067)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.141453, 1.7675276, -1.5864563)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
@@ -175,11 +174,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="Platform2" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 5, -40)
-script = ExtResource("4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.73648, 8.130522, -41.134422)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.21611, 0, 0)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
@@ -187,11 +185,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="Platform3" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 7, -42)
-script = ExtResource("4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.89191, 6.5346622, -40.546623)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9515076, 0, 3.3887596)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
@@ -199,11 +196,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="Platform4" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 9, -44)
-script = ExtResource("4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.616516, 9.924585, -47.431236)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3170815, 0, -0.3984375)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
@@ -211,11 +207,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="Platform5" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 11, -46)
-script = ExtResource("4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.657763, 12.14972, -43.98569)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.854374, 0, -7.022232)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
@@ -223,33 +218,77 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="Platform6" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 13, -48)
-script = ExtResource("4")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.82613, 13, -36.845387)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1035576, 0, 0.31884003)
 mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/Platform6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.011741638, 0, 0.071964264)
 shape = SubResource("BoxShape3D_6")
 
 [node name="LargeFloatingPlatform" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.156574, 6.773533, -13.377699)
+metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/LargeFloatingPlatform"]
-transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 30, 0.01225853, -0.046279907, 0.0048561096)
-material_override = ExtResource("3_exiqo")
+transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 30, 0, 0, 0)
 transparency = 0.32
 mesh = SubResource("BoxMesh_j65ic")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/LargeFloatingPlatform"]
-transform = Transform3D(20, 0, 0, 0, 1, 0, 0, 0, 30, 0, 0, 0)
 shape = SubResource("BoxShape3D_exiqo")
+
+[node name="FloatingCirclePlatform" type="StaticBody3D" parent="Environment/JumpPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.013961, 10.490828, 0)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform"]
+transform = Transform3D(25, 0, 0, 0, 0.5, 0, 0, 0, 25, 0, 0, 0)
+material_override = ExtResource("5_38e7r")
+mesh = SubResource("CylinderMesh_o6cdt")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.014892578, 0)
+shape = SubResource("CylinderShape3D_g4wn3")
+
+[node name="FloatingCirclePlatform2" type="StaticBody3D" parent="Environment/JumpPuzzle"]
+transform = Transform3D(0.9628474, 0.27004594, 0, -0.27004594, 0.9628474, 0, 0, 0, 1, -11.6796665, 12.023125, -28.094618)
+script = ExtResource("6_o6cdt")
+override_settings = true
+spin_speed_rad = 0.615
+bob_height = 0.015
+bob_speed = 0.93
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform2"]
+transform = Transform3D(25, 0, 0, 0, 0.5, 0, 0, 0, 25, 0, 0, 0)
+material_override = ExtResource("7_g4wn3")
+mesh = SubResource("CylinderMesh_o6cdt")
+surface_material_override/0 = ExtResource("7_g4wn3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.014892578, 0)
+shape = SubResource("CylinderShape3D_g4wn3")
+
+[node name="Platform7" type="StaticBody3D" parent="Environment/JumpPuzzle"]
+transform = Transform3D(17.148272, 0, 0, 0, 1, 0, 0, 0, 50.453102, 50.312695, -19.781973, -4.9234123)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform7"]
+material_override = ExtResource("7_g4wn3")
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("StandardMaterial3D_4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/Platform7"]
+shape = SubResource("BoxShape3D_6")
 
 [node name="BasicArmor" parent="Environment" instance=ExtResource("6_dj340")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.603115, 7.688385, -6.9643316)
+
+[node name="Hammer" parent="Environment" instance=ExtResource("9_mh5es")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.681732, 0.81348085, 18.224592)
 
 [node name="PlayerSpawn" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.618599, 1, -25.963375)
@@ -270,7 +309,7 @@ patrol_points = Array[Vector3]([Vector3(-20, 1, -20), Vector3(20, 1, -20), Vecto
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.902466, 0.05001831, 2.8898773)
 
 [node name="Collectible" parent="." instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.862595, 1.4659052, 3.911745)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.862595, 2.3210135, 3.911745)
 
 [node name="EnemyPatrol2" parent="." instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.257658, 1, 26.587162)
@@ -284,5 +323,7 @@ patrol_points = Array[Vector3]([Vector3(-20, 1, -20), Vector3(20, 1, -20), Vecto
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.887733, 1.0000076, -13.007233)
 patrol_points = Array[Vector3]([Vector3(-20, 1, -20), Vector3(20, 1, -20), Vector3(20, 1, 20), Vector3(-20, 1, 20)])
 
-[node name="Hammer" parent="." instance=ExtResource("9_mh5es")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.681732, 0.049995422, 18.224592)
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+volume_db = -29.299
+pitch_scale = 0.85
+script = ExtResource("10_bgmusic")

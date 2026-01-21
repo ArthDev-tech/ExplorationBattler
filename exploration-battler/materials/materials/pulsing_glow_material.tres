@@ -1,10 +1,11 @@
-[gd_resource type="ShaderMaterial" format=3]
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cbukb51f6xa5"]
 
-[ext_resource type="Shader" path="res://materials/shaders/pulsing_glow.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://bbfr3vubd4a3a" path="res://materials/shaders/pulsing_glow.gdshader" id="1"]
 
 [resource]
+render_priority = 0
 shader = ExtResource("1")
-shader/base_color = Vector4(0.5, 0.5, 1, 1)
-shader/glow_color = Vector4(0, 0.8, 1, 1)
-shader/pulse_speed = 1.0
-shader/glow_intensity = 1.0
+shader_parameter/base_color = Color(0.16685647, 0.31929076, 1, 1)
+shader_parameter/glow_color = Color(2.117753e-06, 0.9710888, 0.911359, 1)
+shader_parameter/pulse_speed = 1.3050000587276198
+shader_parameter/glow_intensity = 1.10000005225

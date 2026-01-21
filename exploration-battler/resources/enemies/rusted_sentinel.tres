@@ -11,6 +11,7 @@ base_attack = 3
 difficulty_stars = 2
 ai_behavior_type = 2
 deck_list = []
+deck_json_path = "res://resources/enemies/decks/rusted_sentinel.json"
 special_rules = ["Constructs have +1 HP"]
 gold_reward = 25
 guaranteed_cards = []

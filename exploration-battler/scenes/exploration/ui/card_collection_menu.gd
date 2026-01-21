@@ -413,6 +413,8 @@ func _create_card_with_quantity(card_visual: Control, card_instance: CardInstanc
 	# Set card data
 	if card_visual.has_method("set_card"):
 		card_visual.call_deferred("set_card", card_instance)
+	# Force mouse_filter to IGNORE after _ready() has run (card_visual._ready sets MOUSE_FILTER_STOP)
+	card_visual.set_deferred("mouse_filter", Control.MOUSE_FILTER_IGNORE)
 	
 	# Store card data in wrapper for drag operations
 	if wrapper.get_script():

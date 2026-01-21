@@ -112,7 +112,7 @@ func _on_mouse_exited() -> void:
 			style.shadow_size = 2
 			style.shadow_color = Color(0, 0, 0, 0.2)
 
-func _get_drag_data(position: Vector2) -> Variant:
+func _get_drag_data(_position: Vector2) -> Variant:
 	# Allow dragging deck cards back to collection
 	if not card_instance or not card_instance.data:
 		return null
@@ -129,6 +129,19 @@ func _get_drag_data(position: Vector2) -> Variant:
 		"card_instance": card_instance,
 		"source": "deck"
 	}
+
+func _can_drop_data(_position: Vector2, data: Variant) -> bool:
+	# Forward drop check to parent DeckList drop zone
+	var parent_zone: Node = get_parent()
+	if parent_zone and parent_zone.has_method("_can_drop_data"):
+		return parent_zone._can_drop_data(_position, data)
+	return false
+
+func _drop_data(_position: Vector2, data: Variant) -> void:
+	# Forward drop to parent DeckList drop zone
+	var parent_zone: Node = get_parent()
+	if parent_zone and parent_zone.has_method("_drop_data"):
+		parent_zone._drop_data(_position, data)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
