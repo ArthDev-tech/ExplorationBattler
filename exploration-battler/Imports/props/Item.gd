@@ -1,0 +1,41 @@
+extends Node3D
+
+const ItemFloatSettingsScript = preload("res://scripts/core/item_float_settings.gd")
+
+@export var settings: Resource = preload("res://resources/props/item_float_settings_default.tres")
+
+## If true, use this node's override values instead of `settings` (per-instance tuning without duplicating a .tres).
+@export var override_settings: bool = false
+@export var spin_speed_rad: float = 2.0
+@export var bob_height: float = 0.15
+@export var bob_speed: float = 2.0
+
+var _start_y: float = 0.0
+var _time: float = 0.0
+
+func _ready() -> void:
+	# Cache the placed local height so bobbing is relative to where the item was positioned in the scene.
+	_start_y = position.y
+
+func _process(delta: float) -> void:
+	var spin: float = spin_speed_rad
+	var bob_h: float = bob_height
+	var bob_s: float = bob_speed
+	if not override_settings and settings:
+		var maybe_spin: Variant = settings.get("spin_speed_rad")
+		if maybe_spin != null:
+			spin = float(maybe_spin)
+		var maybe_bob_h: Variant = settings.get("bob_height")
+		if maybe_bob_h != null:
+			bob_h = float(maybe_bob_h)
+		var maybe_bob_s: Variant = settings.get("bob_speed")
+		if maybe_bob_s != null:
+			bob_s = float(maybe_bob_s)
+	
+	rotate_y(spin * delta)
+	
+	if bob_h > 0.0 and bob_s > 0.0:
+		_time += delta
+		var pos: Vector3 = position
+		pos.y = _start_y + sin(_time * bob_s) * bob_h
+		position = pos

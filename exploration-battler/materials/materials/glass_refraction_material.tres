@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b8yu6xaa8r3u"]
+
+[ext_resource type="Shader" uid="uid://bevw32nw7dnoa" path="res://materials/shaders/glass_refraction.gdshader" id="1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/tint_color = Color(0.65, 0.85, 1, 1)
+shader_parameter/opacity = 0.282000013395
+shader_parameter/refraction_strength = 0.0390000018525
+shader_parameter/fresnel_power = 3.96500018507762
+shader_parameter/fresnel_strength = 0.8
+shader_parameter/roughness = 0.05
+shader_parameter/specular = 0.6

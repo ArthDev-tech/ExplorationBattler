@@ -36,6 +36,7 @@ var _awaiting_energy_pick: bool = false
 @onready var _enemy_lanes: Array[Node] = []
 @onready var _player_avatar_slot: Control = null
 @onready var _enemy_avatar_slot: Control = null
+@onready var _card_registry: Node = get_node_or_null("/root/CardRegistry")
 
 func _ready() -> void:
 	# Ensure battle processes even when world is paused
@@ -70,6 +71,55 @@ func _auto_start_battle() -> void:
 	var enemy = load("res://resources/enemies/lost_wanderer.tres")
 	if enemy:
 		_on_battle_started(enemy)
+
+func _load_enemy_deck_from_json(enemy: EnemyData) -> Array[CardData]:
+	var result: Array[CardData] = []
+	if not enemy:
+		return result
+	if enemy.deck_json_path.is_empty():
+		return result
+	if not _card_registry or not _card_registry.has_method("get_card"):
+		push_warning("BattleManager: CardRegistry autoload missing; cannot load enemy deck json: " + enemy.deck_json_path)
+		return result
+	
+	var file: FileAccess = FileAccess.open(enemy.deck_json_path, FileAccess.READ)
+	if not file:
+		push_warning("BattleManager: could not open enemy deck json: " + enemy.deck_json_path)
+		return result
+	
+	var text: String = file.get_as_text()
+	file.close()
+	
+	var parsed: Variant = JSON.parse_string(text)
+	if parsed == null or typeof(parsed) != TYPE_DICTIONARY:
+		push_warning("BattleManager: invalid enemy deck json (expected Dictionary): " + enemy.deck_json_path)
+		return result
+	
+	var counts: Dictionary = parsed as Dictionary
+	for key in counts.keys():
+		var cid_str: String = String(key)
+		var cid: StringName = StringName(cid_str)
+		var count_raw: Variant = counts.get(key, 0)
+		var count: int = 0
+		if typeof(count_raw) == TYPE_INT:
+			count = int(count_raw)
+		elif typeof(count_raw) == TYPE_FLOAT:
+			count = int(count_raw)
+		elif typeof(count_raw) == TYPE_STRING:
+			count = int(String(count_raw).to_int())
+		
+		if count <= 0:
+			continue
+		
+		var cd: CardData = _card_registry.call("get_card", cid) as CardData
+		if not cd:
+			push_warning("BattleManager: enemy deck json references unknown card_id '" + cid_str + "' (" + enemy.deck_json_path + ")")
+			continue
+		
+		for i in range(count):
+			result.append(cd)
+	
+	return result
 
 func _setup_lanes() -> void:
 	_player_lanes.clear()
@@ -232,11 +282,12 @@ func start_battle() -> void:
 		# Also set the persistent deck list for deck builder usage.
 		GameManager.player_deck = Deck.new(starter_cards)
 	
-	# Create enemy deck
-	var enemy_card_list: Array[CardData] = []
-	for resource in enemy_data.deck_list:
-		if resource is CardData:
-			enemy_card_list.append(resource as CardData)
+	# Create enemy deck (prefer JSON if configured; fallback to embedded deck_list)
+	var enemy_card_list: Array[CardData] = _load_enemy_deck_from_json(enemy_data)
+	if enemy_card_list.is_empty():
+		for resource in enemy_data.deck_list:
+			if resource is CardData:
+				enemy_card_list.append(resource as CardData)
 	enemy_deck = Deck.new(enemy_card_list)
 	
 	# Create AI

@@ -1,10 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://player_controller"]
+[gd_scene load_steps=5 format=3 uid="uid://c4lyr4r6pv8lu"]
 
-[ext_resource type="Script" path="res://scenes/exploration/player/player_controller.gd" id="1"]
+[ext_resource type="Script" uid="uid://b3ypjd3e46puq" path="res://scenes/exploration/player/player_controller.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://c14o0nkmpx4am" path="res://Imports/props/Lanturn.tscn" id="2_dxhon"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
-radius = 0.5
-height = 2.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_dxhon"]
 
 [node name="PlayerController" type="CharacterBody3D"]
 script = ExtResource("1")
@@ -13,7 +14,9 @@ script = ExtResource("1")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
-fov = 75.0
+
+[node name="Lanturn" parent="Head" instance=ExtResource("2_dxhon")]
+transform = Transform3D(0.47273678, 0, 0.08318611, 0, 0.48, 0, -0.08318611, 0, 0.47273678, -0.8551141, -0.7503499, -0.96904004)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -21,12 +24,11 @@ shape = SubResource("CapsuleShape3D_1")
 
 [node name="LedgeDetector" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
-enabled = true
-collision_mask = 1
 target_position = Vector3(0, 0, -1.5)
 
 [node name="SpaceCheck" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-enabled = true
-collision_mask = 1
 target_position = Vector3(0, 2, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9927063, 0)
+mesh = SubResource("CapsuleMesh_dxhon")

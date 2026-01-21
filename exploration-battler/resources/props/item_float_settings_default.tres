@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemFloatSettings" load_steps=2 format=3 uid="uid://item_float_settings_default"]
+
+[ext_resource type="Script" path="res://scripts/core/item_float_settings.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+spin_speed_rad = 2.0
+bob_height = 0.15
+bob_speed = 2.0
+

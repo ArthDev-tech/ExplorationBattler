@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://c14o0nkmpx4am"]
+
+[ext_resource type="ArrayMesh" uid="uid://5ww46nld5xej" path="res://Imports/BasicLanturn.res" id="1_1nxi8"]
+[ext_resource type="Script" uid="uid://csmu71f327ucy" path="res://scripts/components/lantern_sway.gd" id="2_lantern_sway"]
+[ext_resource type="Texture2D" uid="uid://cnc6cerf4mnvt" path="res://Imports/BasicLanturn_0.png" id="3_lanturn_tex"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lanturn"]
+albedo_color = Color(1, 1, 1, 1)
+albedo_texture = ExtResource("3_lanturn_tex")
+emission_enabled = false
+
+[node name="Lanturn" type="Node3D"]
+script = ExtResource("2_lantern_sway")
+
+[node name="BasicLanturn" type="MeshInstance3D" parent="."]
+transform = Transform3D(120, 0, 0, 0, -5.2453665e-06, 120, 0, -120, -5.2453665e-06, 0, 0, 0)
+mesh = ExtResource("1_1nxi8")
+surface_material_override/0 = SubResource("StandardMaterial3D_lanturn")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77673507, 0.6360887, 0)
+light_color = Color(0.6, 0.59607846, 0.34509805, 1)
+light_energy = 0.54
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75365984, 0.6360887, 0)
+light_color = Color(0.6, 0.59607846, 0.34509805, 1)
+light_energy = 0.54
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07004267, 0.6360887, -0.68051684)
+light_color = Color(0.6, 0.59607846, 0.34509805, 1)
+light_energy = 0.54
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07004267, 0.6360887, 0.6574917)
+light_color = Color(0.6007966, 0.59482884, 0.34320357, 1)
+light_energy = 0.54

@@ -24,6 +24,10 @@ enum AIBehaviorType {
 # Deck definition - array of CardData resources
 @export var deck_list: Array[Resource] = []
 
+# Optional deck definition (editable outside Godot): JSON counts map { "card_id": count }.
+# If set, battle startup will build the enemy deck from this file and fall back to `deck_list` on error/empty.
+@export_file("*.json") var deck_json_path: String = ""
+
 # Special rules
 @export var special_rules: Array[String] = []
 

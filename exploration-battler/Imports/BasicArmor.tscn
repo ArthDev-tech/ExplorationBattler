@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmmrdko8dwcpl"]
+
+[ext_resource type="PackedScene" uid="uid://ctfw7u2direuv" path="res://Imports/ArmorImport1.fbx" id="1_h0xnq"]
+
+[node name="lod_basic_shaded" instance=ExtResource("1_h0xnq")]
+
+[node name="model_LOD0" parent="." index="0"]
+transform = Transform3D(100, 0, 0, 0, 0, 100, 0, -100, 0, 0.06449127, 1.4935594, 0)
+
+[node name="model_LOD1" parent="." index="1"]
+visible = false
+
+[node name="model_LOD2" parent="." index="2"]
+visible = false
+
+[node name="model_LOD3" parent="." index="3"]
+visible = false
+
+[node name="model_LOD4" parent="." index="4"]
+visible = false
