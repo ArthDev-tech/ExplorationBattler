@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"wraith_lord"
+display_name = "Wraith Lord"
+cost = 5
+card_type = 0
+rarity = 2
+attack = 4
+health = 4
+tribe = 1
+keywords = [&"Flying", &"Soulbound", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Flying, Soulbound. Other Phantoms have +1 Attack."
+is_token = false
+sacrifice_value = 1

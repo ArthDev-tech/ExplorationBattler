@@ -1,0 +1,20 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://ujw0887letqb"]
+
+[ext_resource type="Shader" uid="uid://cxra01p2i76c1" path="res://materials/shaders/dash_motion_lines.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/dash_direction = Vector2(0, -1)
+shader_parameter/dash_intensity = 0.0
+shader_parameter/line_density = 11.625000314687501
+shader_parameter/line_color = Color(1, 1, 1, 0.3)
+shader_parameter/line_speed = 5.0
+shader_parameter/line_thickness = 0.02
+shader_parameter/use_radial_mode = false
+shader_parameter/line_taper = 0.5
+shader_parameter/noise_strength = 0.3
+shader_parameter/noise_scale = 5.0
+shader_parameter/gradient_color = Color(0.78691185, 0.78691185, 0.7869118, 0)
+shader_parameter/use_streak_mode = false
+shader_parameter/center_fade_distance = 0.666000031635
+shader_parameter/speed_multiplier = 0.6330000300675

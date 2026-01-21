@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://btwockurhrmtj"]
+
+[ext_resource type="Script" uid="uid://mpo6lblqlkn7" path="res://scenes/exploration/props/collectible_currency.gd" id="1"]
+[ext_resource type="Material" path="res://materials/materials/pulsing_glow_material.tres" id="2"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_collectible_diamond"]
+radius = 0.6
+height = 1.2
+radial_segments = 4
+rings = 2
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_collectible"]
+radius = 0.7
+
+[node name="CurrencyPickup" type="Node3D"]
+script = ExtResource("1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.36174387, 0)
+material_override = ExtResource("2")
+mesh = SubResource("SphereMesh_collectible_diamond")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("SphereShape3D_collectible")

@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://b6pi51k48y5m0"]
+
+[ext_resource type="Script" uid="uid://vvvdfblirguj" path="res://scenes/exploration/environment/animated_hdri_sky.gd" id="1"]
+
+[node name="AnimatedHDRIBackground2000x1000" type="Node3D"]
+enabled = true
+video_path = "res://assets/Vidieo/-HDRI-2000by1000ogg.ogv"
+show_video_debug = false
+drive_ibl = false
+realtime_radiance = false
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+mouse_filter = 2
+volume_db = -80.0
+autoplay = true

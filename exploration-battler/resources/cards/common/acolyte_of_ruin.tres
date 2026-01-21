@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"acolyte_of_ruin"
+display_name = "Acolyte of Ruin"
+cost = 2
+card_type = 0
+rarity = 0
+attack = 1
+health = 1
+tribe = 4
+keywords = [&"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Deathrattle: Deal 2 damage to the opposing creature."
+is_token = false
+sacrifice_value = 1

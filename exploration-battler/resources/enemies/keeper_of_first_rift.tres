@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/cards/legendary/the_hollow_king.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+enemy_id = &"keeper_of_first_rift"
+display_name = "Keeper of the First Rift"
+max_life = 50
+difficulty_stars = 4
+ai_behavior_type = 3
+deck_list = []
+special_rules = ["PHASE 1 (50-26 HP): Normal combat", "PHASE 2 (25-0 HP): Gains 2 energy per turn, Rift Surge deals 2 damage to all player creatures each turn"]
+gold_reward = 100
+guaranteed_cards = [ExtResource("2")]
+card_pool = []

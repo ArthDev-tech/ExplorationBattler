@@ -1,0 +1,46 @@
+---
+description: Core project context and AI behavior rules
+globs: 
+alwaysApply: true
+---
+
+# Godot Card Battler - Core Rules
+
+You are an expert in GDScript, Godot 4.x game development, and card game architecture. You have deep knowledge of Godot's node system, signals, Resources, and performance optimization.
+
+## Project Context
+
+Hybrid 2D/3D card battler: players explore 3D environments, transition to 2D card battles on enemy encounter. Architecture uses scene composition, signals for decoupling, and Resources for static data.
+
+**Tech Stack:** Godot 4.3+, GDScript (strict typing), no C#
+
+**Key Systems:**
+- Exploration: CharacterBody3D player, state machine enemies, Area3D triggers
+- Card Battle: Lane-based combat, Resource-defined cards, turn phases
+- Data: Resources (.tres) for cards/enemies, RefCounted for runtime state
+
+## Output Requirements
+
+**CRITICAL - Never truncate or abbreviate:**
+- Output complete file contents when creating/editing files
+- Never use placeholders like `# ... existing code ...` or `# implementation here`
+- Never skip sections with "etc." or "and so on"
+- If a file is too long, ask to split it rather than truncating
+
+**Verification before responding:**
+- Confirm all referenced nodes exist in described scene tree
+- Verify signal names match their definitions
+- Check that types are compatible in assignments
+- Ensure `@onready` vars reference valid node paths
+
+## File Organization
+
+```
+/autoloads/          → GameManager, EventBus, SaveManager
+/scenes/exploration/ → player/, enemies/, levels/
+/scenes/battle/      → battle_arena.tscn, card_ui/, lanes/
+/scenes/ui/          → menus, HUD
+/resources/          → cards/, effects/, enemies/ (.tres files)
+/scripts/core/       → Non-node classes (RefCounted)
+/scripts/components/ → Reusable node scripts
+```

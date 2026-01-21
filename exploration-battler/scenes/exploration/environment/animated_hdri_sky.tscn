@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/exploration/environment/animated_hdri_sky.gd" id="1"]
+
+[node name="AnimatedHDRISky" type="Node3D"]
+enabled = false
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+autoplay = true
+paused = false
+volume_db = -80.0
+visible = false
+mouse_filter = 2

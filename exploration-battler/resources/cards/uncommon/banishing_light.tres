@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"banishing_light"
+display_name = "Banishing Light"
+cost = 3
+card_type = 1
+rarity = 1
+attack = 0
+health = 0
+tribe = 0
+keywords = [&"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Destroy target creature with 3 or less Attack."
+is_token = false
+sacrifice_value = 0

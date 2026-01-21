@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_id = &"phantom_warden"
+display_name = "Phantom Warden"
+max_life = 15
+difficulty_stars = 2
+ai_behavior_type = 0
+deck_list = []
+special_rules = ["Starts with 1 Wisp"]
+gold_reward = 20
+guaranteed_cards = []
+card_pool = []

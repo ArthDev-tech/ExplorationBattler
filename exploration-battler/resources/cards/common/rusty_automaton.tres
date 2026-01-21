@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"rusty_automaton"
+display_name = "Rusty Automaton"
+cost = 2
+card_type = 0
+rarity = 0
+attack = 2
+health = 3
+tribe = 3
+keywords = [&"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "A mechanical construct worn by time."
+is_token = false
+sacrifice_value = 1

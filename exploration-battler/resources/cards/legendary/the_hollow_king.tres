@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"the_hollow_king"
+display_name = "The Hollow King"
+cost = 7
+card_type = 0
+rarity = 3
+attack = 5
+health = 5
+tribe = 1
+keywords = [&"Flying", &"Deathtouch", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Flying, Deathtouch. When this deals direct damage, summon a 2/2 Phantom."
+is_token = false
+sacrifice_value = 1

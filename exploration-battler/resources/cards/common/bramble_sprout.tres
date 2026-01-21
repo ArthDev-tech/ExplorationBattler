@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"bramble_sprout"
+display_name = "Bramble Sprout"
+cost = 1
+card_type = 0
+rarity = 0
+attack = 0
+health = 3
+tribe = 5
+keywords = [&"Guard", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Guard. At end of turn, gain +1 Attack."
+is_token = false
+sacrifice_value = 1

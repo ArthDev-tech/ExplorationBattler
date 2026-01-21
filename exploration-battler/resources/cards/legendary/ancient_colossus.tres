@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"ancient_colossus"
+display_name = "Ancient Colossus"
+cost = 8
+card_type = 0
+rarity = 3
+attack = 8
+health = 12
+tribe = 3
+keywords = [&"Guard", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Guard. Costs 1 less for each Construct you control. Can't be targeted by spells."
+is_token = false
+sacrifice_value = 1

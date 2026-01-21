@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"pack_alpha"
+display_name = "Pack Alpha"
+cost = 4
+card_type = 0
+rarity = 2
+attack = 3
+health = 3
+tribe = 2
+keywords = [&"Haste", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Haste. When played, summon two 1/1 Wolf tokens."
+is_token = false
+sacrifice_value = 1

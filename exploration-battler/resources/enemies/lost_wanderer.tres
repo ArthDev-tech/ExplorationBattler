@@ -1,0 +1,19 @@
+[gd_resource type="Resource" load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/cards/starter/wandering_soul.tres" id="2"]
+[ext_resource type="Resource" path="res://resources/cards/starter/forest_whelp.tres" id="3"]
+[ext_resource type="Resource" path="res://resources/cards/common/rusty_automaton.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+enemy_id = &"lost_wanderer"
+display_name = "Lost Wanderer"
+max_life = 10
+difficulty_stars = 1
+ai_behavior_type = 0
+deck_list = [ExtResource("2"), ExtResource("2"), ExtResource("2"), ExtResource("2"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4")]
+special_rules = []
+gold_reward = 10
+guaranteed_cards = []
+card_pool = []

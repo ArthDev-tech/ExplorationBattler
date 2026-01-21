@@ -1,0 +1,79 @@
+---
+description: Card battle system patterns and conventions
+globs: "**/battle/**/*.gd,**/cards/**/*.gd"
+alwaysApply: false
+---
+
+# Card Battle System
+
+## Data Architecture
+
+```
+CardData (Resource)     → Static definition, never modified
+    ↓
+CardInstance (RefCounted) → Runtime state, mutable
+    ↓
+CardVisual (Control)    → UI representation, reacts to instance
+```
+
+## Card Effect Pattern
+
+```gdscript
+# resources/effects/card_effect.gd
+class_name CardEffect extends Resource
+
+enum Trigger { ON_PLAY, ON_DEATH, ON_ATTACK, START_OF_TURN, END_OF_TURN }
+
+@export var trigger: Trigger = Trigger.ON_PLAY
+
+func execute(context: EffectContext) -> void:
+    push_error("CardEffect.execute() not implemented")
+
+# resources/effects/damage_effect.gd
+class_name DamageEffect extends CardEffect
+
+@export var amount: int = 1
+
+func execute(context: EffectContext) -> void:
+    if context.target:
+        context.target.take_damage(amount)
+```
+
+## Battle Manager States
+
+```
+SETUP → PLAYER_TURN → ENEMY_TURN → RESOLVING → (loop or END)
+```
+
+## Lane Combat Rules
+
+- Cards placed in lanes attack directly across
+- Empty opposing lane = direct damage to opponent
+- Resolve left-to-right, attacker's perspective
+
+## Card UI Pooling
+
+```gdscript
+var _card_pool: Array[CardVisual] = []
+
+func get_card_visual() -> CardVisual:
+    if _card_pool.is_empty():
+        return CARD_SCENE.instantiate()
+    var card: CardVisual = _card_pool.pop_back()
+    card.set_process(true)
+    return card
+
+func return_card_visual(card: CardVisual) -> void:
+    card.get_parent().remove_child(card)
+    card.set_process(false)
+    _card_pool.append(card)
+```
+
+## Turn Flow Signals
+
+```gdscript
+signal turn_started(turn: int, is_player: bool)
+signal card_played(card: CardInstance, lane: int)
+signal combat_resolved(results: Array[CombatResult])
+signal turn_ended(turn: int)
+```

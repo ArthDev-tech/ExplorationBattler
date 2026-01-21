@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://materials/shaders/flowing_gradient.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader/color1 = Vector4(0.2, 0.4, 0.8, 1)
+shader/color2 = Vector4(0.8, 0.4, 0.2, 1)
+shader/flow_speed = 1.0
+shader/flow_direction = Vector2(1, 0)

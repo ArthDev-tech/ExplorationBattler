@@ -1,0 +1,86 @@
+---
+description: GDScript coding conventions and patterns
+globs: "**/*.gd"
+alwaysApply: false
+---
+
+# GDScript Conventions
+
+## Naming (Mandatory)
+
+- `snake_case`: variables, functions, signals
+- `PascalCase`: classes, nodes, enums
+- `SCREAMING_SNAKE_CASE`: constants
+- `_underscore_prefix`: private members
+
+## Static Typing (Mandatory)
+
+```gdscript
+# Always specify types
+var health: int = 100
+var cards: Array[CardInstance] = []
+var target: Node3D = null
+
+func deal_damage(target: Enemy, amount: int) -> bool:
+    return target.take_damage(amount)
+```
+
+## Node References
+
+```gdscript
+# CORRECT: @onready with types
+@onready var _health_bar: ProgressBar = $UI/HealthBar
+@onready var _anim: AnimationPlayer = $AnimationPlayer
+
+# WRONG: Never do this
+func _process(delta):
+    get_node("UI/HealthBar").value = health  # Uncached lookup every frame
+```
+
+## Signals
+
+```gdscript
+# Typed parameters
+signal card_played(card: CardInstance, lane: int)
+signal damage_dealt(target: Node, amount: int)
+
+# Connection pattern
+func _ready() -> void:
+    EventBus.battle_ended.connect(_on_battle_ended)
+
+func _exit_tree() -> void:
+    if EventBus.battle_ended.is_connected(_on_battle_ended):
+        EventBus.battle_ended.disconnect(_on_battle_ended)
+```
+
+## Exports
+
+```gdscript
+@export_group("Stats")
+@export var max_health: int = 100
+
+@export_group("References")
+@export var card_data: CardData
+@export var effect_scene: PackedScene
+```
+
+## Deprecated Patterns → Use Instead
+
+| Deprecated | Replacement |
+|------------|-------------|
+| `yield()` | `await signal` or `await get_tree().create_timer(1.0).timeout` |
+| `connect("signal", obj, "method")` | `signal.connect(callable)` |
+| `onready var x = $Path` (untyped) | `@onready var x: Type = $Path` |
+| `export var` | `@export var` |
+| `tool` | `@tool` |
+| `remote`, `puppet`, `master` | `@rpc("any_peer")`, `@rpc("authority")` |
+| `instance()` | `instantiate()` |
+
+## Performance Rules
+
+- Cache node refs with `@onready`, never `get_node()` in `_process()`
+- Use `Array[Type]` over untyped `Array`
+- Use `StringName` (`&"identifier"`) for repeated string comparisons
+- Call `set_process(false)` when processing not needed
+- Use `call_deferred()` for non-urgent operations
+- Object pool frequently spawned nodes (cards, VFX)

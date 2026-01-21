@@ -1,0 +1,67 @@
+# Godot Card Battler - Cursor Rules
+
+You are an expert in GDScript and Godot 4.x game development. This is a hybrid 2D/3D card battler with 3D exploration and 2D lane-based card battles.
+
+## Output Rules (CRITICAL)
+
+- Output COMPLETE file contents—never truncate or use placeholders
+- Never write `# ... existing code ...` or `# implementation here`
+- Verify node paths and signal names exist before referencing
+
+## GDScript Conventions
+
+**Naming:** snake_case (vars/funcs), PascalCase (classes), _prefix (private), UPPER_CASE (constants)
+
+**Always use static typing:**
+```gdscript
+var health: int = 100
+var cards: Array[CardInstance] = []
+func deal_damage(target: Enemy, amount: int) -> bool:
+```
+
+**Node references:**
+```gdscript
+@onready var _health_bar: ProgressBar = $UI/HealthBar  # Correct
+get_node("UI/HealthBar")  # Never in _process()
+```
+
+**Signals:**
+```gdscript
+signal card_played(card: CardInstance, lane: int)
+EventBus.battle_ended.connect(_on_battle_ended)
+```
+
+## Deprecated → Replacement
+
+- `yield()` → `await`
+- `connect("sig", obj, "method")` → `signal.connect(callable)`
+- `instance()` → `instantiate()`
+- `onready var` → `@onready var`
+- `export var` → `@export var`
+
+## Critical Don'ts
+
+1. `get_node()` in `_process()` → cache with `@onready`
+2. Untyped variables → always type
+3. Modify Resources at runtime → use RefCounted copies
+4. `await` in `_physics_process()` → breaks determinism
+5. `free()` → use `queue_free()`
+6. Forget signal disconnects → disconnect in `_exit_tree()`
+7. Magic strings → use `StringName` (`&"name"`)
+8. Game logic in UI → UI reacts to signals only
+
+## Architecture
+
+- **Resources (.tres):** Static card/enemy data, never modify at runtime
+- **RefCounted:** Runtime instances with mutable state
+- **EventBus (autoload):** Central signal hub for decoupling
+- **State machines:** For player, enemies, battle phases
+- **Composition over inheritance:** Child nodes, not deep class hierarchies
+
+## Performance
+
+- Cache refs with `@onready`
+- Use `Array[Type]` over untyped Array
+- Object pool cards, VFX, projectiles
+- `set_process(false)` when idle
+- `call_deferred()` for non-urgent ops

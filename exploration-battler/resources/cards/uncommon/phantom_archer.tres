@@ -1,0 +1,18 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"phantom_archer"
+display_name = "Phantom Archer"
+cost = 3
+card_type = 0
+rarity = 1
+attack = 2
+health = 2
+tribe = 1
+keywords = [&"Ranged", &"Phasing", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Ranged, Phasing"
+is_token = false
+sacrifice_value = 1

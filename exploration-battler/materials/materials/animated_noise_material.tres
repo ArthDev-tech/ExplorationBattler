@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://materials/shaders/animated_noise.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader/base_color = Vector4(0.3, 0.3, 0.5, 1)
+shader/noise_color = Vector4(0.8, 0.6, 0.2, 1)
+shader/noise_scale = 5.0
+shader/animation_speed = 1.0

@@ -1,0 +1,437 @@
+[gd_scene load_steps=12 format=3 uid="uid://card_collection_menu"]
+
+[ext_resource type="Script" path="res://scenes/exploration/ui/card_collection_menu.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.29, 0.22, 0.16, 0.98)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.83, 0.69, 0.22, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 8
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.35, 0.28, 0.20, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.83, 0.69, 0.22, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
+bg_color = Color(0.4, 0.35, 0.25, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.83, 0.69, 0.22, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4"]
+bg_color = Color(0.5, 0.4, 0.3, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.83, 0.69, 0.22, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5"]
+bg_color = Color(0.6, 0.5, 0.4, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.83, 0.69, 0.22, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6"]
+bg_color = Color(0.25, 0.20, 0.15, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.83, 0.69, 0.22, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="CardCollectionMenu" type="CanvasLayer"]
+script = ExtResource("1")
+
+[node name="BackgroundOverlay" type="ColorRect" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.75)
+mouse_filter = 2
+
+[node name="MenuPanel" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 30.0
+offset_right = -40.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="TopBar" type="HBoxContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -400.0
+offset_top = 10.0
+offset_right = 400.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 15
+
+[node name="BackButton" type="Button" parent="MenuPanel/TopBar"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "< Back"
+
+[node name="Spacer" type="Control" parent="MenuPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeckNameEdit" type="LineEdit" parent="MenuPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(300, 0)
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+theme_override_styles/focus = SubResource("StyleBoxFlat_4")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_colors/font_placeholder_color = Color(0.7, 0.65, 0.55, 1)
+theme_override_font_sizes/font_size = 20
+text = "My Deck"
+placeholder_text = "Enter deck name..."
+
+[node name="Spacer2" type="Control" parent="MenuPanel/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="MenuPanel/TopBar"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "X"
+
+[node name="MainContainer" type="HBoxContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 60.0
+offset_right = -15.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="LeftPanel" type="VBoxContainer" parent="MenuPanel/MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 0)
+
+[node name="CollectionTitle" type="Label" parent="MenuPanel/MainContainer/LeftPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 20
+text = "Card Collection"
+
+[node name="CollectionScroll" type="ScrollContainer" parent="MenuPanel/MainContainer/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CollectionGrid" type="GridContainer" parent="MenuPanel/MainContainer/LeftPanel/CollectionScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 4
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+
+[node name="PageIndicator" type="HBoxContainer" parent="MenuPanel/MainContainer/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="PrevPageButton" type="Button" parent="MenuPanel/MainContainer/LeftPanel/PageIndicator"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "< Prev"
+
+[node name="PageLabel" type="Label" parent="MenuPanel/MainContainer/LeftPanel/PageIndicator"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Page 1"
+horizontal_alignment = 1
+
+[node name="NextPageButton" type="Button" parent="MenuPanel/MainContainer/LeftPanel/PageIndicator"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Next >"
+
+[node name="RightPanel" type="VBoxContainer" parent="MenuPanel/MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+custom_minimum_size = Vector2(350, 0)
+
+[node name="DeckHeader" type="HBoxContainer" parent="MenuPanel/MainContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="DeckTitle" type="Label" parent="MenuPanel/MainContainer/RightPanel/DeckHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "Deck List"
+
+[node name="DeckScroll" type="ScrollContainer" parent="MenuPanel/MainContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DeckList" type="VBoxContainer" parent="MenuPanel/MainContainer/RightPanel/DeckScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 5
+
+[node name="DeckSizeBar" type="Panel" parent="MenuPanel/MainContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 0
+custom_minimum_size = Vector2(0, 35)
+theme_override_styles/panel = SubResource("StyleBoxFlat_6")
+
+[node name="DeckSizeLabel" type="Label" parent="MenuPanel/MainContainer/RightPanel/DeckSizeBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "0/30 Cards"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DoneButton" type="Button" parent="MenuPanel/MainContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 0
+custom_minimum_size = Vector2(0, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_4")
+theme_override_styles/hover = SubResource("StyleBoxFlat_5")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_3")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "Done"
+
+[node name="BottomBar" type="HBoxContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -60.0
+offset_right = 500.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 15
+
+[node name="ManaFilters" type="HBoxContainer" parent="MenuPanel/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="FilterAll" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(50, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "All"
+toggle_mode = true
+
+[node name="Filter0" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "0"
+toggle_mode = true
+
+[node name="Filter1" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "1"
+toggle_mode = true
+
+[node name="Filter2" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "2"
+toggle_mode = true
+
+[node name="Filter3" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "3"
+toggle_mode = true
+
+[node name="Filter4" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "4"
+toggle_mode = true
+
+[node name="Filter5" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "5"
+toggle_mode = true
+
+[node name="Filter6" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(40, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "6"
+toggle_mode = true
+
+[node name="Filter7Plus" type="Button" parent="MenuPanel/BottomBar/ManaFilters"]
+layout_mode = 2
+custom_minimum_size = Vector2(50, 40)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "7+"
+toggle_mode = true
+
+[node name="Spacer3" type="Control" parent="MenuPanel/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SearchContainer" type="HBoxContainer" parent="MenuPanel/BottomBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SearchIcon" type="Label" parent="MenuPanel/BottomBar/SearchContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "🔍"
+
+[node name="SearchLineEdit" type="LineEdit" parent="MenuPanel/BottomBar/SearchContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 0)
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+theme_override_styles/focus = SubResource("StyleBoxFlat_4")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_colors/font_placeholder_color = Color(0.7, 0.65, 0.55, 1)
+theme_override_font_sizes/font_size = 14
+placeholder_text = "Search cards..."
+
+[node name="Spacer4" type="Control" parent="MenuPanel/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CraftingButton" type="Button" parent="MenuPanel/BottomBar"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_5")
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "Crafting"

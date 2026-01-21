@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://battle_test"]
+
+[ext_resource type="PackedScene" path="res://scenes/battle/battle_arena.tscn" id="1"]
+
+[node name="BattleTest" type="Node2D"]
+
+[node name="BattleArena" parent="." instance=ExtResource("1")]

@@ -1,0 +1,107 @@
+---
+description: Architecture patterns for state machines, resources, components, and event systems
+globs: 
+alwaysApply: false
+---
+
+# Architecture Patterns
+
+## EventBus (Autoload)
+
+Central signal hub for decoupled communication:
+
+```gdscript
+# autoloads/event_bus.gd
+extends Node
+
+signal card_played(card: CardInstance)
+signal battle_started(enemy_data: EnemyData)
+signal battle_ended(result: BattleResult)
+signal player_health_changed(current: int, maximum: int)
+
+# Usage: EventBus.card_played.emit(card)
+# Usage: EventBus.battle_ended.connect(_on_battle_ended)
+```
+
+## State Machine Pattern
+
+```gdscript
+# scripts/core/state_machine.gd
+class_name StateMachine extends Node
+
+@export var initial_state: State
+var current_state: State
+
+func _ready() -> void:
+    for child in get_children():
+        if child is State:
+            child.state_machine = self
+    current_state = initial_state
+    current_state.enter()
+
+func transition_to(state_name: StringName) -> void:
+    var new_state: State = get_node_or_null(NodePath(state_name))
+    if new_state and new_state != current_state:
+        current_state.exit()
+        current_state = new_state
+        current_state.enter()
+```
+
+## Resource Pattern (Static Data)
+
+```gdscript
+# resources/cards/card_data.gd
+class_name CardData extends Resource
+
+@export var card_id: StringName = &""
+@export var display_name: String = ""
+@export var cost: int = 1
+@export var attack: int = 0
+@export var health: int = 0
+@export var effects: Array[CardEffect] = []
+@export var artwork: Texture2D
+
+# NEVER modify at runtime - changes persist in editor!
+```
+
+## Runtime Instance Pattern
+
+```gdscript
+# scripts/core/card_instance.gd
+class_name CardInstance extends RefCounted
+
+var data: CardData  # Reference to static resource
+var current_health: int
+var current_attack: int
+var status_effects: Array[StatusEffect] = []
+
+func _init(card_data: CardData) -> void:
+    data = card_data
+    current_health = data.health
+    current_attack = data.attack
+```
+
+## Component Pattern
+
+```gdscript
+# scripts/components/health_component.gd
+class_name HealthComponent extends Node
+
+signal health_changed(current: int, maximum: int)
+signal died
+
+@export var max_health: int = 100
+var current_health: int
+
+func take_damage(amount: int) -> void:
+    current_health = maxi(0, current_health - amount)
+    health_changed.emit(current_health, max_health)
+    if current_health <= 0:
+        died.emit()
+```
+
+## Scene Communication Rules
+
+- **Parent → Child:** Direct method calls OK
+- **Child → Parent:** Emit signals
+- **Sibling → Sibling:** Use EventBus or common parent

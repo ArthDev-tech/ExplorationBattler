@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+enemy_id = &"rusted_sentinel"
+display_name = "Rusted Sentinel"
+max_life = 20
+difficulty_stars = 2
+ai_behavior_type = 2
+deck_list = []
+special_rules = ["Constructs have +1 HP"]
+gold_reward = 25
+guaranteed_cards = []
+card_pool = []

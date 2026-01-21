@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b648sdbegosnh"]
+
+[ext_resource type="Shader" uid="uid://bfarm68c8rsbl" path="res://materials/shaders/rotating_pattern.gdshader" id="1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/pattern_color1 = Color(0.36219463, 0.67213595, 0.72777253, 1)
+shader_parameter/pattern_color2 = Color(0.51888317, 0.033101924, 0.24462062, 1)
+shader_parameter/pattern_size = 5.3740002520051195
+shader_parameter/rotation_speed = -0.02799976382999958

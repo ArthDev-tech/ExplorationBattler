@@ -1,0 +1,65 @@
+---
+description: Critical mistakes to avoid in Godot development
+globs: 
+alwaysApply: true
+---
+
+# Critical Pitfalls
+
+## Never Do These
+
+1. **`get_node()` in `_process()`** → Cache with `@onready`
+2. **Untyped variables** → Always use static typing
+3. **Modify Resources at runtime** → Changes persist in editor; use RefCounted copies
+4. **`await` in `_physics_process()`** → Breaks determinism
+5. **`free()` for node deletion** → Use `queue_free()`
+6. **`load()` in loops** → Preload or cache references
+7. **Magic strings for comparisons** → Use `StringName` (`&"name"`)
+8. **Deep inheritance hierarchies** → Prefer composition with child nodes
+9. **Game logic in UI scripts** → UI reacts to signals only
+10. **Forget to disconnect signals** → Disconnect in `_exit_tree()` for persistent nodes
+
+## Memory Leak Sources
+
+```gdscript
+# LEAK: Signal connected, node persists, never disconnected
+func _ready() -> void:
+    GameManager.some_signal.connect(_handler)
+    # Missing _exit_tree() to disconnect!
+
+# SAFE: Always pair connect with disconnect
+func _exit_tree() -> void:
+    if GameManager.some_signal.is_connected(_handler):
+        GameManager.some_signal.disconnect(_handler)
+```
+
+## Common Type Errors
+
+```gdscript
+# WRONG: Untyped array loses type info
+var cards = []  # Array, not Array[Card]
+
+# CORRECT: Typed array
+var cards: Array[CardInstance] = []
+
+# WRONG: Nullable without check
+var enemy: Enemy = get_enemy()
+enemy.take_damage(10)  # Crashes if null
+
+# CORRECT: Null check
+var enemy: Enemy = get_enemy()
+if enemy:
+    enemy.take_damage(10)
+```
+
+## Resource Mutation Bug
+
+```gdscript
+# BUG: Modifies the shared resource!
+func apply_buff(card: CardData) -> void:
+    card.attack += 5  # Affects ALL cards using this resource
+
+# CORRECT: Modify instance, not resource
+func apply_buff(card: CardInstance) -> void:
+    card.current_attack += 5  # Only affects this instance
+```
