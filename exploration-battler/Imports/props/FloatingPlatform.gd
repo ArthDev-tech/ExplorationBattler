@@ -3,26 +3,16 @@ extends Node3D
 const ItemFloatSettingsScript = preload("res://scripts/core/item_float_settings.gd")
 
 @export var settings: Resource = preload("res://resources/props/item_float_settings_default.tres")
-
-## If true, use this node's override values instead of `settings` (per-instance tuning without duplicating a .tres).
 @export var override_settings: bool = false
 @export var spin_speed_rad: float = 2.0
 @export var bob_height: float = 0.15
 @export var bob_speed: float = 2.0
-@export var item_data: ItemData = null
 
 var _start_y: float = 0.0
 var _time: float = 0.0
 
-@onready var _area: Area3D = get_node_or_null("Area3D")
-
 func _ready() -> void:
-	# Cache the placed local height so bobbing is relative to where the item was positioned in the scene.
 	_start_y = position.y
-	
-	# Connect pickup detection if Area3D exists
-	if _area and not _area.body_entered.is_connected(_on_body_entered):
-		_area.body_entered.connect(_on_body_entered)
 
 func _process(delta: float) -> void:
 	var spin: float = spin_speed_rad
@@ -46,10 +36,3 @@ func _process(delta: float) -> void:
 		var pos: Vector3 = position
 		pos.y = _start_y + sin(_time * bob_s) * bob_h
 		position = pos
-
-func _on_body_entered(body: Node) -> void:
-	if body is CharacterBody3D and item_data:
-		# Any CharacterBody3D entering is assumed to be the player
-		# (enemies don't pick up items, and player is the only CharacterBody3D that moves around)
-		if GameManager.add_item_to_inventory(item_data):
-			queue_free()

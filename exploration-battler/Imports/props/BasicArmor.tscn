@@ -5,7 +5,7 @@
 [ext_resource type="Resource" path="res://resources/items/basic_armor.tres" id="3_armor_data"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
-size = Vector3(1.5, 1.5, 1.5)
+size = Vector3(1.665, 2.125, 1.5)
 
 [node name="BasicArmor" type="Node3D"]
 script = ExtResource("2_nanyq")
@@ -18,4 +18,5 @@ mesh = ExtResource("1_w36hx")
 [node name="Area3D" type="Area3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.80916834, 0)
 shape = SubResource("BoxShape3D_pickup")

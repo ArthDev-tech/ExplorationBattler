@@ -19,9 +19,12 @@ var current_scene: Node = null
 var player_deck: RefCounted = null
 var current_zone: StringName = &""
 
-# Computed from _player_data for easy access
+# Computed from player_stats to include equipment bonuses
 var player_max_life: int:
 	get:
+		if player_stats:
+			return player_stats.get_total_health()
+		# Fallback if player_stats not initialized yet
 		var value = _player_data.get("max_life") if _player_data else null
 		return value if value != null else 20
 
@@ -268,7 +271,6 @@ func add_item_to_inventory(item_data: ItemData) -> bool:
 	
 	var item_instance: ItemInstance = ItemInstance.new(item_data, 1)
 	if player_inventory.add_item(item_instance):
-		print("DEBUG: Added item to inventory: ", item_data.item_name, " (total items: ", player_inventory.get_item_count(), ")")
 		EventBus.item_collected.emit(StringName(item_data.item_name))
 		EventBus.stats_changed.emit()  # Trigger UI refresh
 		return true

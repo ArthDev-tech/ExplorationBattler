@@ -1,13 +1,11 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://rr552kph1ho"]
 
-[ext_resource type="Script" path="res://scripts/core/item_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://cot0rs24muukh" path="res://scripts/core/item_data.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 item_name = "Basic Armor"
 description = "A simple set of protective armor."
 item_type = 1
-size = Vector2i(1, 1)
-attack_bonus = 0
 defense_bonus = 2
-health_bonus = 5
+health_bonus = 15

@@ -138,6 +138,8 @@ func _setup_inventory_grid() -> void:
 				var slot: Control = slot_scene.instantiate()
 				slot.slot_position = Vector2i(col, row)
 				slot.slot_clicked.connect(_on_inventory_slot_clicked)
+				if slot.has_signal("slot_drag_started"):
+					slot.slot_drag_started.connect(_on_slot_drag_started)
 				_inventory_grid.add_child(slot)
 				_inventory_slots.append(slot)
 
@@ -150,16 +152,25 @@ func _refresh_inventory_display() -> void:
 		if slot and slot.has_method("clear_item"):
 			slot.clear_item()
 	
-	# Display items from inventory
-	# Note: This is simplified - in full implementation, would track item positions in grid
+	# Display items from inventory using grid positions
 	var inventory: Inventory = GameManager.player_inventory
-	var slot_index: int = 0
-	for item in inventory.items:
-		if slot_index < _inventory_slots.size():
-			var slot: Control = _inventory_slots[slot_index]
-			if slot and slot.has_method("set_item"):
-				slot.set_item(item)
-				slot_index += 1
+	
+	# Map items to their grid positions
+	for row in range(8):
+		for col in range(6):
+			var grid_pos: Vector2i = Vector2i(col, row)
+			var item_at_pos: ItemInstance = inventory.get_item_at(grid_pos)
+			
+			# Find the slot at this position
+			for slot in _inventory_slots:
+				if slot and slot.slot_position == grid_pos:
+					if item_at_pos:
+						if slot.has_method("set_item"):
+							slot.set_item(item_at_pos)
+					else:
+						if slot.has_method("clear_item"):
+							slot.clear_item()
+					break
 	
 	# Update equipment slots
 	for slot_type in _equipment_slots:
@@ -167,6 +178,45 @@ func _refresh_inventory_display() -> void:
 		var equipped_item: ItemInstance = GameManager.equipped_items.get(slot_type)
 		if slot and slot.has_method("set_item"):
 			slot.set_item(equipped_item)
+
+func _on_slot_drag_started(slot: Control, item: ItemInstance) -> void:
+	# Store source slot for drag operation tracking
+	# This is mainly for debugging/logging - the actual swap is handled in drop_data()
+	pass
+
+func _swap_items(source_slot: Control, target_slot: Control) -> void:
+	# Helper method for swapping items between slots
+	if not source_slot or not target_slot:
+		return
+	
+	var source_item: ItemInstance = source_slot.get("item")
+	var target_item: ItemInstance = target_slot.get("item")
+	
+	if not source_item:
+		return
+	
+	# Remove items from inventory grid
+	if GameManager.player_inventory:
+		if source_item:
+			GameManager.player_inventory.remove_item(source_item)
+		if target_item:
+			GameManager.player_inventory.remove_item(target_item)
+	
+	# Place items at new positions
+	if GameManager.player_inventory:
+		if source_item:
+			GameManager.player_inventory.add_item(source_item, target_slot.slot_position)
+		if target_item:
+			GameManager.player_inventory.add_item(target_item, source_slot.slot_position)
+	
+	# Update slot displays
+	if source_slot.has_method("set_item"):
+		source_slot.set_item(target_item)
+	if target_slot.has_method("set_item"):
+		target_slot.set_item(source_item)
+	
+	# Refresh display
+	_refresh_inventory_display()
 
 func _update_stats_display() -> void:
 	if not GameManager.player_stats:
@@ -194,7 +244,7 @@ func _on_inventory_slot_clicked(slot: Control, button_index: int) -> void:
 			return
 		
 		# Access item property directly
-		var item: ItemInstance = slot.get("item") if slot.has("item") else null
+		var item: ItemInstance = slot.get("item")
 		if item and item.data:
 			# Try to equip if it's equipment
 			var slot_type: ItemData.ItemType = item.data.item_type
