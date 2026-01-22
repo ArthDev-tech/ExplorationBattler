@@ -52,6 +52,7 @@ enum Rarity {
 # Metadata
 @export var description: String = ""
 @export var artwork: Texture2D = null  # Placeholder for now
+@export var currency_cost: int = 0  # Cost in currency to purchase/acquire this card
 
 # Token-specific
 @export var is_token: bool = false

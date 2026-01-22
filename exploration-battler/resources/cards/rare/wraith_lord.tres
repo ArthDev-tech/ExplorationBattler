@@ -9,6 +9,7 @@ display_name = "Wraith Lord"
 cost = 5
 card_type = 0
 rarity = 2
+currency_cost = 50
 attack = 4
 health = 4
 tribe = 1

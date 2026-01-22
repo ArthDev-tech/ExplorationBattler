@@ -12,6 +12,7 @@ cost_blue = 0
 cost_green = 0
 card_type = 0
 rarity = 0
+currency_cost = 10
 attack = 3
 health = 3
 tribe = 2

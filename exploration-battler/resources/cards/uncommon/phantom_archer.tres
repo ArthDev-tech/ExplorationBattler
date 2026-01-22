@@ -9,6 +9,7 @@ display_name = "Phantom Archer"
 cost = 3
 card_type = 0
 rarity = 1
+currency_cost = 25
 attack = 2
 health = 2
 tribe = 1

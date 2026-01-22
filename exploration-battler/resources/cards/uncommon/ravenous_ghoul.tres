@@ -9,6 +9,7 @@ display_name = "Ravenous Ghoul"
 cost = 3
 card_type = 0
 rarity = 1
+currency_cost = 25
 attack = 2
 health = 3
 tribe = 4

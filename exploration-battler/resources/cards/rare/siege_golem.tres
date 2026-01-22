@@ -9,6 +9,7 @@ display_name = "Siege Golem"
 cost = 6
 card_type = 0
 rarity = 2
+currency_cost = 50
 attack = 5
 health = 8
 tribe = 3

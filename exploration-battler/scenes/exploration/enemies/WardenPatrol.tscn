@@ -1,0 +1,28 @@
+[gd_scene load_steps=6 format=3 uid="uid://dars72atp7vap"]
+
+[ext_resource type="Script" uid="uid://cl80yf0we7w43" path="res://scenes/exploration/enemies/enemy_patrol.gd" id="1_ccf3v"]
+[ext_resource type="Resource" path="res://resources/enemies/phantom_warden.tres" id="2_phantom"]
+[ext_resource type="ArrayMesh" uid="uid://wy875owklabf" path="res://assets/EnemyResources/PhantomWarden/PhantomWarden.res" id="3_mesh"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_1"]
+radius = 3.0
+
+[node name="EnemyPatrol" type="CharacterBody3D"]
+script = ExtResource("1_ccf3v")
+enemy_data = ExtResource("2_phantom")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(0.43, 0, 0, 0, 0.43, 0, 0, 0, 0.43, 0, 0.805, 0)
+shape = SubResource("SphereShape3D_1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(120, 0, 0, 0, -5.2453665e-06, 120, 0, -120, -5.2453665e-06, 0, 0.039613664, 0)
+mesh = ExtResource("3_mesh")

@@ -9,6 +9,7 @@ display_name = "The Hollow King"
 cost = 7
 card_type = 0
 rarity = 3
+currency_cost = 100
 attack = 5
 health = 5
 tribe = 1

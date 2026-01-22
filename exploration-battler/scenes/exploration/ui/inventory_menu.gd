@@ -39,6 +39,7 @@ func _ready() -> void:
 	
 	EventBus.stats_changed.connect(_on_stats_changed)
 	EventBus.currency_changed.connect(_on_currency_changed)
+	EventBus.item_collected.connect(_on_item_collected)
 	_update_stats_display()
 
 func _input(event: InputEvent) -> void:
@@ -224,8 +225,18 @@ func _on_stats_changed() -> void:
 func _on_currency_changed(_current: int) -> void:
 	_update_stats_display()
 
+func _on_item_collected(item_name: StringName) -> void:
+	# Refresh inventory display when item is collected
+	if _is_open:
+		_refresh_inventory_display()
+
 func _exit_tree() -> void:
 	if EventBus.stats_changed.is_connected(_on_stats_changed):
+		EventBus.stats_changed.disconnect(_on_stats_changed)
+	if EventBus.currency_changed.is_connected(_on_currency_changed):
+		EventBus.currency_changed.disconnect(_on_currency_changed)
+	if EventBus.item_collected.is_connected(_on_item_collected):
+		EventBus.item_collected.disconnect(_on_item_collected)
 		EventBus.stats_changed.disconnect(_on_stats_changed)
 	if EventBus.currency_changed.is_connected(_on_currency_changed):
 		EventBus.currency_changed.disconnect(_on_currency_changed)

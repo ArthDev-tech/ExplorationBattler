@@ -71,6 +71,10 @@ func _do_transition(scene_path: String) -> void:
 	current_scene = get_tree().current_scene
 
 func start_battle(enemy_data: Resource, triggering_enemy: Node3D = null) -> void:
+	if enemy_data:
+		var ed = enemy_data as EnemyData
+		if ed:
+			print("DEBUG [GameManager]: enemy_data.display_name = ", ed.display_name)
 	if BattleOverlayManager:
 		BattleOverlayManager.show_battle_overlay(enemy_data as EnemyData, triggering_enemy)
 	else:
@@ -251,6 +255,25 @@ func unequip_item(slot_type: ItemData.ItemType) -> bool:
 		return true
 	else:
 		# Inventory full, can't unequip
+		return false
+
+func add_item_to_inventory(item_data: ItemData) -> bool:
+	if not item_data or not player_inventory:
+		push_warning("add_item_to_inventory: item_data or player_inventory is null")
+		return false
+	
+	if player_inventory.is_full():
+		push_warning("Inventory is full, cannot add item: " + item_data.item_name)
+		return false
+	
+	var item_instance: ItemInstance = ItemInstance.new(item_data, 1)
+	if player_inventory.add_item(item_instance):
+		print("DEBUG: Added item to inventory: ", item_data.item_name, " (total items: ", player_inventory.get_item_count(), ")")
+		EventBus.item_collected.emit(StringName(item_data.item_name))
+		EventBus.stats_changed.emit()  # Trigger UI refresh
+		return true
+	else:
+		push_warning("Failed to add item to inventory: " + item_data.item_name)
 		return false
 
 func _exit_tree() -> void:

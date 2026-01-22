@@ -9,6 +9,7 @@ display_name = "Pack Alpha"
 cost = 4
 card_type = 0
 rarity = 2
+currency_cost = 50
 attack = 3
 health = 3
 tribe = 2

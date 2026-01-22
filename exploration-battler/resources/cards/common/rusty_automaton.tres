@@ -9,6 +9,7 @@ display_name = "Rusty Automaton"
 cost = 2
 card_type = 0
 rarity = 0
+currency_cost = 10
 attack = 2
 health = 3
 tribe = 3

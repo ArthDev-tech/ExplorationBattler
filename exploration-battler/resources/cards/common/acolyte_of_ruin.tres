@@ -9,6 +9,7 @@ display_name = "Acolyte of Ruin"
 cost = 2
 card_type = 0
 rarity = 0
+currency_cost = 10
 attack = 1
 health = 1
 tribe = 4

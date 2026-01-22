@@ -39,6 +39,12 @@ func _ready() -> void:
 	# Validate patrol points are reasonable
 	_validate_patrol_points()
 	
+	# Wait a frame for exported resources to load, then check
+	await get_tree().process_frame
+	print("DEBUG: enemy_data after frame wait: ", enemy_data)
+	if enemy_data:
+		print("DEBUG: enemy_data.display_name: ", enemy_data.display_name)
+		print("DEBUG: enemy_data.enemy_id: ", enemy_data.enemy_id)
 	if enemy_data == null:
 		# Use call_deferred to ensure all classes are registered
 		call_deferred("_load_enemy_data")
@@ -47,6 +53,11 @@ func _load_enemy_data() -> void:
 	# Wait a frame to ensure all autoloads and class registrations are complete
 	await get_tree().process_frame
 	await get_tree().process_frame  # Extra frame for safety
+	
+	# Check if enemy_data was already set by the scene file
+	if enemy_data != null:
+		print("DEBUG: _load_enemy_data() - enemy_data already set, skipping fallback. Name: ", enemy_data.display_name)
+		return  # Scene already set it, don't override
 	
 	# Try loading with error handling
 	var resource_path: String = "res://resources/enemies/lost_wanderer.tres"
@@ -132,12 +143,19 @@ func trigger_encounter() -> void:
 	if is_defeated:
 		return  # Don't start battle if already defeated
 	
+	print("DEBUG: trigger_encounter() - enemy_data: ", enemy_data)
 	if enemy_data:
+		print("DEBUG: trigger_encounter() - enemy_data.display_name: ", enemy_data.display_name)
+		print("DEBUG: trigger_encounter() - enemy_data.max_life: ", enemy_data.max_life)
+		print("DEBUG: trigger_encounter() - enemy_data.base_attack: ", enemy_data.base_attack)
 		EventBus.encounter_triggered.emit(enemy_data)
 		# Defer battle start to avoid physics callback issues
 		call_deferred("_start_battle_deferred", enemy_data)
+	else:
+		push_error("DEBUG: trigger_encounter() - enemy_data is NULL!")
 
 func _start_battle_deferred(data: EnemyData) -> void:
+	print("DEBUG: _start_battle_deferred() - data.display_name: ", data.display_name if data else "NULL")
 	# Pass self as triggering enemy so it can be marked defeated if player wins
 	GameManager.start_battle(data, self)
 

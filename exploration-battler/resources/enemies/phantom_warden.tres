@@ -1,18 +1,16 @@
-[gd_resource type="Resource" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3 uid="uid://crg1oehl5dfos"]
 
-[ext_resource type="Script" path="res://scripts/core/enemy_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://bd4nkr6yq183v" path="res://scripts/core/enemy_data.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cf2elge2j4yg" path="res://assets/EnemyResources/PhantomWarden/PhantomWarden.png" id="2"]
 
 [resource]
 script = ExtResource("1")
 enemy_id = &"phantom_warden"
 display_name = "Phantom Warden"
-max_life = 15
-base_attack = 3
+max_life = 65
+base_attack = 5
 difficulty_stars = 2
-ai_behavior_type = 0
-deck_list = []
 deck_json_path = "res://resources/enemies/decks/phantom_warden.json"
-special_rules = ["Starts with 1 Wisp"]
+special_rules = Array[String](["Starts with 1 Wisp"])
 gold_reward = 20
-guaranteed_cards = []
-card_pool = []
+portrait = ExtResource("2")

@@ -9,6 +9,7 @@ display_name = "Ancient Colossus"
 cost = 8
 card_type = 0
 rarity = 3
+currency_cost = 100
 attack = 8
 health = 12
 tribe = 3

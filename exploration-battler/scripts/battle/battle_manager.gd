@@ -68,6 +68,10 @@ func _ready() -> void:
 		call_deferred("_auto_start_battle")
 
 func _auto_start_battle() -> void:
+	# If enemy_data was already set by a signal (from BattleOverlayManager), don't override it
+	if enemy_data != null:
+		return  # Battle already started with correct enemy data
+	
 	var enemy = load("res://resources/enemies/lost_wanderer.tres")
 	if enemy:
 		_on_battle_started(enemy)
@@ -168,6 +172,7 @@ func _on_lane_clicked(lane_index: int) -> void:
 			pass
 
 func _on_battle_started(enemy: Resource) -> void:
+	print("DEBUG: _on_battle_started() - enemy: ", enemy)
 	enemy_data = enemy as EnemyData
 	if not enemy_data:
 		# Try to cast as Resource and check script
@@ -180,6 +185,11 @@ func _on_battle_started(enemy: Resource) -> void:
 			push_error("BattleManager: Invalid enemy data")
 			return
 	
+	if enemy_data:
+		print("DEBUG: _on_battle_started() - enemy_data.display_name: ", enemy_data.display_name)
+		print("DEBUG: _on_battle_started() - enemy_data.max_life: ", enemy_data.max_life)
+		print("DEBUG: _on_battle_started() - enemy_data.base_attack: ", enemy_data.base_attack)
+	
 	start_battle()
 
 func start_battle() -> void:
@@ -188,6 +198,7 @@ func start_battle() -> void:
 	# Initialize battle state
 	battle_state = BattleState.new()
 	battle_state.initialize_player(GameManager.player_max_life, 3)
+	print("DEBUG [BattleManager.start_battle]: Using enemy_data.max_life = ", enemy_data.max_life if enemy_data else "NULL")
 	battle_state.initialize_enemy(enemy_data.max_life, 3)
 	
 	# Initialize UI components
@@ -307,6 +318,9 @@ func start_battle() -> void:
 	# Initialize avatar UI if available
 	_initialize_avatar_ui()
 	
+	# Update enemy visuals (portrait and name) from enemy_data
+	_update_enemy_visuals()
+	
 	# Draw starting hands
 	draw_starting_hand(true)
 	draw_starting_hand(false)
@@ -337,6 +351,20 @@ func _initialize_avatar_ui() -> void:
 	if _enemy_avatar_slot and battle_state.enemy_avatar:
 		if _enemy_avatar_slot.has_method("set_avatar"):
 			_enemy_avatar_slot.set_avatar(battle_state.enemy_avatar, false)
+
+func _update_enemy_visuals() -> void:
+	if not enemy_data:
+		return
+	
+	# Update portrait texture
+	var portrait_rect: TextureRect = _ui.get_node_or_null("EnemyCard/Frame/Portrait")
+	if portrait_rect and enemy_data.portrait:
+		portrait_rect.texture = enemy_data.portrait
+	
+	# Update enemy name label
+	var name_label: Label = _ui.get_node_or_null("EnemyCard/EnemyHeader/HeaderContainer/EnemyPortrait")
+	if name_label and not enemy_data.display_name.is_empty():
+		name_label.text = enemy_data.display_name
 
 func _on_draw_cards_requested(count: int, is_player: bool) -> void:
 	if not battle_state:
