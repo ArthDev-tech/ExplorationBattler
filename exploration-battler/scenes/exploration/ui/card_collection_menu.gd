@@ -206,7 +206,7 @@ func _apply_filters() -> void:
 	if not _active_mana_filters.is_empty():
 		var mana_filtered: Array[CardData] = []
 		for card_data in _filtered_collection_cards:
-			var card_cost: int = card_data.cost
+			var card_cost: int = card_data.get_total_cost()
 			var cost_match: bool = false
 			
 			# Check if cost matches any active filter
@@ -557,8 +557,10 @@ func _refresh_deck_display() -> void:
 	
 	# Sort by mana cost, then by name
 	sorted_cards.sort_custom(func(a: CardData, b: CardData) -> bool:
-		if a.cost != b.cost:
-			return a.cost < b.cost
+		var a_total: int = a.get_total_cost()
+		var b_total: int = b.get_total_cost()
+		if a_total != b_total:
+			return a_total < b_total
 		return a.display_name < b.display_name
 	)
 	

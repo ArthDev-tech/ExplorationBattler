@@ -41,6 +41,7 @@ var _tribe_names: Array[String] = ["None", "Phantom", "Beast", "Construct", "Cul
 
 var _battle_manager: Node = null
 var _background_style: StyleBoxFlat = null
+var _original_position: Vector2 = Vector2.ZERO
 
 const _COLOR_GREY: Color = Color(0.5, 0.5, 0.5, 1.0)      # Medium grey (colorless)
 const _COLOR_RED: Color = Color(0.5, 0.15, 0.15, 1.0)     # Dark red
@@ -57,6 +58,8 @@ func _ready() -> void:
 	# Use _unhandled_input for click-to-select instead
 	# Cache battle manager reference - try multiple paths
 	_battle_manager = _get_battle_manager()
+	# Store original position for animations (will be updated when card is placed)
+	call_deferred("_store_original_position")
 	# Allow lanes to receive clicks during targeting
 	EventBus.targeting_started.connect(_on_targeting_started)
 	EventBus.targeting_cancelled.connect(_on_targeting_cancelled)
@@ -66,6 +69,11 @@ func _ready() -> void:
 	EventBus.card_deselected.connect(_on_card_deselected)
 	# Listen for card stats changes (e.g., summoning sickness cleared)
 	EventBus.card_stats_changed.connect(_on_card_stats_changed)
+
+func _store_original_position() -> void:
+	# Store original position for animations (called deferred to ensure position is set)
+	if _original_position == Vector2.ZERO:
+		_original_position = global_position
 
 func _get_battle_manager() -> Node:
 	# Try multiple paths to find battle manager
@@ -383,6 +391,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_drag_started = false
 
 func _get_drag_data(_position: Vector2) -> Variant:
+	# Prevent dragging cards that are already in lanes - only cards in hand should be draggable
+	if _is_in_lane():
+		return null
+	
 	# Allow drag for both creatures and spells if playable
 	if not card_instance:
 		return null
@@ -430,6 +442,47 @@ func _on_card_stats_changed(changed_card: CardInstance) -> void:
 	# Update visual if this card's stats changed
 	if changed_card == card_instance:
 		_update_summoning_sickness_visual()
+
+func play_attack_animation(target_position: Vector2) -> void:
+	## Play bump animation when card attacks a target.
+	## target_position: The global position of the attack target
+	# Store current position if not set
+	if _original_position == Vector2.ZERO:
+		_original_position = global_position
+	
+	var original_pos: Vector2 = _original_position
+	# If original position is still zero, use current position
+	if original_pos == Vector2.ZERO:
+		original_pos = global_position
+		_original_position = original_pos
+	
+	# Store original z_index and set high z_index for animation
+	var original_z_index: int = z_index
+	z_index = 50  # High z_index so card appears above others during animation
+	
+	# Calculate bump position (move 30% toward target)
+	var bump_pos: Vector2 = original_pos.lerp(target_position, 0.3)
+	
+	# Create tween animation
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_QUAD)
+	
+	# Move toward target
+	tween.tween_property(self, "global_position", bump_pos, 0.15)
+	
+	# Brief pause at bump position
+	tween.tween_interval(0.05)
+	
+	# Return to original position
+	tween.set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "global_position", original_pos, 0.15)
+	
+	await tween.finished
+	# Update stored original position in case it changed
+	_original_position = global_position
+	# Restore original z_index
+	z_index = original_z_index
 
 func _update_summoning_sickness_visual() -> void:
 	# Show/hide swirl overlay based on summoning sickness

@@ -11,6 +11,7 @@ max_life = 65
 base_attack = 5
 difficulty_stars = 2
 deck_json_path = "res://resources/enemies/decks/phantom_warden.json"
+reward_card_json_path = "res://resources/enemies/rewards/phantom_warden_rewards.json"
 special_rules = Array[String](["Starts with 1 Wisp"])
 gold_reward = 20
 portrait = ExtResource("2")

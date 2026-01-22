@@ -8,3 +8,4 @@ enemy_id = &"lost_wanderer"
 display_name = "Lost Wanderer"
 max_life = 25
 deck_json_path = "res://resources/enemies/decks/lost_wanderer.json"
+reward_card_json_path = "res://resources/enemies/rewards/lost_wanderer_rewards.json"

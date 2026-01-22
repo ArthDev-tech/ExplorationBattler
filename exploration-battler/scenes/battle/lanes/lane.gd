@@ -74,6 +74,9 @@ func place_card(card: CardInstance) -> bool:
 		_card_visual.anchors_preset = Control.PRESET_CENTER
 		if _card_visual.has_method("set_card"):
 			_card_visual.set_card(card)
+		# Store original position for animations (after card is placed and positioned)
+		if _card_visual.has_method("_store_original_position"):
+			_card_visual.call_deferred("_store_original_position")
 	
 	card_placed.emit(card)
 	_update_visual_state()
@@ -99,6 +102,10 @@ func has_card() -> bool:
 
 func get_card() -> CardInstance:
 	return current_card
+
+func get_card_visual() -> Control:
+	## Returns the card visual Control node if it exists.
+	return _card_visual
 
 func is_empty() -> bool:
 	return current_card == null

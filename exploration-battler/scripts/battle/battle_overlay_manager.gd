@@ -12,8 +12,10 @@ var _hide_timer: float = 0.0
 var _waiting_to_hide: bool = false
 
 var _global_card_pool: Array[CardData] = []
+var _card_registry: Node = null
 
 func _ready() -> void:
+	_card_registry = get_node_or_null("/root/CardRegistry")
 	# Ensure overlay manager processes even when world is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	# Load battle scene
@@ -129,21 +131,49 @@ func _on_victory_rewards_claimed(gold_amount: int, selected_card: CardData) -> v
 		GameManager.add_card_to_collection(selected_card, 1)
 	hide_battle_overlay()
 
+func _get_rarity_weight(card: CardData) -> int:
+	## Returns default weight for a card based on its rarity.
+	## COMMON=8, UNCOMMON=4, RARE=2, LEGENDARY=1
+	if not card:
+		return 1
+	
+	match card.rarity:
+		CardData.Rarity.COMMON:
+			return 8
+		CardData.Rarity.UNCOMMON:
+			return 4
+		CardData.Rarity.RARE:
+			return 2
+		CardData.Rarity.LEGENDARY:
+			return 1
+		_:
+			return 1
+
 func _pick_reward_cards(enemy: EnemyData, count: int) -> Array[CardData]:
 	var desired: int = maxi(0, count)
 	if desired <= 0:
 		return []
 	
-	var pool: Array[CardData] = []
-	if enemy:
+	var weighted_pool: Array[Dictionary] = [] # Array of {"card": CardData, "weight": int}
+	
+	# Priority 1: Load from JSON if available
+	if enemy and not enemy.reward_card_json_path.is_empty():
+		weighted_pool = _load_reward_cards_from_json(enemy)
+	
+	# Priority 2: Use card_pool if JSON didn't provide cards
+	if weighted_pool.is_empty() and enemy:
 		for r in enemy.card_pool:
 			if r is CardData:
-				pool.append(r as CardData)
+				var cd: CardData = r as CardData
+				weighted_pool.append({"card": cd, "weight": _get_rarity_weight(cd)})
 	
-	if pool.is_empty():
-		pool = _get_global_card_pool()
+	# Priority 3: Fall back to global pool
+	if weighted_pool.is_empty():
+		var global_pool: Array[CardData] = _get_global_card_pool()
+		for cd in global_pool:
+			weighted_pool.append({"card": cd, "weight": _get_rarity_weight(cd)})
 	
-	if pool.is_empty():
+	if weighted_pool.is_empty():
 		return []
 	
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -151,17 +181,136 @@ func _pick_reward_cards(enemy: EnemyData, count: int) -> Array[CardData]:
 	var picked: Array[CardData] = []
 	var used_ids: Dictionary = {} # {StringName: true}
 	var safety: int = 200
+	
 	while picked.size() < desired and safety > 0:
 		safety -= 1
-		var cd: CardData = pool[rng.randi_range(0, pool.size() - 1)]
-		if not cd:
+		
+		# Calculate total weight of available cards (excluding already picked)
+		var total_weight: int = 0
+		var available_entries: Array[Dictionary] = []
+		for entry in weighted_pool:
+			var cd: CardData = entry.get("card") as CardData
+			if not cd:
+				continue
+			var cid: StringName = cd.card_id
+			if used_ids.has(cid):
+				continue
+			var weight: int = entry.get("weight", 1) as int
+			if weight <= 0:
+				weight = 1
+			total_weight += weight
+			available_entries.append(entry)
+		
+		if available_entries.is_empty():
+			break
+		
+		# Weighted random selection using cumulative weight method
+		var random_value: int = rng.randi_range(1, total_weight)
+		var cumulative_weight: int = 0
+		var selected_entry: Dictionary = {}
+		
+		for entry in available_entries:
+			var weight: int = entry.get("weight", 1) as int
+			if weight <= 0:
+				weight = 1
+			cumulative_weight += weight
+			if random_value <= cumulative_weight:
+				selected_entry = entry
+				break
+		
+		if selected_entry.is_empty():
+			# Fallback: pick first available
+			selected_entry = available_entries[0]
+		
+		var selected_card: CardData = selected_entry.get("card") as CardData
+		if not selected_card:
 			continue
-		var cid: StringName = cd.card_id
+		
+		var cid: StringName = selected_card.card_id
 		if used_ids.has(cid):
 			continue
+		
 		used_ids[cid] = true
-		picked.append(cd)
+		picked.append(selected_card)
+	
 	return picked
+
+func _load_reward_cards_from_json(enemy: EnemyData) -> Array[Dictionary]:
+	## Loads reward cards from JSON file.
+	## Returns Array[Dictionary] where each dict is {"card": CardData, "weight": int}
+	## Supports two JSON formats:
+	## - Simple array: ["card_id1", "card_id2"] - uses card's built-in rarity
+	## - Object array: [{"id": "card_id1", "weight": 5}, {"id": "card_id2"}] - explicit weight or card rarity
+	var result: Array[Dictionary] = []
+	if not enemy:
+		return result
+	if enemy.reward_card_json_path.is_empty():
+		return result
+	if not _card_registry or not _card_registry.has_method("get_card"):
+		push_warning("BattleOverlayManager: CardRegistry autoload missing; cannot load reward cards json: " + enemy.reward_card_json_path)
+		return result
+	
+	var file: FileAccess = FileAccess.open(enemy.reward_card_json_path, FileAccess.READ)
+	if not file:
+		push_warning("BattleOverlayManager: could not open reward cards json: " + enemy.reward_card_json_path)
+		return result
+	
+	var text: String = file.get_as_text()
+	file.close()
+	
+	var parsed: Variant = JSON.parse_string(text)
+	if parsed == null or typeof(parsed) != TYPE_ARRAY:
+		push_warning("BattleOverlayManager: invalid reward cards json (expected Array): " + enemy.reward_card_json_path)
+		return result
+	
+	var entries: Array = parsed as Array
+	for entry_raw in entries:
+		var card_id_str: String = ""
+		var explicit_weight: int = -1 # -1 means use card rarity
+		
+		# Detect format: string (simple) vs object (weighted)
+		if typeof(entry_raw) == TYPE_STRING:
+			# Simple format: just a card ID string
+			card_id_str = String(entry_raw)
+		elif typeof(entry_raw) == TYPE_DICTIONARY:
+			# Weighted format: object with "id" and optional "weight"
+			var entry_dict: Dictionary = entry_raw as Dictionary
+			if entry_dict.has("id"):
+				card_id_str = String(entry_dict.get("id", ""))
+			elif entry_dict.has("card_id"):
+				# Support both "id" and "card_id" keys
+				card_id_str = String(entry_dict.get("card_id", ""))
+			else:
+				push_warning("BattleOverlayManager: reward card entry missing 'id' or 'card_id' field: " + str(entry_raw))
+				continue
+			
+			if entry_dict.has("weight"):
+				var weight_val = entry_dict.get("weight")
+				if typeof(weight_val) == TYPE_INT or typeof(weight_val) == TYPE_FLOAT:
+					explicit_weight = int(weight_val)
+		else:
+			push_warning("BattleOverlayManager: invalid reward card entry type (expected String or Dictionary): " + str(entry_raw))
+			continue
+		
+		if card_id_str.is_empty():
+			continue
+		
+		var cid: StringName = StringName(card_id_str)
+		var cd: CardData = _card_registry.call("get_card", cid) as CardData
+		if not cd:
+			push_warning("BattleOverlayManager: reward cards json references unknown card_id '" + card_id_str + "' (" + enemy.reward_card_json_path + ")")
+			continue
+		
+		# Determine weight: use explicit weight if provided, otherwise use card rarity
+		var final_weight: int
+		if explicit_weight >= 0:
+			final_weight = explicit_weight
+		else:
+			final_weight = _get_rarity_weight(cd)
+		
+		result.append({"card": cd, "weight": final_weight})
+	
+	return result
 
 func _get_global_card_pool() -> Array[CardData]:
 	if not _global_card_pool.is_empty():

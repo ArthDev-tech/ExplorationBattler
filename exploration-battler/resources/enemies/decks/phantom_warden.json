@@ -1,2 +1,14 @@
 {
+  "flickering_wisp": 4,
+  "spawn_wisps": 3,
+  "wandering_soul": 3,
+  "vengeful_spirit": 3,
+  "hollow_knight": 2,
+  "spectral_surge": 2,
+  "phantom_archer": 2,
+  "ravenous_ghoul": 1,
+  "soul_trap": 1,
+  "wraith_lord": 1,
+  "dark_pact": 1,
+  "banishing_light": 1
 }

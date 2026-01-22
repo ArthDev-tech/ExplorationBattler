@@ -8,11 +8,11 @@ extends Node
 ## - If opposing lane has a creature, creatures attack each other (both deal damage)
 ## - Combat resolves left-to-right during end of turn phase
 
-func resolve_combat(state: BattleState) -> void:
+func resolve_combat(state: BattleState, battle_manager: Node = null) -> void:
 	# Process all lanes left-to-right
 	var lane_count: int = mini(state.player_lanes.size(), state.enemy_lanes.size())
 	for lane in range(lane_count):
-		resolve_lane(lane, state)
+		await resolve_lane(lane, state, battle_manager)
 	
 	# Process death triggers
 	process_deaths(state)
@@ -20,12 +20,20 @@ func resolve_combat(state: BattleState) -> void:
 	# Process end-of-combat effects
 	process_end_of_combat(state)
 
-func resolve_lane(lane: int, state: BattleState) -> void:
+func resolve_lane(lane: int, state: BattleState, battle_manager: Node = null) -> void:
 	var player_card: CardInstance = state.player_lanes[lane]
 	var enemy_card: CardInstance = state.enemy_lanes[lane]
 	
 	# Player attacks
 	if player_card and player_card.can_attack():
+		# Play attack animation before dealing damage
+		if battle_manager:
+			var target_pos: Vector2 = _get_target_position_for_attack(lane, true, state, battle_manager)
+			if target_pos != Vector2.ZERO:
+				var attacker_visual: Control = _get_card_visual_from_lane(lane, true, battle_manager)
+				if attacker_visual and attacker_visual.has_method("play_attack_animation"):
+					await attacker_visual.play_attack_animation(target_pos)
+		
 		if enemy_card:
 			# Attack opposing creature
 			deal_damage(player_card, enemy_card, state, true)
@@ -37,6 +45,14 @@ func resolve_lane(lane: int, state: BattleState) -> void:
 		
 		# Frenzy: attack again
 		if player_card.has_keyword(&"Frenzy") and player_card.can_attack():
+			# Play animation for frenzy attack
+			if battle_manager:
+				var target_pos: Vector2 = _get_target_position_for_attack(lane, true, state, battle_manager)
+				if target_pos != Vector2.ZERO:
+					var attacker_visual: Control = _get_card_visual_from_lane(lane, true, battle_manager)
+					if attacker_visual and attacker_visual.has_method("play_attack_animation"):
+						await attacker_visual.play_attack_animation(target_pos)
+			
 			if enemy_card and enemy_card.is_alive():
 				deal_damage(player_card, enemy_card, state, true)
 			elif not enemy_card:
@@ -44,6 +60,14 @@ func resolve_lane(lane: int, state: BattleState) -> void:
 	
 	# Enemy attacks
 	if enemy_card and enemy_card.can_attack():
+		# Play attack animation before dealing damage
+		if battle_manager:
+			var target_pos: Vector2 = _get_target_position_for_attack(lane, false, state, battle_manager)
+			if target_pos != Vector2.ZERO:
+				var attacker_visual: Control = _get_card_visual_from_lane(lane, false, battle_manager)
+				if attacker_visual and attacker_visual.has_method("play_attack_animation"):
+					await attacker_visual.play_attack_animation(target_pos)
+		
 		if player_card and player_card.is_alive():
 			# Attack opposing creature
 			deal_damage(enemy_card, player_card, state, false)
@@ -55,6 +79,14 @@ func resolve_lane(lane: int, state: BattleState) -> void:
 		
 		# Frenzy: attack again
 		if enemy_card.has_keyword(&"Frenzy") and enemy_card.can_attack():
+			# Play animation for frenzy attack
+			if battle_manager:
+				var target_pos: Vector2 = _get_target_position_for_attack(lane, false, state, battle_manager)
+				if target_pos != Vector2.ZERO:
+					var attacker_visual: Control = _get_card_visual_from_lane(lane, false, battle_manager)
+					if attacker_visual and attacker_visual.has_method("play_attack_animation"):
+						await attacker_visual.play_attack_animation(target_pos)
+			
 			if player_card and player_card.is_alive():
 				deal_damage(enemy_card, player_card, state, false)
 			elif not player_card:
@@ -207,6 +239,55 @@ func _find_lane(creature: CardInstance, state: BattleState, is_player: bool) -> 
 		if lanes[i] == creature:
 			return i
 	return -1
+
+func _get_card_visual_from_lane(lane: int, is_player: bool, battle_manager: Node) -> Control:
+	## Gets the card visual Control node from a lane.
+	if not battle_manager:
+		return null
+	
+	var lanes_array: Array = battle_manager.get("_player_lanes") if is_player else battle_manager.get("_enemy_lanes")
+	if not lanes_array or lane < 0 or lane >= lanes_array.size():
+		return null
+	
+	var lane_node: Node = lanes_array[lane]
+	if not lane_node or not lane_node.has_method("get_card_visual"):
+		return null
+	
+	return lane_node.get_card_visual() as Control
+
+func _get_target_position_for_attack(lane: int, is_player_attacker: bool, state: BattleState, battle_manager: Node) -> Vector2:
+	## Gets the target position for an attack animation.
+	## Returns Vector2.ZERO if target position cannot be determined.
+	if not battle_manager:
+		return Vector2.ZERO
+	
+	var opposing_lane_card: CardInstance = null
+	if is_player_attacker:
+		opposing_lane_card = state.enemy_lanes[lane] if lane < state.enemy_lanes.size() else null
+	else:
+		opposing_lane_card = state.player_lanes[lane] if lane < state.player_lanes.size() else null
+	
+	# If opposing lane has a card, target that card
+	if opposing_lane_card and opposing_lane_card.is_alive():
+		var opposing_lanes_array: Array = battle_manager.get("_enemy_lanes") if is_player_attacker else battle_manager.get("_player_lanes")
+		if opposing_lanes_array and lane < opposing_lanes_array.size():
+			var opposing_lane_node: Node = opposing_lanes_array[lane]
+			if opposing_lane_node and opposing_lane_node.has_method("get_card_visual"):
+				var target_visual: Control = opposing_lane_node.get_card_visual() as Control
+				if target_visual:
+					return target_visual.global_position + target_visual.size / 2
+	
+	# If opposing lane is empty, target the avatar
+	var avatar_slot: Control = null
+	if is_player_attacker:
+		avatar_slot = battle_manager.get("_enemy_avatar_slot") as Control
+	else:
+		avatar_slot = battle_manager.get("_player_avatar_slot") as Control
+	
+	if avatar_slot:
+		return avatar_slot.global_position + avatar_slot.size / 2
+	
+	return Vector2.ZERO
 
 ## Avatar Combat Methods
 

@@ -197,13 +197,21 @@ func start_battle() -> void:
 	
 	# Initialize battle state
 	battle_state = BattleState.new()
-	battle_state.initialize_player(GameManager.player_max_life, 3)
+	# Use persistent health if available, otherwise use max_life (first battle)
+	var current_life: int = GameManager.player_max_life
+	if GameManager.player_current_life >= 0:
+		current_life = GameManager.player_current_life
+	else:
+		# First battle - initialize health
+		GameManager.player_current_life = GameManager.player_max_life
+		current_life = GameManager.player_max_life
+	battle_state.initialize_player(GameManager.player_max_life, current_life, 3)
 	print("DEBUG [BattleManager.start_battle]: Using enemy_data.max_life = ", enemy_data.max_life if enemy_data else "NULL")
 	battle_state.initialize_enemy(enemy_data.max_life, 3)
 	
 	# Initialize UI components
 	if _player_life_bar and _player_life_bar.has_method("initialize"):
-		_player_life_bar.initialize(true, battle_state.player_max_life)
+		_player_life_bar.initialize(true, battle_state.player_max_life, battle_state.player_life)
 	if _enemy_life_bar and _enemy_life_bar.has_method("initialize"):
 		_enemy_life_bar.initialize(false, battle_state.enemy_max_life)
 	if _player_energy_display and _player_energy_display.has_method("initialize"):
@@ -918,7 +926,7 @@ func resolve_combat() -> void:
 	current_state = TurnPhase.RESOLVING
 	
 	if _combat_resolver:
-		_combat_resolver.resolve_combat(battle_state)
+		await _combat_resolver.resolve_combat(battle_state, self)
 	
 	# Sync lane visuals after combat
 	_sync_lane_visuals()
@@ -982,6 +990,14 @@ func _on_energy_color_picked(color: int, is_player: bool) -> void:
 
 func end_battle() -> void:
 	current_state = TurnPhase.END
+	
+	# Save persistent health before battle ends
+	if battle_state:
+		# Save current life (stays at 0 if player died, no auto-heal)
+		GameManager.player_current_life = battle_state.player_life
+		# Emit signal to notify UI systems of health change
+		EventBus.player_health_changed.emit(GameManager.player_current_life, GameManager.player_max_life)
+	
 	var winner: int = battle_state.get_winner()
 	EventBus.battle_ended.emit(winner)
 	# BattleOverlayManager will handle hiding the overlay after a delay

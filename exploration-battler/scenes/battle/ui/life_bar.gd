@@ -10,11 +10,17 @@ var _is_player: bool = true
 func _ready() -> void:
 	EventBus.life_changed.connect(_on_life_changed)
 
-func initialize(is_player: bool, max_life: int) -> void:
+func initialize(is_player: bool, max_life: int, current_life: int = -1) -> void:
 	_is_player = is_player
 	_progress_bar.max_value = max_life
-	_progress_bar.value = max_life
-	_update_display(max_life, max_life)
+	# Use current_life if provided, otherwise default to max_life (backward compatible)
+	var initial_life: int = max_life
+	if current_life >= 0:
+		# Cap current_life at max_life and ensure it's not negative
+		initial_life = mini(current_life, max_life)
+		initial_life = maxi(0, initial_life)
+	_progress_bar.value = initial_life
+	_update_display(initial_life, max_life)
 
 func _on_life_changed(current: int, max_life: int, is_player: bool) -> void:
 	if is_player == _is_player:

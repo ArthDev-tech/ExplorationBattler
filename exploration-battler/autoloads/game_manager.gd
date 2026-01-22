@@ -36,6 +36,8 @@ var player_card_collection: Array[CardData] = []
 var player_card_quantities: Dictionary = {}  # {StringName: int}
 var equipped_items: Dictionary = {}  # {ItemData.ItemType: ItemInstance}
 var player_currency: int = 0
+## Persistent player health between battles. -1 indicates uninitialized (will use max_life on first battle).
+var player_current_life: int = -1
 
 func _ready() -> void:
 	current_scene = get_tree().current_scene
@@ -58,6 +60,10 @@ func _ready() -> void:
 	_initialize_starter_deck()
 	_initialize_card_collection()
 	_rebuild_collection_quantities_from_deck()
+	
+	# Initialize player health if not already set
+	if player_current_life < 0:
+		player_current_life = player_max_life
 
 func _on_scene_transition_requested(scene_path: String) -> void:
 	transition_to_scene(scene_path)
@@ -231,6 +237,9 @@ func equip_item(item: ItemInstance, slot_type: ItemData.ItemType) -> bool:
 	if not item or item.data.item_type != slot_type:
 		return false
 	
+	# Store old max_life before equipment change
+	var old_max_life: int = player_max_life
+	
 	# Unequip current item if any
 	var current_item: ItemInstance = equipped_items.get(slot_type)
 	if current_item:
@@ -240,6 +249,12 @@ func equip_item(item: ItemInstance, slot_type: ItemData.ItemType) -> bool:
 	equipped_items[slot_type] = item
 	player_inventory.remove_item(item)
 	player_stats.update_equipment_bonuses(equipped_items)
+	
+	# Update health proportionally if max_life changed
+	var new_max_life: int = player_max_life
+	if old_max_life != new_max_life:
+		_update_health_on_max_change(old_max_life, new_max_life)
+	
 	EventBus.item_equipped.emit(item, slot_type)
 	EventBus.stats_changed.emit()
 	return true
@@ -249,16 +264,48 @@ func unequip_item(slot_type: ItemData.ItemType) -> bool:
 	if not item:
 		return false
 	
+	# Store old max_life before equipment change
+	var old_max_life: int = player_max_life
+	
 	# Try to add back to inventory
 	if player_inventory.add_item(item):
 		equipped_items[slot_type] = null
 		player_stats.update_equipment_bonuses(equipped_items)
+		
+		# Update health proportionally if max_life changed
+		var new_max_life: int = player_max_life
+		if old_max_life != new_max_life:
+			_update_health_on_max_change(old_max_life, new_max_life)
+		
 		EventBus.item_unequipped.emit(item, slot_type)
 		EventBus.stats_changed.emit()
 		return true
 	else:
 		# Inventory full, can't unequip
 		return false
+
+func _update_health_on_max_change(old_max: int, new_max: int) -> void:
+	## Updates player_current_life when max_life changes.
+	## If max increases: scales current health proportionally.
+	## If max decreases: caps current health at new max.
+	if player_current_life < 0:
+		# Not initialized yet, set to new max
+		player_current_life = new_max
+		return
+	
+	if new_max > old_max:
+		# Max increased: scale proportionally
+		if old_max > 0:
+			var ratio: float = float(player_current_life) / float(old_max)
+			player_current_life = int(round(ratio * float(new_max)))
+		else:
+			player_current_life = new_max
+	else:
+		# Max decreased: cap at new max
+		player_current_life = mini(player_current_life, new_max)
+	
+	# Ensure health is never negative
+	player_current_life = maxi(0, player_current_life)
 
 func add_item_to_inventory(item_data: ItemData) -> bool:
 	if not item_data or not player_inventory:

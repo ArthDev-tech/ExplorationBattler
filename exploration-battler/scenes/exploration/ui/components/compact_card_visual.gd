@@ -51,8 +51,8 @@ func set_card(instance: CardInstance, count: int = 1) -> void:
 	
 	var data: CardData = card_instance.data
 	
-	# Mana cost
-	_mana_cost_label.text = str(data.cost)
+	# Mana cost (total including colored costs)
+	_mana_cost_label.text = str(data.get_total_cost())
 	
 	# Style mana cost icon with blue background
 	var mana_icon_style: StyleBoxFlat = _mana_cost_label.get_parent().get_theme_stylebox("panel", "Panel") as StyleBoxFlat

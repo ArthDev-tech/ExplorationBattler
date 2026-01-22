@@ -3,6 +3,8 @@ extends CharacterBody3D
 ## Basic patrol enemy that triggers battle on contact. Stub for Phase 3.
 
 @export var patrol_speed: float = 2.0
+@export var pursuit_speed: float = 3.5
+@export var detection_range: float = 15.0
 @export var patrol_points: Array[Vector3] = []
 @export var enemy_data: EnemyData = null
 
@@ -13,9 +15,12 @@ var _stuck_timer: float = 0.0
 var _stuck_threshold: float = 2.0  # Seconds before considering stuck
 var _min_movement_distance: float = 0.1  # Minimum movement to not be considered stuck
 var is_defeated: bool = false
+var _is_pursuing: bool = false
+var _patrol_start_position: Vector3 = Vector3.ZERO
 
 @onready var _area: Area3D = $Area3D
 var _raycast: RayCast3D = null
+var _player: CharacterBody3D = null
 
 func _ready() -> void:
 	_area.body_entered.connect(_on_body_entered)
@@ -48,6 +53,9 @@ func _ready() -> void:
 	if enemy_data == null:
 		# Use call_deferred to ensure all classes are registered
 		call_deferred("_load_enemy_data")
+	
+	# Find player reference
+	_find_player()
 
 func _load_enemy_data() -> void:
 	# Wait a frame to ensure all autoloads and class registrations are complete
@@ -82,55 +90,129 @@ func _physics_process(delta: float) -> void:
 	if is_defeated:
 		return
 	
-	if patrol_points.is_empty():
-		return
+	# Find player if not found yet
+	if not _player:
+		_find_player()
 	
-	var target: Vector3 = patrol_points[_current_patrol_index]
-	var direction: Vector3 = (target - global_position).normalized()
+	# Check player distance
+	var player_distance: float = 0.0
+	var player_direction: Vector3 = Vector3.ZERO
+	if _player:
+		player_direction = (_player.global_position - global_position)
+		player_distance = player_direction.length()
+		player_direction = player_direction.normalized()
 	
-	# Check if reached target
-	if global_position.distance_to(target) < 0.5:
-		_advance_patrol_point()
-		target = patrol_points[_current_patrol_index]
-		direction = (target - global_position).normalized()
-	
-	# Check for obstacles ahead using raycast
-	if _raycast:
-		_raycast.target_position = direction * 2.0  # Check 2 units in movement direction
-		_raycast.force_raycast_update()
-		if _raycast.is_colliding():
-			# Obstacle ahead, skip to next point
+	# Determine behavior: pursue or patrol
+	if _player and player_distance <= detection_range:
+		# Player detected - pursue
+		if not _is_pursuing:
+			_is_pursuing = true
+			_patrol_start_position = global_position
+		
+		# Move toward player
+		var direction: Vector3 = player_direction
+		
+		# Check for obstacles ahead using raycast
+		if _raycast:
+			_raycast.target_position = direction * 2.0  # Check 2 units in movement direction
+			_raycast.force_raycast_update()
+			if _raycast.is_colliding():
+				# Obstacle ahead, try to navigate around or stop
+				# For now, just slow down
+				direction = direction * 0.5
+		
+		# Set velocity
+		velocity.x = direction.x * pursuit_speed
+		velocity.z = direction.z * pursuit_speed
+		velocity.y = 0.0  # Keep on ground level
+		
+		# Move
+		move_and_slide()
+		
+		# Check for collisions after movement
+		var collision_count: int = get_slide_collision_count()
+		if collision_count > 0:
+			# Hit a wall or obstacle, could try to navigate around
+			# For now, just stop
+			velocity.x = 0.0
+			velocity.z = 0.0
+		
+		# Update stuck tracking
+		var movement_distance: float = global_position.distance_to(_last_position)
+		if movement_distance < _min_movement_distance:
+			_stuck_timer += delta
+		else:
+			_stuck_timer = 0.0
+			_last_position = global_position
+		
+		# Face player
+		look_at(_player.global_position, Vector3.UP)
+		
+	else:
+		# Player out of range or not found - patrol
+		if _is_pursuing:
+			_is_pursuing = false
+			# Return to patrol - continue from current patrol point
+		
+		if patrol_points.is_empty():
+			return
+		
+		var target: Vector3 = patrol_points[_current_patrol_index]
+		var direction: Vector3 = (target - global_position).normalized()
+		
+		# Check if reached target
+		if global_position.distance_to(target) < 0.5:
 			_advance_patrol_point()
 			target = patrol_points[_current_patrol_index]
 			direction = (target - global_position).normalized()
-	
-	# Set velocity
-	velocity.x = direction.x * patrol_speed
-	velocity.z = direction.z * patrol_speed
-	velocity.y = 0.0  # Keep on ground level
-	
-	# Move
-	move_and_slide()
-	
-	# Check for collisions after movement
-	var collision_count: int = get_slide_collision_count()
-	if collision_count > 0:
-		# Hit a wall or obstacle, advance to next patrol point
-		_advance_patrol_point()
-		return
-	
-	# Check if stuck (not moving toward target)
-	var movement_distance: float = global_position.distance_to(_last_position)
-	if movement_distance < _min_movement_distance:
-		_stuck_timer += delta
-		if _stuck_timer >= _stuck_threshold:
-			# Been stuck too long, skip to next point
+		
+		# Check for obstacles ahead using raycast
+		if _raycast:
+			_raycast.target_position = direction * 2.0  # Check 2 units in movement direction
+			_raycast.force_raycast_update()
+			if _raycast.is_colliding():
+				# Obstacle ahead, skip to next point
+				_advance_patrol_point()
+				target = patrol_points[_current_patrol_index]
+				direction = (target - global_position).normalized()
+		
+		# Set velocity
+		velocity.x = direction.x * patrol_speed
+		velocity.z = direction.z * patrol_speed
+		velocity.y = 0.0  # Keep on ground level
+		
+		# Move
+		move_and_slide()
+		
+		# Check for collisions after movement
+		var collision_count: int = get_slide_collision_count()
+		if collision_count > 0:
+			# Hit a wall or obstacle, advance to next patrol point
 			_advance_patrol_point()
+			return
+		
+		# Check if stuck (not moving toward target)
+		var movement_distance: float = global_position.distance_to(_last_position)
+		if movement_distance < _min_movement_distance:
+			_stuck_timer += delta
+			if _stuck_timer >= _stuck_threshold:
+				# Been stuck too long, skip to next point
+				_advance_patrol_point()
+				_stuck_timer = 0.0
+		else:
+			# Moving normally, reset stuck timer
 			_stuck_timer = 0.0
-	else:
-		# Moving normally, reset stuck timer
-		_stuck_timer = 0.0
-		_last_position = global_position
+			_last_position = global_position
+		
+		# Face the player if found, otherwise face movement direction
+		if _player:
+			var player_pos: Vector3 = _player.global_position
+			# Make enemy look at player (Y-up convention)
+			look_at(player_pos, Vector3.UP)
+		elif direction.length() > 0.01:
+			# Fallback: face movement direction if no player found
+			var target_pos: Vector3 = global_position + direction
+			look_at(target_pos, Vector3.UP)
 
 func _on_body_entered(body: Node3D) -> void:
 	if is_defeated:
@@ -193,3 +275,21 @@ func _validate_patrol_points() -> void:
 	if not patrol_points.is_empty():
 		for i in range(patrol_points.size()):
 			patrol_points[i].y = global_position.y
+
+func _find_player() -> void:
+	var root: Node = get_tree().current_scene
+	_player = _search_for_player(root)
+	if not _player:
+		# Try alternative paths
+		_player = get_node_or_null("../../PlayerController")
+		if not _player:
+			_player = get_node_or_null("../PlayerController")
+
+func _search_for_player(node: Node) -> CharacterBody3D:
+	if node.name == "PlayerController" and node is CharacterBody3D:
+		return node as CharacterBody3D
+	for child in node.get_children():
+		var result = _search_for_player(child)
+		if result:
+			return result
+	return null

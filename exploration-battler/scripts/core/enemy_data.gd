@@ -35,6 +35,9 @@ enum AIBehaviorType {
 @export var gold_reward: int = 10
 @export var guaranteed_cards: Array[Resource] = []  # Cards always dropped
 @export var card_pool: Array[Resource] = []  # Random card from pool
+# Optional reward card pool (editable outside Godot): JSON array of card IDs ["card_id1", "card_id2", ...].
+# If set, victory screen will pick reward cards from this pool instead of card_pool or global pool.
+@export_file("*.json") var reward_card_json_path: String = ""
 
 # Visual
 @export var portrait: Texture2D = null  # Placeholder for now

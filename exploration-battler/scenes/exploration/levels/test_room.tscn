@@ -1,16 +1,13 @@
-[gd_scene load_steps=37 format=3 uid="uid://bbckhx202xkna"]
+[gd_scene load_steps=34 format=3 uid="uid://bbckhx202xkna"]
 
 [ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b15kp0tx43v6a" path="res://scenes/exploration/enemies/enemy_patrol.tscn" id="2"]
-[ext_resource type="Script" uid="uid://8k4110w7gjp4" path="res://scenes/exploration/enemies/levels/test_room.gd" id="3"]
+[ext_resource type="Script" uid="uid://8k4110w7gjp4" path="res://scenes/exploration/levels/test_room.gd" id="3"]
 [ext_resource type="Script" uid="uid://cgmy3vwljghat" path="res://scripts/components/mesh_collision_sync.gd" id="4"]
 [ext_resource type="PackedScene" uid="uid://dars72atp7vap" path="res://scenes/exploration/enemies/WardenPatrol.tscn" id="4_301dv"]
 [ext_resource type="Material" uid="uid://cbukb51f6xa5" path="res://materials/materials/pulsing_glow_material.tres" id="5_38e7r"]
 [ext_resource type="PackedScene" uid="uid://b6o56b8r2cfy7" path="res://Imports/props/BasicArmor.tscn" id="6_dj340"]
-[ext_resource type="Script" uid="uid://bo7o5rjaeniov" path="res://Imports/props/Item.gd" id="6_o6cdt"]
-[ext_resource type="Script" path="res://Imports/props/FloatingPlatform.gd" id="6_floating"]
-[ext_resource type="Resource" path="res://resources/items/basic_armor.tres" id="10_armor"]
-[ext_resource type="Resource" path="res://resources/items/hammer.tres" id="11_hammer"]
+[ext_resource type="Script" uid="uid://dntytoh0puu6a" path="res://Imports/props/FloatingPlatform.gd" id="6_floating"]
 [ext_resource type="Material" uid="uid://b8yu6xaa8r3u" path="res://materials/materials/glass_refraction_material.tres" id="7_g4wn3"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/environment/static_hdri_environment.tscn" id="7_j65ic"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="8"]
@@ -290,11 +287,9 @@ shape = SubResource("BoxShape3D_6")
 
 [node name="BasicArmor" parent="Environment" instance=ExtResource("6_dj340")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.603115, 7.688385, -6.9643316)
-item_data = ExtResource("10_armor")
 
 [node name="Hammer" parent="Environment" instance=ExtResource("9_mh5es")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.681732, 0.81348085, 18.224592)
-item_data = ExtResource("11_hammer")
 
 [node name="PlayerSpawn" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.618599, 1, -25.963375)
@@ -303,7 +298,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.618599, 1, -25.963375)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 5)
 
 [node name="PlayerController" parent="." instance=ExtResource("1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.319923, 11.574291, 4.1026707)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.118584, 11.574291, -15.971525)
 
 [node name="EnemyPatrol" parent="." instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 5)

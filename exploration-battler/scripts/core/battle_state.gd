@@ -44,11 +44,16 @@ var turn_number: int = 1
 var is_player_turn: bool = true
 var momentum: int = 0  # Builds when dealing direct damage
 
-func initialize_player(max_life: int, starting_energy: int) -> void:
+func initialize_player(max_life: int, current_life: int, starting_energy: int) -> void:
 	player_max_life = max_life
-	player_life = max_life
+	# Use current_life, but cap it at max_life in case max_life decreased
+	player_life = mini(current_life, max_life)
+	# Ensure health is never negative
+	player_life = maxi(0, player_life)
 	_set_player_starting_energy(starting_energy)
 	_emit_energy_signals(true)
+	# Emit life_changed signal to notify UI of initial health state
+	EventBus.life_changed.emit(player_life, player_max_life, true)
 
 func initialize_enemy(max_life: int, starting_energy: int) -> void:
 	enemy_max_life = max_life

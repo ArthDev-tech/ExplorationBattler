@@ -40,6 +40,7 @@ func _ready() -> void:
 	EventBus.stats_changed.connect(_on_stats_changed)
 	EventBus.currency_changed.connect(_on_currency_changed)
 	EventBus.item_collected.connect(_on_item_collected)
+	EventBus.player_health_changed.connect(_on_player_health_changed)
 	_update_stats_display()
 
 func _input(event: InputEvent) -> void:
@@ -225,7 +226,11 @@ func _update_stats_display() -> void:
 	var stats: PlayerStats = GameManager.player_stats
 	
 	if _health_label:
-		_health_label.text = "Health: " + str(GameManager.player_max_life) + "/" + str(GameManager.player_max_life)
+		# Use current_life if initialized, otherwise fall back to max_life
+		var current_life: int = GameManager.player_current_life
+		if current_life < 0:
+			current_life = GameManager.player_max_life
+		_health_label.text = "Health: " + str(current_life) + "/" + str(GameManager.player_max_life)
 	if _level_label:
 		_level_label.text = "Level: " + str(stats.level)
 	if _xp_label:
@@ -280,6 +285,10 @@ func _on_item_collected(item_name: StringName) -> void:
 	if _is_open:
 		_refresh_inventory_display()
 
+func _on_player_health_changed(current: int, maximum: int) -> void:
+	# Update stats display when health changes (e.g., after battle)
+	_update_stats_display()
+
 func _exit_tree() -> void:
 	if EventBus.stats_changed.is_connected(_on_stats_changed):
 		EventBus.stats_changed.disconnect(_on_stats_changed)
@@ -287,6 +296,5 @@ func _exit_tree() -> void:
 		EventBus.currency_changed.disconnect(_on_currency_changed)
 	if EventBus.item_collected.is_connected(_on_item_collected):
 		EventBus.item_collected.disconnect(_on_item_collected)
-		EventBus.stats_changed.disconnect(_on_stats_changed)
-	if EventBus.currency_changed.is_connected(_on_currency_changed):
-		EventBus.currency_changed.disconnect(_on_currency_changed)
+	if EventBus.player_health_changed.is_connected(_on_player_health_changed):
+		EventBus.player_health_changed.disconnect(_on_player_health_changed)
