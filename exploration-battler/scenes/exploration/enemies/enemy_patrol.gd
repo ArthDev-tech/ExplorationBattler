@@ -8,6 +8,13 @@ extends CharacterBody3D
 @export var patrol_points: Array[Vector3] = []
 @export var enemy_data: EnemyData = null
 
+# Animation parameters
+@export var bob_amplitude: float = 0.05  # Vertical bob distance
+@export var bob_frequency: float = 2.0  # Bob speed
+@export var sway_amplitude: float = 0.03  # Horizontal sway distance (rotation)
+@export var sway_frequency: float = 1.5  # Sway speed
+@export var scale_variation: float = 0.05  # Scale grow/shrink amount (0.05 = 5% variation)
+
 var _current_patrol_index: int = 0
 var _patrol_direction: int = 1
 var _last_position: Vector3 = Vector3.ZERO
@@ -19,12 +26,25 @@ var _is_pursuing: bool = false
 var _patrol_start_position: Vector3 = Vector3.ZERO
 
 @onready var _area: Area3D = $Area3D
+@onready var _mesh_instance: MeshInstance3D = $MeshInstance3D
 var _raycast: RayCast3D = null
 var _player: CharacterBody3D = null
+
+# Animation state
+var _animation_time: float = 0.0
+var _base_scale: Vector3 = Vector3.ONE
+var _base_mesh_position: Vector3 = Vector3.ZERO
+var _base_mesh_rotation: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
 	_area.body_entered.connect(_on_body_entered)
 	_last_position = global_position
+	
+	# Store base mesh transform for animation
+	if _mesh_instance:
+		_base_scale = _mesh_instance.scale
+		_base_mesh_position = _mesh_instance.position
+		_base_mesh_rotation = _mesh_instance.rotation
 	
 	# Create raycast for obstacle detection
 	if has_node("RayCast3D"):
@@ -46,16 +66,15 @@ func _ready() -> void:
 	
 	# Wait a frame for exported resources to load, then check
 	await get_tree().process_frame
-	print("DEBUG: enemy_data after frame wait: ", enemy_data)
-	if enemy_data:
-		print("DEBUG: enemy_data.display_name: ", enemy_data.display_name)
-		print("DEBUG: enemy_data.enemy_id: ", enemy_data.enemy_id)
 	if enemy_data == null:
 		# Use call_deferred to ensure all classes are registered
 		call_deferred("_load_enemy_data")
 	
 	# Find player reference
 	_find_player()
+	
+	# Ensure animation pauses with world (menus/battles)
+	process_mode = Node.PROCESS_MODE_PAUSABLE
 
 func _load_enemy_data() -> void:
 	# Wait a frame to ensure all autoloads and class registrations are complete
@@ -64,7 +83,6 @@ func _load_enemy_data() -> void:
 	
 	# Check if enemy_data was already set by the scene file
 	if enemy_data != null:
-		print("DEBUG: _load_enemy_data() - enemy_data already set, skipping fallback. Name: ", enemy_data.display_name)
 		return  # Scene already set it, don't override
 	
 	# Try loading with error handling
@@ -214,6 +232,42 @@ func _physics_process(delta: float) -> void:
 			var target_pos: Vector3 = global_position + direction
 			look_at(target_pos, Vector3.UP)
 
+func _process(delta: float) -> void:
+	# Don't animate if defeated
+	if is_defeated or not _mesh_instance:
+		# Reset to base state if defeated
+		if is_defeated and _mesh_instance:
+			_mesh_instance.position = _base_mesh_position
+			_mesh_instance.rotation = _base_mesh_rotation
+			_mesh_instance.scale = _base_scale
+		return
+	
+	# Update animation time
+	_animation_time += delta
+	
+	# Check if enemy is moving (has velocity)
+	var is_moving: bool = velocity.length() > 0.1
+	
+	if is_moving:
+		# Calculate bob (vertical movement)
+		var bob: float = sin(_animation_time * bob_frequency * TAU) * bob_amplitude
+		
+		# Calculate sway (rotation roll - left/right tilt)
+		var sway: float = sin(_animation_time * sway_frequency * TAU) * sway_amplitude
+		
+		# Calculate scale variation (grow/shrink with slightly different frequency)
+		var scale_factor: float = 1.0 + sin(_animation_time * bob_frequency * TAU * 0.7) * scale_variation
+		
+		# Apply to mesh
+		_mesh_instance.position = _base_mesh_position + Vector3(0, bob, 0)
+		_mesh_instance.rotation = _base_mesh_rotation + Vector3(0, 0, sway)
+		_mesh_instance.scale = _base_scale * scale_factor
+	else:
+		# Not moving - reset to base state smoothly
+		_mesh_instance.position = _mesh_instance.position.lerp(_base_mesh_position, delta * 5.0)
+		_mesh_instance.rotation = _mesh_instance.rotation.lerp(_base_mesh_rotation, delta * 5.0)
+		_mesh_instance.scale = _mesh_instance.scale.lerp(_base_scale, delta * 5.0)
+
 func _on_body_entered(body: Node3D) -> void:
 	if is_defeated:
 		return  # Dead enemies don't trigger battles
@@ -225,19 +279,14 @@ func trigger_encounter() -> void:
 	if is_defeated:
 		return  # Don't start battle if already defeated
 	
-	print("DEBUG: trigger_encounter() - enemy_data: ", enemy_data)
 	if enemy_data:
-		print("DEBUG: trigger_encounter() - enemy_data.display_name: ", enemy_data.display_name)
-		print("DEBUG: trigger_encounter() - enemy_data.max_life: ", enemy_data.max_life)
-		print("DEBUG: trigger_encounter() - enemy_data.base_attack: ", enemy_data.base_attack)
 		EventBus.encounter_triggered.emit(enemy_data)
 		# Defer battle start to avoid physics callback issues
 		call_deferred("_start_battle_deferred", enemy_data)
 	else:
-		push_error("DEBUG: trigger_encounter() - enemy_data is NULL!")
+		push_error("trigger_encounter() - enemy_data is NULL!")
 
 func _start_battle_deferred(data: EnemyData) -> void:
-	print("DEBUG: _start_battle_deferred() - data.display_name: ", data.display_name if data else "NULL")
 	# Pass self as triggering enemy so it can be marked defeated if player wins
 	GameManager.start_battle(data, self)
 

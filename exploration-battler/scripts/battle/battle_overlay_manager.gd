@@ -30,8 +30,6 @@ func _ready() -> void:
 	EventBus.battle_ended.connect(_on_battle_ended)
 
 func show_battle_overlay(enemy_data: EnemyData, triggering_enemy: Node3D = null) -> void:
-	if enemy_data:
-		print("DEBUG [BattleOverlayManager]: enemy_data.display_name = ", enemy_data.display_name)
 	if _current_battle_overlay:
 		push_warning("Battle overlay already active, hiding previous one")
 		hide_battle_overlay()

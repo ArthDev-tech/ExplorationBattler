@@ -2,6 +2,8 @@ extends CharacterBody3D
 
 ## First-person player controller for 3D exploration.
 
+const ClimbableScript = preload("res://scripts/components/climbable.gd")
+
 enum PlayerState {
 	NORMAL,
 	LEDGE_GRABBING,
@@ -181,6 +183,15 @@ func _check_ledge_grab() -> void:
 	if _ledge_detector.is_colliding():
 		var collision_point: Vector3 = _ledge_detector.get_collision_point()
 		var collision_normal: Vector3 = _ledge_detector.get_collision_normal()
+		
+		# Check if the collider is a climbable StaticBody3D
+		var collider: Node = _ledge_detector.get_collider()
+		if not collider or not collider is StaticBody3D:
+			return
+		
+		var collider_script: Script = collider.get_script()
+		if not collider_script or collider_script != ClimbableScript:
+			return
 		
 		# Check if there's space above the ledge using a temporary raycast
 		var space_ray: RayCast3D = _space_check if _space_check else null

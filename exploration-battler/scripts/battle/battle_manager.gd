@@ -172,7 +172,6 @@ func _on_lane_clicked(lane_index: int) -> void:
 			pass
 
 func _on_battle_started(enemy: Resource) -> void:
-	print("DEBUG: _on_battle_started() - enemy: ", enemy)
 	enemy_data = enemy as EnemyData
 	if not enemy_data:
 		# Try to cast as Resource and check script
@@ -184,11 +183,6 @@ func _on_battle_started(enemy: Resource) -> void:
 		if not enemy_data:
 			push_error("BattleManager: Invalid enemy data")
 			return
-	
-	if enemy_data:
-		print("DEBUG: _on_battle_started() - enemy_data.display_name: ", enemy_data.display_name)
-		print("DEBUG: _on_battle_started() - enemy_data.max_life: ", enemy_data.max_life)
-		print("DEBUG: _on_battle_started() - enemy_data.base_attack: ", enemy_data.base_attack)
 	
 	start_battle()
 
@@ -206,7 +200,6 @@ func start_battle() -> void:
 		GameManager.player_current_life = GameManager.player_max_life
 		current_life = GameManager.player_max_life
 	battle_state.initialize_player(GameManager.player_max_life, current_life, 3)
-	print("DEBUG [BattleManager.start_battle]: Using enemy_data.max_life = ", enemy_data.max_life if enemy_data else "NULL")
 	battle_state.initialize_enemy(enemy_data.max_life, 3)
 	
 	# Initialize UI components

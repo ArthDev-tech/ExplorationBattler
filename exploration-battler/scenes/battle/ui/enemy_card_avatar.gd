@@ -15,6 +15,11 @@ var _original_position: Vector2 = Vector2.ZERO
 
 @onready var _frame: ColorRect = $Frame
 @onready var _attack_label: Label = $AttackLabel
+@onready var _border_indicator: Panel = $BorderIndicator
+
+# Border colors for identity indicator
+const BORDER_ENEMY_COLOR: Color = Color(0.8, 0.2, 0.2, 1.0)  # Red
+const BORDER_WIDTH: int = 3
 
 func _ready() -> void:
 	mouse_filter = MOUSE_FILTER_STOP
@@ -32,6 +37,24 @@ func _ready() -> void:
 	# Ensure Frame doesn't block drop events
 	if _frame:
 		_frame.mouse_filter = MOUSE_FILTER_PASS
+	
+	# Initialize border indicator
+	_setup_border_indicator()
+
+func _setup_border_indicator() -> void:
+	if not _border_indicator:
+		return
+	
+	# Create StyleBoxFlat for the border
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0)  # Transparent fill
+	style.border_width_left = BORDER_WIDTH
+	style.border_width_top = BORDER_WIDTH
+	style.border_width_right = BORDER_WIDTH
+	style.border_width_bottom = BORDER_WIDTH
+	style.border_color = BORDER_ENEMY_COLOR
+	
+	_border_indicator.add_theme_stylebox_override("panel", style)
 
 func set_avatar(avatar: CardInstance, _is_player: bool) -> void:
 	avatar_instance = avatar
@@ -256,8 +279,24 @@ func _update_hover_visual(hovering: bool) -> void:
 	
 	if hovering:
 		_frame.color = Color(0.15, 0.15, 0.2, 0.95)  # Slightly lighter on hover
+		_update_border_hover(true)
 	else:
 		_frame.color = Color(0.08, 0.08, 0.1, 0.95)  # Default color
+		_update_border_hover(false)
+
+func _update_border_hover(hovering: bool) -> void:
+	if not _border_indicator:
+		return
+	
+	var style: StyleBoxFlat = _border_indicator.get_theme_stylebox("panel") as StyleBoxFlat
+	if not style:
+		return
+	
+	if hovering:
+		# Brighten the border color on hover
+		style.border_color = BORDER_ENEMY_COLOR * 1.3
+	else:
+		style.border_color = BORDER_ENEMY_COLOR
 
 func _update_targeting_visual() -> void:
 	if not _frame:

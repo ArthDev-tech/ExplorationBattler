@@ -1,13 +1,18 @@
-[gd_scene load_steps=6 format=3 uid="uid://dars72atp7vap"]
+[gd_scene load_steps=9 format=3 uid="uid://dars72atp7vap"]
 
 [ext_resource type="Script" uid="uid://cl80yf0we7w43" path="res://scenes/exploration/enemies/enemy_patrol.gd" id="1_ccf3v"]
 [ext_resource type="Resource" uid="uid://crg1oehl5dfos" path="res://resources/enemies/phantom_warden.tres" id="2_phantom"]
 [ext_resource type="ArrayMesh" uid="uid://wy875owklabf" path="res://assets/EnemyResources/PhantomWarden/PhantomWarden.res" id="3_mesh"]
+[ext_resource type="Texture2D" uid="uid://s5p5q3pg538b" path="res://assets/EnemyResources/PhantomWarden/PhantomWarden_0.png" id="4_texture"]
+[ext_resource type="PackedScene" uid="uid://c14o0nkmpx4am" path="res://Imports/props/Lanturn.tscn" id="5_d6jcx"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1"]
 radius = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_warden"]
+albedo_texture = ExtResource("4_texture")
 
 [node name="EnemyPatrol" type="CharacterBody3D"]
 script = ExtResource("1_ccf3v")
@@ -26,3 +31,7 @@ shape = SubResource("SphereShape3D_1")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(-119.999954, -0.1151886, -5.03519e-09, -1.542281e-13, -5.245366e-06, 119.99999, -0.1151886, 119.999954, 5.2453643e-06, 0, 0.039613664, 0)
 mesh = ExtResource("3_mesh")
+surface_material_override/0 = SubResource("StandardMaterial3D_warden")
+
+[node name="Lanturn" parent="." instance=ExtResource("5_d6jcx")]
+transform = Transform3D(0.26943707, 0.05435617, -0.008605282, -0.05503311, 0.26612282, -0.042130668, -5.193767e-10, 0.04300051, 0.27161726, -0.7057494, 0.5693283, -0.6846392)

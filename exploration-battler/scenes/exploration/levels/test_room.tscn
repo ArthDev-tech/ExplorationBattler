@@ -1,19 +1,20 @@
-[gd_scene load_steps=34 format=3 uid="uid://bbckhx202xkna"]
+[gd_scene load_steps=35 format=3 uid="uid://bbckhx202xkna"]
 
 [ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b15kp0tx43v6a" path="res://scenes/exploration/enemies/enemy_patrol.tscn" id="2"]
 [ext_resource type="Script" uid="uid://8k4110w7gjp4" path="res://scenes/exploration/levels/test_room.gd" id="3"]
 [ext_resource type="Script" uid="uid://cgmy3vwljghat" path="res://scripts/components/mesh_collision_sync.gd" id="4"]
 [ext_resource type="PackedScene" uid="uid://dars72atp7vap" path="res://scenes/exploration/enemies/WardenPatrol.tscn" id="4_301dv"]
-[ext_resource type="Material" uid="uid://cbukb51f6xa5" path="res://materials/materials/pulsing_glow_material.tres" id="5_38e7r"]
+[ext_resource type="Script" uid="uid://bwyhoebq0j2oy" path="res://scripts/components/climbable.gd" id="4_ltsvc"]
+[ext_resource type="Material" uid="uid://d14ol7drqkcx2" path="res://materials/materials/distance_visualization_material.tres" id="4_oi2s7"]
 [ext_resource type="PackedScene" uid="uid://b6o56b8r2cfy7" path="res://Imports/props/BasicArmor.tscn" id="6_dj340"]
-[ext_resource type="Script" uid="uid://dntytoh0puu6a" path="res://Imports/props/FloatingPlatform.gd" id="6_floating"]
 [ext_resource type="Material" uid="uid://b8yu6xaa8r3u" path="res://materials/materials/glass_refraction_material.tres" id="7_g4wn3"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/environment/static_hdri_environment.tscn" id="7_j65ic"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="8"]
 [ext_resource type="PackedScene" uid="uid://btwockurhrmtj" path="res://Imports/props/currency_pickup.tscn" id="9"]
 [ext_resource type="PackedScene" uid="uid://dolxiqf3te0co" path="res://Imports/props/Hammer.tscn" id="9_mh5es"]
 [ext_resource type="Script" uid="uid://bkg8npc403ars" path="res://scripts/components/background_music.gd" id="10_bgmusic"]
+[ext_resource type="PackedScene" uid="uid://deki12ot3ip2g" path="res://Imports/TreeA/TreeAProp.tscn" id="15_ltsvc"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_301dv"]
 size = Vector3(100.57, 1, 100.2)
@@ -53,7 +54,8 @@ albedo_color = Color(0.4, 0.6, 0.3, 1)
 size = Vector3(4, 0.5, 4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4"]
-albedo_color = Color(1, 0.7, 0.2, 1)
+albedo_color = Color(0.66756445, 0.45790118, 0.13157195, 1)
+metallic_specular = 0.58
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6"]
 size = Vector3(4, 0.5, 4)
@@ -103,7 +105,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.754786, 8.725704, -4.83029
 
 [node name="WallNorth" type="StaticBody3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -50)
-script = ExtResource("4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/WallNorth"]
 mesh = SubResource("BoxMesh_1")
@@ -114,7 +115,6 @@ shape = SubResource("BoxShape3D_2")
 
 [node name="WallSouth" type="StaticBody3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 50)
-script = ExtResource("4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/WallSouth"]
 mesh = SubResource("BoxMesh_1")
@@ -125,7 +125,6 @@ shape = SubResource("BoxShape3D_2")
 
 [node name="WallWest" type="StaticBody3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 2, 0)
-script = ExtResource("4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/WallWest"]
 mesh = SubResource("BoxMesh_2")
@@ -165,6 +164,7 @@ shape = SubResource("BoxShape3D_g4wn3")
 
 [node name="Platform1" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.84101, 5.449301, -40.1067)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform1"]
@@ -176,6 +176,7 @@ shape = SubResource("BoxShape3D_6")
 
 [node name="Platform2" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.73648, 8.130522, -41.134422)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform2"]
@@ -187,6 +188,7 @@ shape = SubResource("BoxShape3D_6")
 
 [node name="Platform3" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.89191, 6.5346622, -40.546623)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform3"]
@@ -198,6 +200,7 @@ shape = SubResource("BoxShape3D_6")
 
 [node name="Platform4" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.616516, 9.924585, -47.431236)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform4"]
@@ -209,6 +212,7 @@ shape = SubResource("BoxShape3D_6")
 
 [node name="Platform5" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.657763, 12.14972, -43.98569)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform5"]
@@ -219,7 +223,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="Platform6" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.82613, 13, -36.845387)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.82613, 13.684866, -35.571495)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform6"]
@@ -231,6 +236,7 @@ shape = SubResource("BoxShape3D_6")
 
 [node name="LargeFloatingPlatform" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.156574, 6.773533, -13.377699)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/LargeFloatingPlatform"]
@@ -243,24 +249,22 @@ shape = SubResource("BoxShape3D_exiqo")
 
 [node name="FloatingCirclePlatform" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.013961, 10.490828, 0)
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform"]
 transform = Transform3D(25, 0, 0, 0, 0.5, 0, 0, 0, 25, 0, 0, 0)
-material_override = ExtResource("5_38e7r")
+material_override = ExtResource("4_oi2s7")
 mesh = SubResource("CylinderMesh_o6cdt")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.014892578, 0)
 shape = SubResource("CylinderShape3D_g4wn3")
+debug_color = Color(0.27215096, 0.5987574, 0.5755123, 0.41960785)
 
 [node name="FloatingCirclePlatform2" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(0.9628474, 0.27004594, 0, -0.27004594, 0.9628474, 0, 0, 0, 1, -11.6796665, 12.023125, -28.094618)
-script = ExtResource("6_floating")
-override_settings = true
-spin_speed_rad = 0.615
-bob_height = 0.015
-bob_speed = 0.93
+script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform2"]
@@ -272,6 +276,7 @@ surface_material_override/0 = ExtResource("7_g4wn3")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.014892578, 0)
 shape = SubResource("CylinderShape3D_g4wn3")
+debug_color = Color(0.27215096, 0.5987574, 0.5755123, 0.41960785)
 
 [node name="Platform7" type="StaticBody3D" parent="Environment/JumpPuzzle"]
 transform = Transform3D(17.148272, 0, 0, 0, 1, 0, 0, 0, 50.453102, 50.312695, -19.781973, -4.9234123)
@@ -330,4 +335,12 @@ pitch_scale = 0.85
 script = ExtResource("10_bgmusic")
 
 [node name="WardenPatrol" parent="." instance=ExtResource("4_301dv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.529621, 11.592829, -2.1587543)
+transform = Transform3D(0.99861306, 0, 0.05264968, 0, 1, 0, -0.05264968, 0, 0.99861306, 6.529621, 11.592829, -2.1587543)
+pursuit_speed = 2.2
+detection_range = 12.0
+bob_frequency = 0.02
+sway_amplitude = 0.01
+sway_frequency = 9.0
+
+[node name="TreeAProp" parent="." instance=ExtResource("15_ltsvc")]
+transform = Transform3D(1.5662824, 0, -0.95602536, 0, 1.835, 0, 0.95602536, 0, 1.5662824, 7.2854977, -0.6289557, -37.233547)

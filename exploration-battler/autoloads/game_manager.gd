@@ -80,10 +80,6 @@ func _do_transition(scene_path: String) -> void:
 	current_scene = get_tree().current_scene
 
 func start_battle(enemy_data: Resource, triggering_enemy: Node3D = null) -> void:
-	if enemy_data:
-		var ed = enemy_data as EnemyData
-		if ed:
-			print("DEBUG [GameManager]: enemy_data.display_name = ", ed.display_name)
 	if BattleOverlayManager:
 		BattleOverlayManager.show_battle_overlay(enemy_data as EnemyData, triggering_enemy)
 	else:

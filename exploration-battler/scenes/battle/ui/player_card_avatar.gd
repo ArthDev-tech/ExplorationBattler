@@ -15,11 +15,16 @@ var _original_position: Vector2 = Vector2.ZERO
 @onready var _frame: ColorRect = $Frame
 @onready var _attack_label: Label = $AttackLabel
 @onready var _attack_border: Panel = $AttackBorder
+@onready var _identity_border: Panel = $IdentityBorder
 
 # Border colors for attack state indicator
 const BORDER_CAN_ATTACK: Color = Color(0.6, 0.6, 0.6)  # Light grey
 const BORDER_ALREADY_ATTACKED: Color = Color(0.3, 0.3, 0.3)  # Dark grey
 const BORDER_WIDTH: int = 4
+
+# Border colors for identity indicator
+const BORDER_PLAYER_COLOR: Color = Color(0.2, 0.4, 0.8, 1.0)  # Blue
+const IDENTITY_BORDER_WIDTH: int = 3
 
 func _ready() -> void:
 	mouse_filter = MOUSE_FILTER_STOP
@@ -45,6 +50,9 @@ func _ready() -> void:
 	# Initialize attack border
 	_setup_attack_border()
 	_update_attack_border()
+	
+	# Initialize identity border
+	_setup_identity_border()
 
 func set_avatar(avatar: CardInstance, _is_player: bool) -> void:
 	avatar_instance = avatar
@@ -71,6 +79,21 @@ func _setup_attack_border() -> void:
 	style.border_color = BORDER_CAN_ATTACK
 	
 	_attack_border.add_theme_stylebox_override("panel", style)
+
+func _setup_identity_border() -> void:
+	if not _identity_border:
+		return
+	
+	# Create StyleBoxFlat for the identity border
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0)  # Transparent fill
+	style.border_width_left = IDENTITY_BORDER_WIDTH
+	style.border_width_top = IDENTITY_BORDER_WIDTH
+	style.border_width_right = IDENTITY_BORDER_WIDTH
+	style.border_width_bottom = IDENTITY_BORDER_WIDTH
+	style.border_color = BORDER_PLAYER_COLOR
+	
+	_identity_border.add_theme_stylebox_override("panel", style)
 
 func _update_attack_border() -> void:
 	if not _attack_border:
@@ -315,8 +338,24 @@ func _update_hover_visual(hovering: bool) -> void:
 	
 	if hovering:
 		_frame.color = Color(0.15, 0.15, 0.2, 0.95)  # Slightly lighter on hover
+		_update_border_hover(true)
 	else:
 		_frame.color = Color(0.08, 0.08, 0.1, 0.95)  # Default color
+		_update_border_hover(false)
+
+func _update_border_hover(hovering: bool) -> void:
+	if not _identity_border:
+		return
+	
+	var style: StyleBoxFlat = _identity_border.get_theme_stylebox("panel") as StyleBoxFlat
+	if not style:
+		return
+	
+	if hovering:
+		# Brighten the border color on hover
+		style.border_color = BORDER_PLAYER_COLOR * 1.3
+	else:
+		style.border_color = BORDER_PLAYER_COLOR
 
 func _update_targeting_visual() -> void:
 	if not _frame:

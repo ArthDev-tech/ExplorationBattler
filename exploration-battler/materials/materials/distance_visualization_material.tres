@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://d14ol7drqkcx2"]
+
+[ext_resource type="Shader" uid="uid://02m0tr86gmln" path="res://materials/shaders/distance_visualization.gdshader" id="1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/reference_position = Vector3(0, 0, 0)
+shader_parameter/near_color = Color(0.6721683, 0.6698643, 0.5869694, 1)
+shader_parameter/far_color = Color(0.43447718, 0.3055562, 0.18462613, 1)
+shader_parameter/max_distance = 10.0
+shader_parameter/band_width = 1.0
+shader_parameter/band_sharpness = 2.0
