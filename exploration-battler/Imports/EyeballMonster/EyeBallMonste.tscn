@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://xu71hqacvol"]
+
+[ext_resource type="ArrayMesh" uid="uid://d0jg1t2s2upyp" path="res://Imports/EyeballMonster/EyeBallMonster.res" id="1_qmxea"]
+
+[node name="EyeBallMonste" type="Node3D"]
+
+[node name="EyeBallMonster" type="MeshInstance3D" parent="."]
+transform = Transform3D(150, 0, 0, 0, -6.5567083e-06, 150, 0, -150, -6.5567083e-06, 0, 0, 0)
+mesh = ExtResource("1_qmxea")

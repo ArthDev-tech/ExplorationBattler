@@ -1,16 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://b15kp0tx43v6a"]
+[gd_scene load_steps=5 format=3 uid="uid://b15kp0tx43v6a"]
 
 [ext_resource type="Script" uid="uid://cl80yf0we7w43" path="res://scenes/exploration/enemies/enemy_patrol.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://xu71hqacvol" path="res://Imports/EyeballMonster/EyeBallMonste.tscn" id="2_ydu34"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1"]
 radius = 3.0
-
-[sub_resource type="SphereMesh" id="SphereMesh_1"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
-albedo_color = Color(1, 0, 0, 1)
 
 [node name="EnemyPatrol" type="CharacterBody3D"]
 script = ExtResource("1")
@@ -25,7 +21,5 @@ shape = SubResource("CapsuleShape3D_1")
 transform = Transform3D(0.43, 0, 0, 0, 0.43, 0, 0, 0, 0.43, 0, 0.805, 0)
 shape = SubResource("SphereShape3D_1")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("SphereMesh_1")
-surface_material_override/0 = SubResource("StandardMaterial3D_1")
+[node name="EyeBallMonste" parent="Area3D" instance=ExtResource("2_ydu34")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
