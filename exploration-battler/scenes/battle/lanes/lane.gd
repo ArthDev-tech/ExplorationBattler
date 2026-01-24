@@ -229,7 +229,7 @@ func _can_drop_data(_position: Vector2, data: Variant) -> bool:
 		if is_player_lane and current_card == null:
 			can_drop = true
 	
-	# Handle spells: can target creatures in any lane (player or enemy)
+	# Handle non-creatures (spells, traps, relics)
 	elif not card.data.is_creature():
 		var needs_target: bool = false
 		if battle_manager.has_method("spell_needs_target"):
@@ -239,8 +239,10 @@ func _can_drop_data(_position: Vector2, data: Variant) -> bool:
 			# Spell needs target - check if this lane has a valid target
 			can_drop = _can_be_targeted()
 		else:
-			# Spell doesn't need target - can drop anywhere
-			can_drop = true
+			# Non-targeting spells/traps/relics - accept drop to redirect to backrow
+			# Only on player lanes (since we're playing the card)
+			if is_player_lane:
+				can_drop = true
 	
 	# Update visual state
 	_is_drag_over = can_drop
@@ -248,7 +250,7 @@ func _can_drop_data(_position: Vector2, data: Variant) -> bool:
 	
 	return can_drop
 
-func _drop_data(_position: Vector2, data: Variant) -> void:
+func _drop_data(drop_position: Vector2, data: Variant) -> void:
 	var was_avatar_attack: bool = _is_avatar_attack_drag
 	
 	# Reset drag visual state
@@ -260,6 +262,9 @@ func _drop_data(_position: Vector2, data: Variant) -> void:
 	var battle_manager = _get_battle_manager()
 	if not battle_manager:
 		return
+	
+	# Calculate global drop position for animations
+	var global_drop_pos: Vector2 = global_position + drop_position
 	
 	# Handle avatar attack drop
 	if was_avatar_attack and data is Dictionary:
@@ -285,7 +290,7 @@ func _drop_data(_position: Vector2, data: Variant) -> void:
 			battle_manager.play_card(card, lane_index, true)
 		return
 	
-	# Handle spells
+	# Handle non-creatures (spells, traps, relics)
 	if not card.data.is_creature():
 		var needs_target: bool = false
 		if battle_manager.has_method("spell_needs_target"):
@@ -296,11 +301,11 @@ func _drop_data(_position: Vector2, data: Variant) -> void:
 			if _can_be_targeted() and battle_manager.has_method("target_creature"):
 				# Pass spell directly to target_creature (drag-and-drop mode)
 				battle_manager.target_creature(current_card, lane_index, is_player_lane, card)
-			else:
-				pass
 		else:
-			# Spell doesn't need target - play immediately
-			if battle_manager.has_method("play_card"):
+			# Non-targeting spells/traps/relics - animate to backrow
+			if battle_manager.has_method("play_card_animated_to_backrow"):
+				battle_manager.play_card_animated_to_backrow(card, global_drop_pos, true)
+			elif battle_manager.has_method("play_card"):
 				battle_manager.play_card(card, -1, true)
 
 func _is_targeting_mode() -> bool:

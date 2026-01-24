@@ -6,7 +6,10 @@
 script = ExtResource("1")
 card_id = &"ravenous_ghoul"
 display_name = "Ravenous Ghoul"
-cost = 3
+cost = 2
+cost_red = 1
+cost_blue = 0
+cost_green = 0
 card_type = 0
 rarity = 1
 currency_cost = 25

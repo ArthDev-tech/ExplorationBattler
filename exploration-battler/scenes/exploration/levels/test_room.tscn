@@ -263,7 +263,7 @@ shape = SubResource("CylinderShape3D_g4wn3")
 debug_color = Color(0.27215096, 0.5987574, 0.5755123, 0.41960785)
 
 [node name="FloatingCirclePlatform2" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(0.9628474, 0.27004594, 0, -0.27004594, 0.9628474, 0, 0, 0, 1, -11.6796665, 12.023125, -28.094618)
+transform = Transform3D(0.75581783, 0.21198119, -0.6195188, -0.27004597, 0.96284753, 0, 0.596502, 0.16729853, 0.78498185, -11.6796665, 12.023125, -28.094618)
 script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 

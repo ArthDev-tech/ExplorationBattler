@@ -16,6 +16,11 @@ const VERTICAL_OFFSET: float = -180.0  # Negative to position cards upward from 
 const HOVER_POP_HEIGHT: float = 100.0  # Increased for better visibility
 const HOVER_SCALE: float = 1.25  # Slightly larger scale
 
+# Draw animation parameters
+const DRAW_ANIMATION_DURATION: float = 0.3
+const DRAW_STAGGER_DELAY: float = 0.1
+const DRAW_START_OFFSET_Y: float = 400.0  # How far below final position cards start
+
 func _ready() -> void:
 	EventBus.hand_updated.connect(_on_hand_updated)
 	# Load card scene
@@ -26,7 +31,17 @@ func _on_hand_updated(cards: Array, is_player: bool) -> void:
 		_update_hand(cards)
 
 func _update_hand(cards: Array) -> void:
-	_current_cards = cards
+	# Determine which cards are new (for animation)
+	var old_card_ids: Array = []
+	for card in _current_cards:
+		if card:
+			old_card_ids.append(card.get_instance_id())
+	
+	# Properly copy cards to typed array (direct assignment can fail with type mismatch)
+	_current_cards.clear()
+	for c in cards:
+		if c:
+			_current_cards.append(c)
 	
 	# Clear existing visuals
 	for visual in _card_visuals:
@@ -37,10 +52,16 @@ func _update_hand(cards: Array) -> void:
 	_hovered_card_index = -1
 	
 	# Create visuals for each card
+	var new_card_indices: Array[int] = []
 	for i in range(cards.size()):
 		var card_instance = cards[i]
 		if not card_instance:
 			continue
+		
+		# Check if this card is new (wasn't in previous hand)
+		var is_new_card: bool = not old_card_ids.has(card_instance.get_instance_id())
+		if is_new_card:
+			new_card_indices.append(i)
 		
 		if not CARD_SCENE:
 			CARD_SCENE = load("res://scenes/battle/card_ui/card_visual.tscn") as PackedScene
@@ -66,11 +87,86 @@ func _update_hand(cards: Array) -> void:
 			card_visual.mouse_entered.connect(_on_card_hovered.bind(i))
 			card_visual.mouse_exited.connect(_on_card_unhovered)
 	
-	# Position cards in arc after all are created
-	_position_cards_in_arc()
+	# Position cards and animate new ones
+	if new_card_indices.size() > 0:
+		print("[HandArea] Animating ", new_card_indices.size(), " new cards: ", new_card_indices)
+	_position_cards_with_animation(new_card_indices)
 
 func _on_card_clicked(card: CardInstance) -> void:
 	EventBus.card_selected.emit(card)
+
+func _position_cards_with_animation(new_card_indices: Array[int]) -> void:
+	## Position all cards, animating new cards from below the hand area.
+	var card_count = _card_visuals.size()
+	if card_count == 0:
+		return
+	
+	# Get the bottom-center position of the hand area as reference
+	var container_center_x = _card_container.size.x / 2.0
+	var container_bottom_y = _card_container.size.y
+	
+	# Arc parameters
+	var max_spread_angle_rad = deg_to_rad(MAX_SPREAD_ANGLE)
+	var card_spacing_angle = max_spread_angle_rad / max(1, card_count - 1) if card_count > 1 else 0.0
+	
+	# Track animation index for staggering new cards
+	var animation_index: int = 0
+	
+	for i in range(card_count):
+		var card = _card_visuals[i]
+		if not card:
+			continue
+		
+		var center_offset = (card_count - 1) / 2.0
+		var angle = (i - center_offset) * card_spacing_angle
+		
+		# Calculate final position on arc
+		var x = sin(angle) * ARC_RADIUS
+		var y = (1.0 - cos(angle)) * ARC_RADIUS + VERTICAL_OFFSET
+		var final_local_pos = Vector2(container_center_x + x, container_bottom_y + y)
+		var final_rotation = angle
+		
+		# Check if this is a new card that needs animation
+		var is_new: bool = new_card_indices.has(i)
+		
+		if is_new:
+			# Start position: same X as final, but below the hand area
+			var start_local_pos = Vector2(final_local_pos.x, container_bottom_y + DRAW_START_OFFSET_Y)
+			card.position = start_local_pos
+			card.rotation = 0.0  # Start straight
+			card.modulate.a = 1.0  # Fully visible from start
+			card.z_index = 100 + animation_index  # High z-index during animation
+			card.scale = Vector2(0.85, 0.85)  # Start slightly smaller
+			
+			# Animate to final position with stagger
+			var tween: Tween = create_tween()
+			tween.set_ease(Tween.EASE_OUT)
+			tween.set_trans(Tween.TRANS_BACK)
+			
+			var delay: float = animation_index * DRAW_STAGGER_DELAY
+			if delay > 0:
+				tween.tween_interval(delay)
+			
+			# Move to final position
+			tween.tween_property(card, "position", final_local_pos, DRAW_ANIMATION_DURATION)
+			# Rotate to final angle
+			tween.parallel().tween_property(card, "rotation", final_rotation, DRAW_ANIMATION_DURATION)
+			# Scale to normal
+			tween.parallel().tween_property(card, "scale", Vector2(1.0, 1.0), DRAW_ANIMATION_DURATION)
+			# Reset z_index after animation (check validity in case hand was updated)
+			tween.tween_callback(func():
+				if is_instance_valid(card):
+					card.z_index = 0
+			)
+			
+			animation_index += 1
+		else:
+			# Existing card - position instantly
+			card.position = final_local_pos
+			card.rotation = final_rotation
+			card.z_index = 0
+			card.scale = Vector2(1.0, 1.0)
+			card.modulate.a = 1.0
 
 func _position_cards_in_arc() -> void:
 	var card_count = _card_visuals.size()

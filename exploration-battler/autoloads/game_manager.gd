@@ -135,53 +135,56 @@ func initialize_player_deck(deck: RefCounted) -> void:
 	player_deck = deck
 
 func _initialize_starter_deck() -> void:
-	# Create starter deck with one of each starter card
-	var starter_card_paths: Array[String] = [
-		# Original starter cards
-		"res://resources/cards/starter/wandering_soul.tres",
-		"res://resources/cards/starter/forest_whelp.tres",
-		"res://resources/cards/starter/stone_sentry.tres",
-		"res://resources/cards/starter/soul_strike.tres",
-		"res://resources/cards/starter/vengeful_spirit.tres",
-		"res://resources/cards/starter/thornback_wolf.tres",
-		"res://resources/cards/starter/hollow_knight.tres",
-		"res://resources/cards/starter/mend.tres",
-		"res://resources/cards/starter/spectral_surge.tres",
-		"res://resources/cards/starter/cracked_lantern.tres",
-		# Green energy cards
-		"res://resources/cards/starter/green_breath.tres",
-		"res://resources/cards/starter/green_bloom_guardian.tres",
-		"res://resources/cards/starter/green_restore.tres",
-		"res://resources/cards/starter/green_rejuvenate.tres",
-		# Blue energy cards
-		"res://resources/cards/starter/blue_ponder.tres",
-		"res://resources/cards/starter/blue_study.tres",
-		"res://resources/cards/starter/blue_skim.tres",
-		"res://resources/cards/starter/blue_insight.tres",
-		# Red energy cards
-		"res://resources/cards/starter/red_uppercut.tres",
-		"res://resources/cards/starter/red_rampage.tres",
-		"res://resources/cards/starter/red_bash.tres",
-		"res://resources/cards/starter/red_strike.tres",
-		# Grey energy cards
-		"res://resources/cards/starter/grey_scout.tres",
-		"res://resources/cards/starter/grey_shieldbearer.tres",
-		"res://resources/cards/starter/grey_strike.tres"
-	]
+	# Load starter deck from JSON file
+	var path: String = "res://resources/player/decks/starting_deck.json"
+	var card_registry: Node = get_node_or_null("/root/CardRegistry")
+	
+	if not card_registry or not card_registry.has_method("get_card"):
+		push_error("GameManager: CardRegistry not available for starter deck")
+		return
+	
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	if not file:
+		push_error("GameManager: could not open starter deck json: " + path)
+		return
+	
+	var text: String = file.get_as_text()
+	file.close()
+	
+	var parsed: Variant = JSON.parse_string(text)
+	if parsed == null or typeof(parsed) != TYPE_DICTIONARY:
+		push_error("GameManager: invalid starter deck json")
+		return
 	
 	var starter_cards: Array[CardData] = []
-	for card_path in starter_card_paths:
-		var card: CardData = load(card_path) as CardData
-		if card:
-			starter_cards.append(card)
+	var counts: Dictionary = parsed as Dictionary
+	for key in counts.keys():
+		var cid_str: String = String(key)
+		var card_id: StringName = StringName(cid_str)
+		var count_raw: Variant = counts.get(key, 0)
+		var count: int = 0
+		if typeof(count_raw) == TYPE_INT:
+			count = int(count_raw)
+		elif typeof(count_raw) == TYPE_FLOAT:
+			count = int(count_raw)
+		elif typeof(count_raw) == TYPE_STRING:
+			count = int(String(count_raw).to_int())
+		
+		if count <= 0:
+			continue
+		
+		var card_data: CardData = card_registry.call("get_card", card_id) as CardData
+		if card_data:
+			for i in range(count):
+				starter_cards.append(card_data)
 		else:
-			push_error("Failed to load card from path: " + card_path)
+			push_warning("GameManager: starter deck json references unknown card_id '" + cid_str + "'")
 	
 	# Create deck
 	if not starter_cards.is_empty():
 		player_deck = Deck.new(starter_cards)
 	else:
-		push_error("Failed to initialize starter deck - no cards loaded")
+		push_error("Failed to initialize starter deck from JSON - no cards loaded")
 
 func _initialize_card_collection() -> void:
 	# Add starter cards to collection (one of each unique card)

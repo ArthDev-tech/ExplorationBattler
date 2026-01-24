@@ -6,7 +6,7 @@
 script = ExtResource("1")
 card_id = &"soul_trap"
 display_name = "Soul Trap"
-cost = 2
+cost = 3
 card_type = 2
 rarity = 1
 currency_cost = 25
@@ -14,6 +14,6 @@ attack = 0
 health = 0
 tribe = 0
 keywords = [&"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
-description = "When opponent plays a creature, deal 3 damage to it."
+description = "When opponent plays a creature, deal 1 damage to it."
 is_token = false
 sacrifice_value = 0

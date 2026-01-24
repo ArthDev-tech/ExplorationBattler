@@ -10,6 +10,7 @@ var _is_playable: bool = false
 var _drag_started: bool = false
 var _click_timer: float = 0.0
 var _mouse_press_pos: Vector2 = Vector2.ZERO
+var _original_scale: Vector2 = Vector2(1.0, 1.0)
 
 @onready var _background: Panel = $Background
 @onready var _cost_label: Label = $VBox/Header/CostLabel
@@ -290,7 +291,8 @@ func _on_mouse_entered() -> void:
 	if card_instance:
 		# Only apply scale/z_index for cards not in hand (hand_area handles those)
 		if not _is_in_hand():
-			scale = Vector2(1.15, 1.15)
+			_original_scale = scale  # Store current scale before modifying
+			scale = _original_scale * 1.15  # Scale up from current (preserves 0.7x for backrow)
 			z_index = 20
 		# Always add glow effect
 		if _background:
@@ -302,7 +304,7 @@ func _on_mouse_entered() -> void:
 func _on_mouse_exited() -> void:
 	# Only reset scale/z_index for cards not in hand
 	if not _is_in_hand():
-		scale = Vector2(1.0, 1.0)
+		scale = _original_scale  # Restore to original scale (preserves 0.7x for backrow)
 		z_index = 0
 	# Always remove glow effect
 	if _background:
@@ -332,6 +334,17 @@ func _is_in_lane() -> bool:
 		return true
 	if parent_node.get_parent() and parent_node.get_parent().has_method("place_card"):
 		return true
+	return false
+
+func _is_in_backrow() -> bool:
+	# Cards in backrow are in backrow_zone's SlotsContainer -> Slot1/Slot2/Slot3
+	var parent_node: Node = get_parent()
+	if not parent_node:
+		return false
+	if parent_node.name.begins_with("Slot"):
+		var grandparent: Node = parent_node.get_parent()
+		if grandparent and grandparent.name == "SlotsContainer":
+			return true
 	return false
 
 func _is_targeting_mode() -> bool:
@@ -391,8 +404,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_drag_started = false
 
 func _get_drag_data(_position: Vector2) -> Variant:
-	# Prevent dragging cards that are already in lanes - only cards in hand should be draggable
-	if _is_in_lane():
+	# Prevent dragging cards that are already in lanes or backrow - only cards in hand should be draggable
+	if _is_in_lane() or _is_in_backrow():
 		return null
 	
 	# Allow drag for both creatures and spells if playable

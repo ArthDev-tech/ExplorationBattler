@@ -137,6 +137,37 @@ func remove_card_from_lane(lane: int, is_player: bool) -> CardInstance:
 	lanes[lane] = null
 	return card
 
+func add_to_backrow(card: CardInstance, is_player: bool) -> int:
+	## Add a card to the backrow. Returns the slot index or -1 if full.
+	var backrow: Array[CardInstance] = player_backrow if is_player else enemy_backrow
+	if backrow.size() >= 3:
+		return -1
+	backrow.append(card)
+	return backrow.size() - 1
+
+func remove_from_backrow(index: int, is_player: bool) -> CardInstance:
+	## Remove and return the card at the specified backrow index.
+	var backrow: Array[CardInstance] = player_backrow if is_player else enemy_backrow
+	if index < 0 or index >= backrow.size():
+		return null
+	return backrow.pop_at(index)
+
+func get_backrow_card(index: int, is_player: bool) -> CardInstance:
+	## Get the card at the specified backrow index.
+	var backrow: Array[CardInstance] = player_backrow if is_player else enemy_backrow
+	if index < 0 or index >= backrow.size():
+		return null
+	return backrow[index]
+
+func get_backrow_count(is_player: bool) -> int:
+	## Get the number of cards in the backrow.
+	var backrow: Array[CardInstance] = player_backrow if is_player else enemy_backrow
+	return backrow.size()
+
+func is_backrow_full(is_player: bool) -> bool:
+	## Check if the backrow is full.
+	return get_backrow_count(is_player) >= 3
+
 func is_battle_over() -> bool:
 	return player_life <= 0 or enemy_life <= 0
 

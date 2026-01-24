@@ -37,6 +37,9 @@ var _awaiting_energy_pick: bool = false
 @onready var _player_avatar_slot: Control = null
 @onready var _enemy_avatar_slot: Control = null
 @onready var _card_registry: Node = get_node_or_null("/root/CardRegistry")
+@onready var _player_backrow_zone: Control = $UI/PlayerBackrow
+@onready var _enemy_backrow_zone: Control = $UI/EnemyBackrow
+@onready var _screen_flash: ColorRect = $UI/ScreenFlash
 
 func _ready() -> void:
 	# Ensure battle processes even when world is paused
@@ -125,6 +128,53 @@ func _load_enemy_deck_from_json(enemy: EnemyData) -> Array[CardData]:
 	
 	return result
 
+func _load_player_starter_deck_from_json() -> Array[CardData]:
+	var result: Array[CardData] = []
+	var path: String = "res://resources/player/decks/starting_deck.json"
+	
+	if not _card_registry or not _card_registry.has_method("get_card"):
+		push_warning("BattleManager: CardRegistry autoload missing; cannot load player starter deck json")
+		return result
+	
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	if not file:
+		push_warning("BattleManager: could not open player starter deck json: " + path)
+		return result
+	
+	var text: String = file.get_as_text()
+	file.close()
+	
+	var parsed: Variant = JSON.parse_string(text)
+	if parsed == null or typeof(parsed) != TYPE_DICTIONARY:
+		push_warning("BattleManager: invalid player starter deck json (expected Dictionary): " + path)
+		return result
+	
+	var counts: Dictionary = parsed as Dictionary
+	for key in counts.keys():
+		var cid_str: String = String(key)
+		var cid: StringName = StringName(cid_str)
+		var count_raw: Variant = counts.get(key, 0)
+		var count: int = 0
+		if typeof(count_raw) == TYPE_INT:
+			count = int(count_raw)
+		elif typeof(count_raw) == TYPE_FLOAT:
+			count = int(count_raw)
+		elif typeof(count_raw) == TYPE_STRING:
+			count = int(String(count_raw).to_int())
+		
+		if count <= 0:
+			continue
+		
+		var cd: CardData = _card_registry.call("get_card", cid) as CardData
+		if not cd:
+			push_warning("BattleManager: player starter deck json references unknown card_id '" + cid_str + "'")
+			continue
+		
+		for i in range(count):
+			result.append(cd)
+	
+	return result
+
 func _setup_lanes() -> void:
 	_player_lanes.clear()
 	_enemy_lanes.clear()
@@ -147,6 +197,12 @@ func _setup_lanes() -> void:
 				lane.set_lane_index(i)
 				lane.is_player_lane = false
 				_enemy_lanes.append(lane)
+	
+	# Setup backrow zones
+	if _player_backrow_zone and _player_backrow_zone.has_method("set_player_zone"):
+		_player_backrow_zone.set_player_zone(true)
+	if _enemy_backrow_zone and _enemy_backrow_zone.has_method("set_player_zone"):
+		_enemy_backrow_zone.set_player_zone(false)
 
 func _connect_lane_clicks() -> void:
 	# Connect lane click signals for card placement
@@ -227,69 +283,15 @@ func start_battle() -> void:
 			# Fallback: if player_deck isn't a Deck instance, use it as-is.
 			player_deck = GameManager.player_deck
 	else:
-		# Create starter deck
-		var starter_cards: Array[CardData] = []
-		var wandering_soul: CardData = load("res://resources/cards/starter/wandering_soul.tres")
-		var forest_whelp: CardData = load("res://resources/cards/starter/forest_whelp.tres")
-		var stone_sentry: CardData = load("res://resources/cards/starter/stone_sentry.tres")
-		var soul_strike: CardData = load("res://resources/cards/starter/soul_strike.tres")
-		var spectral_surge: CardData = load("res://resources/cards/starter/spectral_surge.tres")
-		var mend: CardData = load("res://resources/cards/starter/mend.tres")
-		
-		# New STS-like pack
-		var red_strike: CardData = load("res://resources/cards/starter/red_strike.tres")
-		var red_bash: CardData = load("res://resources/cards/starter/red_bash.tres")
-		var red_rampage: CardData = load("res://resources/cards/starter/red_rampage.tres")
-		var red_uppercut: CardData = load("res://resources/cards/starter/red_uppercut.tres")
-		
-		var blue_study: CardData = load("res://resources/cards/starter/blue_study.tres")
-		var blue_insight: CardData = load("res://resources/cards/starter/blue_insight.tres")
-		var blue_skim: CardData = load("res://resources/cards/starter/blue_skim.tres")
-		var blue_ponder: CardData = load("res://resources/cards/starter/blue_ponder.tres")
-		
-		var green_restore: CardData = load("res://resources/cards/starter/green_restore.tres")
-		var green_rejuvenate: CardData = load("res://resources/cards/starter/green_rejuvenate.tres")
-		var green_bloom_guardian: CardData = load("res://resources/cards/starter/green_bloom_guardian.tres")
-		var green_breath: CardData = load("res://resources/cards/starter/green_breath.tres")
-		
-		var grey_strike: CardData = load("res://resources/cards/starter/grey_strike.tres")
-		var grey_scout: CardData = load("res://resources/cards/starter/grey_scout.tres")
-		var grey_shieldbearer: CardData = load("res://resources/cards/starter/grey_shieldbearer.tres")
-		
-		for i in range(3):
-			starter_cards.append(wandering_soul)
-		for i in range(2):
-			starter_cards.append(forest_whelp)
-		for i in range(2):
-			starter_cards.append(stone_sentry)
-		starter_cards.append(load("res://resources/cards/starter/vengeful_spirit.tres"))
-		starter_cards.append(load("res://resources/cards/starter/thornback_wolf.tres"))
-		starter_cards.append(load("res://resources/cards/starter/hollow_knight.tres"))
-		for i in range(2):
-			starter_cards.append(soul_strike)
-		starter_cards.append(mend)
-		starter_cards.append(spectral_surge)
-		starter_cards.append(load("res://resources/cards/starter/cracked_lantern.tres"))
-		
-		# Add 1 copy of each new card for quick testing
-		starter_cards.append(red_strike)
-		starter_cards.append(red_bash)
-		starter_cards.append(red_rampage)
-		starter_cards.append(red_uppercut)
-		
-		starter_cards.append(blue_study)
-		starter_cards.append(blue_insight)
-		starter_cards.append(blue_skim)
-		starter_cards.append(blue_ponder)
-		
-		starter_cards.append(green_restore)
-		starter_cards.append(green_rejuvenate)
-		starter_cards.append(green_bloom_guardian)
-		starter_cards.append(green_breath)
-		
-		starter_cards.append(grey_strike)
-		starter_cards.append(grey_scout)
-		starter_cards.append(grey_shieldbearer)
+		# Create starter deck from JSON
+		var starter_cards: Array[CardData] = _load_player_starter_deck_from_json()
+		if starter_cards.is_empty():
+			push_warning("BattleManager: Could not load starter deck from JSON, using minimal fallback")
+			# Minimal fallback deck
+			var fallback_card: CardData = load("res://resources/cards/starter/wandering_soul.tres")
+			if fallback_card:
+				for i in range(10):
+					starter_cards.append(fallback_card)
 		player_deck = Deck.new(starter_cards)
 		# Also set the persistent deck list for deck builder usage.
 		GameManager.player_deck = Deck.new(starter_cards)
@@ -444,9 +446,9 @@ func process_enemy_turn() -> void:
 			"play_card":
 				var card: CardInstance = decision.get("card")
 				var lane: int = decision.get("lane", 0)
-				if play_card(card, lane, false):
+				if await play_enemy_card_animated(card, lane):
 					action_count += 1
-					await get_tree().create_timer(0.3).timeout  # Brief delay between actions
+					await get_tree().create_timer(0.2).timeout  # Brief delay between actions
 					continue  # Try another action
 				else:
 					# Can't play card, end turn
@@ -527,8 +529,38 @@ func play_card(card: CardInstance, lane: int, is_player: bool) -> bool:
 			var lane_node = lanes[lane]
 			if lane_node.has_method("place_card"):
 				lane_node.place_card(card)
+	elif card.data.card_type == CardData.CardType.TRAP or card.data.card_type == CardData.CardType.RELIC:
+		# Handle traps and relics - place in backrow instead of executing
+		var backrow: Array[CardInstance] = state.player_backrow if is_player else state.enemy_backrow
+		if backrow.size() >= 3:
+			return false  # Backrow is full
+		
+		# Spend energy
+		var spent_backrow: bool = state.spend_player_cost(card.data) if is_player else state.spend_enemy_cost(card.data)
+		if not spent_backrow:
+			return false
+		
+		# Remove from hand
+		if is_player:
+			var index_br: int = state.player_hand.find(card)
+			if index_br >= 0:
+				state.player_hand.remove_at(index_br)
+				EventBus.hand_updated.emit(state.player_hand, true)
+		else:
+			var index_bre: int = state.enemy_hand.find(card)
+			if index_bre >= 0:
+				state.enemy_hand.remove_at(index_bre)
+				EventBus.hand_updated.emit(state.enemy_hand, false)
+		
+		# Add to backrow state
+		backrow.append(card)
+		
+		# Update backrow zone visual
+		var zone: Control = _player_backrow_zone if is_player else _enemy_backrow_zone
+		if zone and zone.has_method("place_card"):
+			zone.place_card(card, backrow.size() - 1)
 	else:
-		# Spend energy for non-creature cards (spells/relics).
+		# Spend energy for non-creature cards (spells).
 		var spent_spell: bool = state.spend_player_cost(card.data) if is_player else state.spend_enemy_cost(card.data)
 		if not spent_spell:
 			return false
@@ -545,7 +577,7 @@ func play_card(card: CardInstance, lane: int, is_player: bool) -> bool:
 				state.enemy_hand.remove_at(index_es)
 				EventBus.hand_updated.emit(state.enemy_hand, false)
 		
-		# Non-creature cards (spells/relics) - execute effects immediately
+		# Non-creature cards (spells) - execute effects immediately
 		# Note: If spell needs targeting, it should be handled via enter_targeting_mode()
 		# This path is for spells that don't need targets or are being played with a target
 		if card.data.on_play_effect:
@@ -557,6 +589,264 @@ func play_card(card: CardInstance, lane: int, is_player: bool) -> bool:
 	
 	EventBus.card_played.emit(card, lane, is_player)
 	return true
+
+func play_spell_animated(card: CardInstance, is_player: bool = true) -> bool:
+	## Play a spell with animated feedback. Returns true if spell was executed.
+	## This is called after the animation completes for spells dropped in the play area.
+	if not card or not card.data:
+		return false
+	if is_player and _awaiting_energy_pick:
+		return false
+	
+	var state: BattleState = battle_state
+	if not state:
+		return false
+	
+	# Check affordability
+	if is_player:
+		if not state.can_afford_player_cost(card.data):
+			return false
+	else:
+		if not state.can_afford_enemy_cost(card.data):
+			return false
+	
+	# Spend energy
+	var spent: bool = state.spend_player_cost(card.data) if is_player else state.spend_enemy_cost(card.data)
+	if not spent:
+		return false
+	
+	# Remove from hand
+	if is_player:
+		var index: int = state.player_hand.find(card)
+		if index >= 0:
+			state.player_hand.remove_at(index)
+			EventBus.hand_updated.emit(state.player_hand, true)
+	else:
+		var index: int = state.enemy_hand.find(card)
+		if index >= 0:
+			state.enemy_hand.remove_at(index)
+			EventBus.hand_updated.emit(state.enemy_hand, false)
+	
+	# Execute effect
+	if card.data.on_play_effect:
+		var context = EffectContext.new(state, card, is_player)
+		context.target_lane = -1
+		if card.data.on_play_effect.has_method("execute"):
+			card.data.on_play_effect.execute(context)
+	
+	# Flash screen in spell color
+	var spell_color: Color = get_card_color(card)
+	flash_screen(spell_color, 0.3)
+	
+	EventBus.card_played.emit(card, -1, is_player)
+	return true
+
+const CARD_SCENE_PATH: String = "res://scenes/battle/card_ui/card_visual.tscn"
+const CARD_ANIMATION_DURATION: float = 0.25
+
+func play_card_animated_to_backrow(card: CardInstance, from_pos: Vector2, is_player: bool = true) -> void:
+	## Animate a non-creature card from a position to the backrow, then execute it.
+	## Used when dropping spells/traps/relics on lanes or the play area.
+	if not card or not card.data:
+		return
+	
+	# Get backrow zone for target position
+	var backrow_zone: Control = _player_backrow_zone if is_player else _enemy_backrow_zone
+	var target_pos: Vector2 = from_pos  # Default fallback
+	
+	if backrow_zone:
+		target_pos = backrow_zone.global_position + backrow_zone.size / 2
+	
+	# Create temporary card visual
+	var temp_visual: Control = _create_temp_card_visual(card, from_pos)
+	if not temp_visual:
+		# Fallback: just execute the action without animation
+		_execute_backrow_card(card, is_player)
+		return
+	
+	# Animate to backrow area
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_QUAD)
+	
+	# Move and scale down slightly
+	var target_visual_pos: Vector2 = target_pos - temp_visual.custom_minimum_size * 0.35
+	tween.tween_property(temp_visual, "global_position", target_visual_pos, CARD_ANIMATION_DURATION)
+	tween.parallel().tween_property(temp_visual, "scale", Vector2(0.7, 0.7), CARD_ANIMATION_DURATION)
+	
+	# On complete: handle based on card type
+	tween.tween_callback(func():
+		if is_instance_valid(temp_visual):
+			_on_backrow_animation_complete(card, temp_visual, is_player)
+	)
+
+func _on_backrow_animation_complete(card: CardInstance, temp_visual: Control, is_player: bool) -> void:
+	if not card or not card.data:
+		if is_instance_valid(temp_visual):
+			temp_visual.queue_free()
+		return
+	
+	var card_type: int = card.data.card_type
+	
+	if card_type == CardData.CardType.SPELL:
+		# Spell: flash screen, execute effect, remove visual
+		play_spell_animated(card, is_player)
+		
+		# Fade out and remove the visual
+		var fade_tween: Tween = create_tween()
+		fade_tween.tween_property(temp_visual, "modulate:a", 0.0, 0.2)
+		fade_tween.tween_callback(func():
+			if is_instance_valid(temp_visual):
+				temp_visual.queue_free()
+		)
+	else:
+		# Trap or Relic: place in backrow, remove temp visual
+		if is_instance_valid(temp_visual):
+			temp_visual.queue_free()
+		play_card(card, -1, is_player)
+
+func _execute_backrow_card(card: CardInstance, is_player: bool) -> void:
+	## Fallback execution when animation can't be created
+	var card_type: int = card.data.card_type
+	
+	if card_type == CardData.CardType.SPELL:
+		play_spell_animated(card, is_player)
+	else:
+		play_card(card, -1, is_player)
+
+func _create_temp_card_visual(card: CardInstance, start_pos: Vector2) -> Control:
+	## Create a temporary card visual for animation purposes
+	var card_scene: PackedScene = load(CARD_SCENE_PATH) as PackedScene
+	if not card_scene:
+		return null
+	
+	var card_visual: Control = card_scene.instantiate() as Control
+	if not card_visual:
+		return null
+	
+	# Add to UI layer so it's visible above everything
+	if _ui:
+		_ui.add_child(card_visual)
+	else:
+		add_child(card_visual)
+	
+	# Position at start
+	card_visual.global_position = start_pos - card_visual.custom_minimum_size / 2
+	card_visual.z_index = 50  # Above other UI elements
+	
+	# Set the card data
+	if card_visual.has_method("set_card"):
+		card_visual.set_card(card)
+	
+	# Disable mouse interaction on the temp visual
+	card_visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	return card_visual
+
+const ENEMY_CARD_SCENE_PATH: String = "res://scenes/battle/card_ui/card_visual.tscn"
+const ENEMY_ANIMATION_DURATION: float = 0.35
+
+func play_enemy_card_animated(card: CardInstance, lane: int) -> bool:
+	## Play an enemy card with animation from top of screen.
+	## Returns true if card was successfully played.
+	if not card or not card.data:
+		return false
+	
+	var state: BattleState = battle_state
+	if not state:
+		return false
+	
+	# Check affordability before starting animation
+	if not state.can_afford_enemy_cost(card.data):
+		return false
+	
+	# Determine target position based on card type
+	var target_pos: Vector2
+	var is_creature: bool = card.data.is_creature()
+	var is_spell: bool = card.data.card_type == CardData.CardType.SPELL
+	
+	if is_creature:
+		# Target: enemy lane
+		if lane < 0 or lane >= _enemy_lanes.size():
+			return false
+		var lane_node: Control = _enemy_lanes[lane] as Control
+		if not lane_node:
+			return false
+		target_pos = lane_node.global_position + lane_node.size / 2
+	else:
+		# Target: enemy backrow zone
+		if _enemy_backrow_zone:
+			target_pos = _enemy_backrow_zone.global_position + _enemy_backrow_zone.size / 2
+		else:
+			# Fallback position
+			target_pos = Vector2(get_viewport().get_visible_rect().size.x / 2, 200)
+	
+	# Create temporary card visual
+	var card_scene: PackedScene = load(ENEMY_CARD_SCENE_PATH) as PackedScene
+	if not card_scene:
+		# Fallback: play without animation
+		if is_spell:
+			return play_spell_animated(card, false)
+		else:
+			return play_card(card, lane, false)
+	
+	var temp_visual: Control = card_scene.instantiate() as Control
+	if not temp_visual:
+		if is_spell:
+			return play_spell_animated(card, false)
+		else:
+			return play_card(card, lane, false)
+	
+	# Add to UI layer
+	_ui.add_child(temp_visual)
+	
+	# Position at top-center of screen
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var card_size: Vector2 = temp_visual.custom_minimum_size
+	var start_pos: Vector2 = Vector2(viewport_size.x / 2 - card_size.x / 2, -card_size.y - 20)
+	temp_visual.global_position = start_pos
+	temp_visual.z_index = 50
+	temp_visual.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	# Set the card data for visual display
+	if temp_visual.has_method("set_card"):
+		temp_visual.set_card(card)
+	
+	# Calculate target visual position (centered on target)
+	var target_visual_pos: Vector2 = target_pos - card_size / 2
+	if not is_creature:
+		# Scale down for backrow
+		target_visual_pos = target_pos - card_size * 0.35
+	
+	# Animate to destination
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_QUAD)
+	
+	tween.tween_property(temp_visual, "global_position", target_visual_pos, ENEMY_ANIMATION_DURATION)
+	if not is_creature:
+		tween.parallel().tween_property(temp_visual, "scale", Vector2(0.7, 0.7), ENEMY_ANIMATION_DURATION)
+	
+	# Wait for animation to complete
+	await tween.finished
+	
+	# Execute the card play
+	var success: bool = false
+	if is_spell:
+		# Spell: execute with flash, then fade out visual
+		success = play_spell_animated(card, false)
+		
+		# Fade out and remove
+		var fade_tween: Tween = create_tween()
+		fade_tween.tween_property(temp_visual, "modulate:a", 0.0, 0.2)
+		await fade_tween.finished
+		temp_visual.queue_free()
+	else:
+		# Creature, Trap, or Relic: play card and remove visual
+		temp_visual.queue_free()
+		success = play_card(card, lane, false)
+	
+	return success
 
 func spell_needs_target(card: CardInstance) -> bool:
 	# Check if spell needs a target (has effect that requires target)
@@ -686,6 +976,10 @@ func target_creature(target_card: CardInstance, lane: int, _is_player: bool, spe
 	else:
 		# Spell has no effect resource - create one based on description
 		_create_and_execute_effect_from_description(spell_to_cast, target_card, lane, state, _is_player)
+	
+	# Flash screen for targeting spell visual feedback
+	var spell_color: Color = get_card_color(spell_to_cast)
+	flash_screen(spell_color, 0.3)
 	
 	# Emit card played signal
 	EventBus.card_played.emit(spell_to_cast, lane, true)
@@ -1051,6 +1345,47 @@ func _sync_lane_visuals() -> void:
 					var card_visual = lane_node.get("_card_visual")
 					if card_visual and card_visual.has_method("update_visual_state"):
 						card_visual.update_visual_state()
+
+func flash_screen(color: Color, duration: float = 0.3) -> void:
+	## Flash the screen with the given color for visual feedback.
+	if not _screen_flash:
+		return
+	
+	# Set the flash color with alpha
+	var flash_color: Color = color
+	flash_color.a = 0.5
+	_screen_flash.color = flash_color
+	
+	# Create tween for fade out
+	var tween: Tween = create_tween()
+	tween.tween_property(_screen_flash, "color:a", 0.0, duration).set_ease(Tween.EASE_OUT)
+
+func get_card_color(card: CardInstance) -> Color:
+	## Get the dominant color of a card based on its cost pips.
+	if not card or not card.data:
+		return Color(1, 1, 1, 0.5)  # White default
+	
+	var data: CardData = card.data
+	var red: int = data.cost_red
+	var blue: int = data.cost_blue
+	var green: int = data.cost_green
+	
+	if red > blue and red > green:
+		return Color(1.0, 0.3, 0.3, 0.5)  # Red
+	elif blue > red and blue > green:
+		return Color(0.3, 0.5, 1.0, 0.5)  # Blue
+	elif green > red and green > blue:
+		return Color(0.3, 1.0, 0.4, 0.5)  # Green
+	elif red > 0 or blue > 0 or green > 0:
+		# Mixed or equal - pick highest or default to first non-zero
+		if red >= blue and red >= green and red > 0:
+			return Color(1.0, 0.3, 0.3, 0.5)
+		elif blue >= red and blue >= green and blue > 0:
+			return Color(0.3, 0.5, 1.0, 0.5)
+		elif green > 0:
+			return Color(0.3, 1.0, 0.4, 0.5)
+	
+	return Color(0.8, 0.8, 0.8, 0.5)  # Gray for colorless
 
 func _exit_tree() -> void:
 	if EventBus.battle_started.is_connected(_on_battle_started):
