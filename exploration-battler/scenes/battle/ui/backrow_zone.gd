@@ -1,6 +1,26 @@
 extends Control
 
-## Manages a backrow zone with 3 slots for traps and relics.
+## =============================================================================
+## BackrowZone - Spell/Trap/Relic Zone Controller
+## =============================================================================
+## Manages a backrow zone with slots for non-creature cards.
+## Handles card placement, removal, and drag-and-drop interactions.
+##
+## Backrow Slots:
+## - MAX_SLOTS (3) slots per side
+## - Accepts SPELL, TRAP, and RELIC card types
+## - Cards are scaled down (0.7x) to fit the smaller slots
+##
+## Card Behavior:
+## - SPELL: Activates and discards (handled by battle_manager)
+## - TRAP: Stays until triggered by conditions
+## - RELIC: Stays permanently until destroyed
+##
+## Drag-and-Drop:
+## - Only accepts non-creature cards
+## - Validates energy cost before accepting
+## - Delegates actual play logic to battle_manager
+## =============================================================================
 
 signal backrow_slot_clicked(slot_index: int)
 signal card_placed(card: CardInstance, slot: int)

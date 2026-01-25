@@ -1,7 +1,32 @@
 class_name Keywords
 extends RefCounted
 
+## =============================================================================
+## Keywords - Keyword Definitions and Utilities
+## =============================================================================
 ## Keyword constants and helper functions for card keywords.
+## All 12 keywords from GDD Section 5.4.
+##
+## Combat Keywords:
+## - Haste: Attack immediately (no summoning sickness)
+## - Guard: Forces enemies to attack this first
+## - Flying: Only damaged by Flying/Ranged
+## - Ranged: Can attack any lane
+## - Frenzy: Attacks twice per combat
+##
+## Damage Keywords:
+## - Poison: Damages attacker when hit
+## - Lifesteal: Heals owner for damage dealt
+## - Deathtouch: Any damage kills target
+##
+## Defensive Keywords:
+## - Shield: Blocks first damage instance
+## - Phasing: Can't be targeted first turn
+## - Regenerate: Heals at turn start
+## - Soulbound: Returns to hand on death (once)
+##
+## Usage: Import this class and use Keywords.HASTE, Keywords.GUARD, etc.
+## =============================================================================
 
 # All 12 keywords from GDD Section 5.4
 const HASTE: StringName = &"Haste"

@@ -1,6 +1,28 @@
 extends Control
 
+## =============================================================================
+## Lane - Single Battle Lane Controller
+## =============================================================================
 ## Manages a single lane in the battle arena with visual representation.
+## Handles card placement, removal, drag-and-drop, and targeting interactions.
+##
+## Lanes are the core unit of the battlefield:
+## - Each side has LANE_COUNT (3) lanes
+## - Creatures are placed in lanes to attack and block
+## - Lanes handle mouse input for card selection and targeting
+##
+## Drag-and-Drop Behavior:
+## - Creatures: Only drop on empty player lanes
+## - Targeting Spells: Drop on lanes with valid targets
+## - Non-targeting Spells: Redirect to backrow via battle_manager
+## - Avatar Attacks: Allow on enemy lanes with creatures
+##
+## Visual States:
+## - Hover: Yellow border
+## - Valid Drop Target: Green border
+## - Targeting Mode: Blue border for valid targets
+## - Avatar Attack Target: Red border
+## =============================================================================
 
 signal card_placed(card: CardInstance)
 signal card_removed(card: CardInstance)

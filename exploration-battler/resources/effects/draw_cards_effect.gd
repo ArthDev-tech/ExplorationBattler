@@ -1,7 +1,18 @@
 class_name DrawCardsEffect
 extends CardEffect
 
-## Requests drawing cards for the caster's side.
+## =============================================================================
+## DrawCardsEffect - Card Draw Effect
+## =============================================================================
+## Requests drawing cards from deck to hand for the caster's side.
+## Emits draw_cards_requested signal handled by BattleManager.
+##
+## Parameters:
+## - count: Number of cards to draw (HARDCODED default 1)
+##
+## Uses EventBus signal rather than direct state manipulation to ensure
+## proper animation and hand updates are triggered.
+## =============================================================================
 
 @export var count: int = 1
 

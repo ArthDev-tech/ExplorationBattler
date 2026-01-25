@@ -1,0 +1,113 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://c08k0ajnkkx41"
+path="res://.godot/imported/SimpleScene.fbx-0caa9c1ca730d0261eeef062683309d9.scn"
+
+[deps]
+
+source_file="res://Imports/Terrain/SimpleScene.fbx"
+dest_files=["res://.godot/imported/SimpleScene.fbx-0caa9c1ca730d0261eeef062683309d9.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/root_script=null
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=true
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"nodes": {
+"PATH:Building ": {
+"generate/physics": true
+},
+"PATH:Building _001": {
+"generate/physics": true
+},
+"PATH:Building _002": {
+"generate/physics": true
+},
+"PATH:Building _003": {
+"generate/physics": true
+},
+"PATH:Building _004": {
+"generate/physics": true
+},
+"PATH:Building _005": {
+"generate/physics": true
+},
+"PATH:Building _006": {
+"generate/physics": true
+},
+"PATH:Building _007": {
+"generate/physics": true
+},
+"PATH:Building _008": {
+"generate/physics": true
+},
+"PATH:Building _009": {
+"generate/physics": true
+},
+"PATH:Building _010": {
+"generate/physics": true
+},
+"PATH:Building _011": {
+"generate/physics": true
+},
+"PATH:Building _012": {
+"import/skip_import": true
+},
+"PATH:Building _013": {
+"generate/physics": true
+},
+"PATH:Building _014": {
+"generate/physics": true
+},
+"PATH:Building _015": {
+"generate/physics": true
+},
+"PATH:Building _016": {
+"generate/physics": true
+},
+"PATH:Fountain _001": {
+"generate/physics": true
+},
+"PATH:Fountain _002": {
+"generate/physics": true
+},
+"PATH:Fountain _003": {
+"generate/physics": true
+},
+"PATH:Ground ": {
+"generate/physics": true
+},
+"PATH:PersonRef": {
+"generate/physics": true
+}
+}
+}
+fbx/importer=0
+fbx/allow_geometry_helper_nodes=false
+fbx/embedded_image_handling=1
+fbx/naming_version=2

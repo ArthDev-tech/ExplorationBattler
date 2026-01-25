@@ -1,9 +1,23 @@
 extends Node
 
+## =============================================================================
+## GameManager - Central Game State Controller (Autoload Singleton)
+## =============================================================================
 ## Manages global game state, scene transitions, and high-level game flow.
+## This autoload is the single source of truth for:
+## - Player deck and card collection
+## - Player stats, inventory, and equipment
+## - Currency and persistent health
+## - Scene transitions and zone tracking
+##
+## Access via: GameManager (autoload name in Project Settings)
+## =============================================================================
 
-# Preload core resource classes to ensure they're registered before resources load
-# These const declarations execute when the script loads (before _ready)
+# -----------------------------------------------------------------------------
+# PRELOADED SCRIPTS
+# -----------------------------------------------------------------------------
+# Preload core resource classes to ensure they're registered before resources load.
+# These const declarations execute when the script loads (before _ready).
 const CardDataScript = preload("res://scripts/core/card_data.gd")
 const EnemyDataScript = preload("res://scripts/core/enemy_data.gd")
 const ItemDataScript = preload("res://scripts/core/item_data.gd")
@@ -12,44 +26,78 @@ const PlayerStatsScript = preload("res://scripts/core/player_stats.gd")
 const InventoryScript = preload("res://scripts/core/inventory.gd")
 const DeckScript = preload("res://scripts/core/deck.gd")
 
-# Player data resource - loaded dynamically to ensure class is registered first
+# -----------------------------------------------------------------------------
+# STATE VARIABLES
+# -----------------------------------------------------------------------------
+
+## Player data resource - loaded dynamically to ensure class is registered first.
+## Contains base stats defined in player_data.tres.
 var _player_data: Resource = null
 
+## Reference to the currently active scene node.
 var current_scene: Node = null
+
+## The player's current deck (Deck class instance).
+## Initialized from starting_deck.json on game start.
 var player_deck: RefCounted = null
+
+## Current exploration zone identifier (e.g., &"forest", &"dungeon").
+## Used for save/load and zone-specific logic.
 var current_zone: StringName = &""
 
-# Computed from player_stats to include equipment bonuses
+## Computed max life including equipment bonuses.
+## Dynamically calculated from player_stats when accessed.
 var player_max_life: int:
 	get:
 		if player_stats:
 			return player_stats.get_total_health()
 		# Fallback if player_stats not initialized yet
 		var value = _player_data.get("max_life") if _player_data else null
+		# HARDCODED: Default fallback max life if data not loaded
 		return value if value != null else 20
 
+## Player stats manager - handles base stats and equipment bonuses.
 var player_stats: PlayerStats = null
+
+## Player inventory - holds unequipped items.
 var player_inventory: Inventory = null
+
+## All cards the player has unlocked/collected (unique CardData references).
 var player_card_collection: Array[CardData] = []
-## Persistent collection quantities keyed by `CardData.card_id`.
-## This drives deckbuilding availability (how many copies you own).
+
+## Persistent collection quantities keyed by CardData.card_id.
+## This drives deckbuilding availability (how many copies of each card you own).
 var player_card_quantities: Dictionary = {}  # {StringName: int}
+
+## Currently equipped items by slot type.
+## Keys are ItemData.ItemType enum values (WEAPON, ARMOR, ACCESSORY).
 var equipped_items: Dictionary = {}  # {ItemData.ItemType: ItemInstance}
+
+## Player's currency (gold/coins).
 var player_currency: int = 0
-## Persistent player health between battles. -1 indicates uninitialized (will use max_life on first battle).
+
+## Persistent player health between battles.
+## -1 indicates uninitialized (will use max_life on first battle).
 var player_current_life: int = -1
+
+# -----------------------------------------------------------------------------
+# INITIALIZATION
+# -----------------------------------------------------------------------------
 
 func _ready() -> void:
 	current_scene = get_tree().current_scene
 	EventBus.scene_transition_requested.connect(_on_scene_transition_requested)
 	
 	# Load player data resource - must happen in _ready() to ensure class is registered
+	# HARDCODED: Path to player base data resource
 	_player_data = load("res://resources/player/player_data.tres")
 	
 	# Initialize player systems
 	player_stats = PlayerStats.new()
 	player_stats.initialize(_player_data)
 	player_inventory = Inventory.new()
+	
+	# Initialize equipment slots (all empty at start)
 	equipped_items = {
 		ItemData.ItemType.WEAPON: null,
 		ItemData.ItemType.ARMOR: null,
@@ -65,9 +113,15 @@ func _ready() -> void:
 	if player_current_life < 0:
 		player_current_life = player_max_life
 
+# -----------------------------------------------------------------------------
+# SCENE TRANSITIONS
+# -----------------------------------------------------------------------------
+
 func _on_scene_transition_requested(scene_path: String) -> void:
 	transition_to_scene(scene_path)
 
+## Transitions to a new scene. Uses call_deferred to avoid issues during physics.
+## @param scene_path: Full resource path to the scene (e.g., "res://scenes/...")
 func transition_to_scene(scene_path: String) -> void:
 	# Use call_deferred to avoid removing nodes during physics callbacks
 	call_deferred("_do_transition", scene_path)
@@ -79,21 +133,43 @@ func _do_transition(scene_path: String) -> void:
 		return
 	current_scene = get_tree().current_scene
 
+# -----------------------------------------------------------------------------
+# BATTLE MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## Initiates a battle with the specified enemy.
+## @param enemy_data: EnemyData resource defining the enemy
+## @param triggering_enemy: Optional reference to the 3D enemy node that started combat
 func start_battle(enemy_data: Resource, triggering_enemy: Node3D = null) -> void:
 	if BattleOverlayManager:
 		BattleOverlayManager.show_battle_overlay(enemy_data as EnemyData, triggering_enemy)
 	else:
 		push_error("BattleOverlayManager not found - battle overlay system not available")
 
+## Returns player to the exploration test room after battle.
+## HARDCODED: Scene path - change this when implementing zone-based return
 func return_to_exploration() -> void:
 	transition_to_scene("res://scenes/exploration/levels/test_room.tscn")
 
+# -----------------------------------------------------------------------------
+# CURRENCY MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## Adds or removes currency from player.
+## @param amount: Positive to add, negative to remove (clamped to 0 minimum)
 func add_currency(amount: int) -> void:
 	if amount == 0:
 		return
 	player_currency = maxi(0, player_currency + amount)
 	EventBus.currency_changed.emit(player_currency)
 
+# -----------------------------------------------------------------------------
+# CARD COLLECTION MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## Adds copies of a card to the player's collection.
+## @param card: The CardData to add
+## @param amount: Number of copies to add (default 1)
 func add_card_to_collection(card: CardData, amount: int = 1) -> void:
 	var add_amount: int = maxi(0, amount)
 	if add_amount <= 0:
@@ -101,7 +177,7 @@ func add_card_to_collection(card: CardData, amount: int = 1) -> void:
 	if not card:
 		return
 	
-	# Ensure the card is in the visible collection list.
+	# Ensure the card is in the visible collection list
 	var cid: StringName = card.card_id
 	var has_card: bool = false
 	for existing in player_card_collection:
@@ -111,10 +187,12 @@ func add_card_to_collection(card: CardData, amount: int = 1) -> void:
 	if not has_card:
 		player_card_collection.append(card)
 	
-	# Increase owned quantity.
+	# Increase owned quantity
 	var current: int = int(player_card_quantities.get(cid, 0))
 	player_card_quantities[cid] = current + add_amount
 
+## Rebuilds card quantity tracking from the current deck.
+## Called on initialization to sync quantities with starter deck.
 func _rebuild_collection_quantities_from_deck() -> void:
 	player_card_quantities.clear()
 	var deck: Deck = player_deck as Deck
@@ -124,18 +202,21 @@ func _rebuild_collection_quantities_from_deck() -> void:
 				var cid: StringName = inst.data.card_id
 				player_card_quantities[cid] = int(player_card_quantities.get(cid, 0)) + 1
 	
-	# Ensure every unlocked collection card has at least 1 quantity entry (even if not in deck).
+	# Ensure every unlocked collection card has at least 1 quantity entry (even if not in deck)
 	for cd in player_card_collection:
 		if not cd:
 			continue
 		if not player_card_quantities.has(cd.card_id):
 			player_card_quantities[cd.card_id] = 1
 
+## Sets the player deck (used when loading saves or changing decks).
 func initialize_player_deck(deck: RefCounted) -> void:
 	player_deck = deck
 
+## Loads the starter deck from JSON configuration.
+## HARDCODED: Path to starter deck JSON file
 func _initialize_starter_deck() -> void:
-	# Load starter deck from JSON file
+	# HARDCODED: Starter deck configuration path - change for different starter decks
 	var path: String = "res://resources/player/decks/starting_deck.json"
 	var card_registry: Node = get_node_or_null("/root/CardRegistry")
 	
@@ -161,6 +242,7 @@ func _initialize_starter_deck() -> void:
 	for key in counts.keys():
 		var cid_str: String = String(key)
 		var card_id: StringName = StringName(cid_str)
+		# Parse count from various JSON number formats
 		var count_raw: Variant = counts.get(key, 0)
 		var count: int = 0
 		if typeof(count_raw) == TYPE_INT:
@@ -180,14 +262,16 @@ func _initialize_starter_deck() -> void:
 		else:
 			push_warning("GameManager: starter deck json references unknown card_id '" + cid_str + "'")
 	
-	# Create deck
+	# Create deck from loaded cards
 	if not starter_cards.is_empty():
 		player_deck = Deck.new(starter_cards)
 	else:
 		push_error("Failed to initialize starter deck from JSON - no cards loaded")
 
+## Initializes the card collection with all starter cards.
+## HARDCODED: List of starter card resource paths - expand this list to add more cards
 func _initialize_card_collection() -> void:
-	# Add starter cards to collection (one of each unique card)
+	# HARDCODED: Starter card paths - add new cards here as they're created
 	var starter_cards: Array[String] = [
 		# Original starter cards
 		"res://resources/cards/starter/wandering_soul.tres",
@@ -232,11 +316,19 @@ func _initialize_card_collection() -> void:
 	if player_card_collection.is_empty():
 		push_error("Card collection is empty - no cards loaded successfully!")
 
+# -----------------------------------------------------------------------------
+# EQUIPMENT MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## Equips an item to the specified slot.
+## @param item: ItemInstance to equip
+## @param slot_type: ItemData.ItemType enum value
+## @return: true if equipped successfully, false otherwise
 func equip_item(item: ItemInstance, slot_type: ItemData.ItemType) -> bool:
 	if not item or item.data.item_type != slot_type:
 		return false
 	
-	# Store old max_life before equipment change
+	# Store old max_life before equipment change (for proportional health scaling)
 	var old_max_life: int = player_max_life
 	
 	# Unequip current item if any
@@ -258,6 +350,9 @@ func equip_item(item: ItemInstance, slot_type: ItemData.ItemType) -> bool:
 	EventBus.stats_changed.emit()
 	return true
 
+## Unequips an item from the specified slot and returns it to inventory.
+## @param slot_type: ItemData.ItemType enum value
+## @return: true if unequipped successfully, false if slot empty or inventory full
 func unequip_item(slot_type: ItemData.ItemType) -> bool:
 	var item: ItemInstance = equipped_items.get(slot_type)
 	if not item:
@@ -283,10 +378,10 @@ func unequip_item(slot_type: ItemData.ItemType) -> bool:
 		# Inventory full, can't unequip
 		return false
 
+## Updates player_current_life when max_life changes due to equipment.
+## If max increases: scales current health proportionally.
+## If max decreases: caps current health at new max.
 func _update_health_on_max_change(old_max: int, new_max: int) -> void:
-	## Updates player_current_life when max_life changes.
-	## If max increases: scales current health proportionally.
-	## If max decreases: caps current health at new max.
 	if player_current_life < 0:
 		# Not initialized yet, set to new max
 		player_current_life = new_max
@@ -306,6 +401,13 @@ func _update_health_on_max_change(old_max: int, new_max: int) -> void:
 	# Ensure health is never negative
 	player_current_life = maxi(0, player_current_life)
 
+# -----------------------------------------------------------------------------
+# INVENTORY MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## Adds an item to the player's inventory.
+## @param item_data: ItemData resource to create an instance from
+## @return: true if added successfully, false if inventory full or invalid
 func add_item_to_inventory(item_data: ItemData) -> bool:
 	if not item_data or not player_inventory:
 		push_warning("add_item_to_inventory: item_data or player_inventory is null")
@@ -323,6 +425,10 @@ func add_item_to_inventory(item_data: ItemData) -> bool:
 	else:
 		push_warning("Failed to add item to inventory: " + item_data.item_name)
 		return false
+
+# -----------------------------------------------------------------------------
+# CLEANUP
+# -----------------------------------------------------------------------------
 
 func _exit_tree() -> void:
 	if EventBus.scene_transition_requested.is_connected(_on_scene_transition_requested):

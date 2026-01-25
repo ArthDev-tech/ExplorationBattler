@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3 uid="uid://bwjpt8gd616bl"]
+
+[ext_resource type="PackedScene" uid="uid://c08k0ajnkkx41" path="res://Imports/Terrain/SimpleScene.fbx" id="1_2gu5m"]
+[ext_resource type="Script" uid="uid://b0bq0meic75se" path="res://scenes/exploration/levels/city_blocking.gd" id="2_378yy"]
+[ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="3_nmek6"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="4_72bcx"]
+
+[node name="SimpleScene" instance=ExtResource("1_2gu5m")]
+script = ExtResource("2_378yy")
+
+[node name="Building " parent="." index="0"]
+transform = Transform3D(100, -1.629207e-05, 0, 0, 0, 100, -1.629207e-05, -100, 0, -113.91113, 26.425247, 9.916229)
+
+[node name="Fountain _002" parent="." index="17"]
+transform = Transform3D(400, -8.146035e-05, 0, 0, 0, 100, -6.516828e-05, -500, 0, -8.826666, -1.8316134, 5.045141)
+
+[node name="PlayerController" parent="." index="21" instance=ExtResource("3_nmek6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.507381, 1.7722983, -20.602968)
+
+[node name="ExplorationUI" parent="." index="22" instance=ExtResource("4_72bcx")]

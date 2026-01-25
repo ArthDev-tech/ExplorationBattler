@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://bbckhx202xkna"]
+[gd_scene load_steps=36 format=3 uid="uid://bbckhx202xkna"]
 
 [ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b15kp0tx43v6a" path="res://scenes/exploration/enemies/enemy_patrol.tscn" id="2"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://dolxiqf3te0co" path="res://Imports/props/Hammer.tscn" id="9_mh5es"]
 [ext_resource type="Script" uid="uid://bkg8npc403ars" path="res://scripts/components/background_music.gd" id="10_bgmusic"]
 [ext_resource type="PackedScene" uid="uid://deki12ot3ip2g" path="res://Imports/TreeA/TreeAProp.tscn" id="15_ltsvc"]
+[ext_resource type="PackedScene" uid="uid://d3v3th3dfy347" path="res://Imports/Terrain/TallBuilding.tscn" id="16_t20v2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_301dv"]
 size = Vector3(100.57, 1, 100.2)
@@ -95,13 +96,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.432789, 1.5021702, -24.535
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.841547, 1.5021702, -13.849327)
 
 [node name="CurrencyPickup3" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.60102, 9.045541, -0.89322853)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.60102, 8.488279, -0.89322853)
 
 [node name="CurrencyPickup4" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.458963, 8.725704, -19.150976)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.458963, 7.656995, -19.150976)
+
+[node name="CurrencyPickup6" parent="Environment/Floor" instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67.5592, -8.611263, -28.386246)
 
 [node name="CurrencyPickup5" parent="Environment/Floor" instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.754786, 8.725704, -4.830291)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.754786, 8.099503, -4.830291)
 
 [node name="WallNorth" type="StaticBody3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -50)
@@ -160,6 +164,17 @@ mesh = SubResource("BoxMesh_o6cdt")
 surface_material_override/0 = SubResource("StandardMaterial3D_3")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/Ramp"]
+shape = SubResource("BoxShape3D_g4wn3")
+
+[node name="Ramp2" type="StaticBody3D" parent="Environment/JumpPuzzle"]
+transform = Transform3D(26.656263, 0.30500004, 0, -15.390001, 0.52827555, 0, 0, 0, 11.245002, 63.260414, -7.653409, -28.621868)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Ramp2"]
+mesh = SubResource("BoxMesh_o6cdt")
+surface_material_override/0 = SubResource("StandardMaterial3D_3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/Ramp2"]
 shape = SubResource("BoxShape3D_g4wn3")
 
 [node name="Platform1" type="StaticBody3D" parent="Environment/JumpPuzzle"]
@@ -279,7 +294,7 @@ shape = SubResource("CylinderShape3D_g4wn3")
 debug_color = Color(0.27215096, 0.5987574, 0.5755123, 0.41960785)
 
 [node name="Platform7" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(17.148272, 0, 0, 0, 1, 0, 0, 0, 50.453102, 50.312695, -19.781973, -4.9234123)
+transform = Transform3D(17.148272, 0, 0, 0, 1, 0, 0, 0, 50.453102, 50.312695, -14.836674, -4.9234123)
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/Platform7"]
@@ -303,7 +318,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.618599, 1, -25.963375)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 5)
 
 [node name="PlayerController" parent="." instance=ExtResource("1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.118584, 11.574291, -15.971525)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.118584, 7.7043324, -15.971525)
 
 [node name="EnemyPatrol" parent="." instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 5)
@@ -344,3 +359,9 @@ sway_frequency = 9.0
 
 [node name="TreeAProp" parent="." instance=ExtResource("15_ltsvc")]
 transform = Transform3D(1.5662824, 0, -0.95602536, 0, 1.835, 0, 0.95602536, 0, 1.5662824, 7.2854977, -0.6289557, -37.233547)
+
+[node name="Test" parent="." instance=ExtResource("16_t20v2")]
+transform = Transform3D(0.96665823, 0, -0.25607005, 0, 1, 0, 0.25607005, 0, 0.96665823, 56.2369, -18.495459, 45.068665)
+
+[node name="Test2" parent="." instance=ExtResource("16_t20v2")]
+transform = Transform3D(0.60902447, 0, -0.79315144, 0, 1, 0, 0.79315144, 0, 0.60902447, 9.262024, -18.495459, 64.00329)

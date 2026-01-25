@@ -1,17 +1,51 @@
 class_name Inventory
 extends RefCounted
 
-## Grid-based inventory management system (6x8 = 48 slots).
+## =============================================================================
+## Inventory - Grid-Based Item Storage
+## =============================================================================
+## Manages player's unequipped items in a grid-based inventory system.
+## Items occupy cells based on their size (e.g., 2x3 for large weapons).
+##
+## Grid Layout:
+## - GRID_WIDTH x GRID_HEIGHT cells (default 6x8 = 48 slots)
+## - Items can span multiple cells based on ItemData.size
+## - Items are stored in both a 2D grid (for position) and a flat list
+##
+## Usage:
+##   if inventory.add_item(item_instance):
+##       print("Item added!")
+##   var item = inventory.get_item_at(Vector2i(3, 2))
+## =============================================================================
 
+# -----------------------------------------------------------------------------
+# CONSTANTS
+# -----------------------------------------------------------------------------
+
+## HARDCODED: Grid dimensions - change requires UI updates in inventory_menu
 const GRID_WIDTH: int = 6
 const GRID_HEIGHT: int = 8
 
-var grid: Array[Array] = []  # 2D array: grid[row][col] = ItemInstance or null
-var items: Array[ItemInstance] = []  # List of all items in inventory
+# -----------------------------------------------------------------------------
+# STATE
+# -----------------------------------------------------------------------------
+
+## 2D grid array: grid[row][col] = ItemInstance or null.
+## Multiple cells can reference the same ItemInstance for multi-cell items.
+var grid: Array[Array] = []
+
+## Flat list of all unique items in inventory.
+## Use this for iteration; grid contains duplicate references for large items.
+var items: Array[ItemInstance] = []
+
+# -----------------------------------------------------------------------------
+# INITIALIZATION
+# -----------------------------------------------------------------------------
 
 func _init() -> void:
 	_initialize_grid()
 
+## Creates empty grid structure.
 func _initialize_grid() -> void:
 	grid.clear()
 	for row in range(GRID_HEIGHT):
@@ -20,6 +54,14 @@ func _initialize_grid() -> void:
 			row_array.append(null)
 		grid.append(row_array)
 
+# -----------------------------------------------------------------------------
+# ITEM MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## Adds an item to the inventory.
+## @param item: ItemInstance to add
+## @param position: Specific grid position, or (-1,-1) for auto-placement
+## @return: True if added successfully, false if no space or invalid
 func add_item(item: ItemInstance, position: Vector2i = Vector2i(-1, -1)) -> bool:
 	if not item or not item.data:
 		return false
@@ -32,7 +74,7 @@ func add_item(item: ItemInstance, position: Vector2i = Vector2i(-1, -1)) -> bool
 			return true
 		return false
 	
-	# Find first available space
+	# Auto-placement: find first available space
 	var found_pos: Vector2i = find_space(item)
 	if found_pos.x >= 0:
 		_place_item_at(item, found_pos)
@@ -41,6 +83,9 @@ func add_item(item: ItemInstance, position: Vector2i = Vector2i(-1, -1)) -> bool
 	
 	return false
 
+## Removes an item from the inventory.
+## @param item: ItemInstance to remove
+## @return: True if found and removed, false otherwise
 func remove_item(item: ItemInstance) -> bool:
 	if not item:
 		return false
@@ -49,7 +94,7 @@ func remove_item(item: ItemInstance) -> bool:
 	if index < 0:
 		return false
 	
-	# Remove from grid
+	# Clear all grid cells occupied by this item
 	for row in range(GRID_HEIGHT):
 		for col in range(GRID_WIDTH):
 			if grid[row][col] == item:
@@ -58,13 +103,16 @@ func remove_item(item: ItemInstance) -> bool:
 	items.remove_at(index)
 	return true
 
+## Finds a position where the item can fit.
+## @param item: ItemInstance to find space for
+## @return: Grid position (col, row) or (-1,-1) if no space
 func find_space(item: ItemInstance) -> Vector2i:
 	if not item or not item.data:
 		return Vector2i(-1, -1)
 	
 	var item_size: Vector2i = item.data.size
 	
-	# Try each position
+	# Scan grid left-to-right, top-to-bottom for first fit
 	for row in range(GRID_HEIGHT - item_size.y + 1):
 		for col in range(GRID_WIDTH - item_size.x + 1):
 			if _can_place_at(item, Vector2i(col, row)):
@@ -72,6 +120,11 @@ func find_space(item: ItemInstance) -> Vector2i:
 	
 	return Vector2i(-1, -1)
 
+# -----------------------------------------------------------------------------
+# PRIVATE - PLACEMENT HELPERS
+# -----------------------------------------------------------------------------
+
+## Checks if an item can be placed at a specific position.
 func _can_place_at(item: ItemInstance, position: Vector2i) -> bool:
 	if not item or not item.data:
 		return false
@@ -82,7 +135,7 @@ func _can_place_at(item: ItemInstance, position: Vector2i) -> bool:
 	if position.x + item_size.x > GRID_WIDTH or position.y + item_size.y > GRID_HEIGHT:
 		return false
 	
-	# Check if all cells are empty
+	# Check if all required cells are empty
 	for row in range(item_size.y):
 		for col in range(item_size.x):
 			var check_row: int = position.y + row
@@ -92,23 +145,34 @@ func _can_place_at(item: ItemInstance, position: Vector2i) -> bool:
 	
 	return true
 
+## Places an item at a specific position, filling all its cells.
 func _place_item_at(item: ItemInstance, position: Vector2i) -> void:
 	var item_size: Vector2i = item.data.size
 	
+	# Fill all cells the item occupies with a reference to the item
 	for row in range(item_size.y):
 		for col in range(item_size.x):
 			grid[position.y + row][position.x + col] = item
 
+# -----------------------------------------------------------------------------
+# QUERIES
+# -----------------------------------------------------------------------------
+
+## Returns the item at a specific grid position.
+## @param position: Grid position (col, row)
+## @return: ItemInstance at position, or null if empty/invalid
 func get_item_at(position: Vector2i) -> ItemInstance:
 	if position.x < 0 or position.x >= GRID_WIDTH or position.y < 0 or position.y >= GRID_HEIGHT:
 		return null
 	return grid[position.y][position.x] as ItemInstance
 
+## Returns the number of unique items in inventory.
 func get_item_count() -> int:
 	return items.size()
 
+## Checks if inventory has no empty cells.
+## Note: This checks for ANY empty cell, not if a specific item fits.
 func is_full() -> bool:
-	# Check if there's any empty space
 	for row in range(GRID_HEIGHT):
 		for col in range(GRID_WIDTH):
 			if grid[row][col] == null:

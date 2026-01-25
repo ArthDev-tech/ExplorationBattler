@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://xu71hqacvol" path="res://Imports/EyeballMonster/EyeBallMonste.tscn" id="2_ydu34"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.47802734
+height = 2.8710938
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1"]
 radius = 3.0
@@ -12,7 +14,7 @@ radius = 3.0
 script = ExtResource("1")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5870299, -0.40649796)
 shape = SubResource("CapsuleShape3D_1")
 
 [node name="Area3D" type="Area3D" parent="."]

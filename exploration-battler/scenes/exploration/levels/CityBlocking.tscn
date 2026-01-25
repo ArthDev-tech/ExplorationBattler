@@ -1,0 +1,99 @@
+[gd_scene load_steps=13 format=3 uid="uid://ctvft3c44v23l"]
+
+[ext_resource type="PackedScene" uid="uid://c08k0ajnkkx41" path="res://Imports/Terrain/SimpleScene.fbx" id="1_h4eow"]
+[ext_resource type="Script" uid="uid://b0bq0meic75se" path="res://scenes/exploration/levels/city_blocking.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="3_player"]
+[ext_resource type="Script" uid="uid://bovsq51qmmks5" path="res://scripts/components/auto_trimesh_collision.gd" id="4_collision"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="5_ui"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/environment/static_hdri_environment.tscn" id="6_hdri"]
+[ext_resource type="Script" uid="uid://bwyhoebq0j2oy" path="res://scripts/components/climbable.gd" id="7_kh763"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.5, 0.6, 0.8, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.8, 0.85, 0.95, 1)
+ambient_light_energy = 0.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_killzone"]
+size = Vector3(200, 2, 200)
+
+[sub_resource type="BoxMesh" id="BoxMesh_28gdf"]
+size = Vector3(4, 0.5, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tbdpr"]
+albedo_color = Color(0.66756445, 0.45790118, 0.13157195, 1)
+metallic_specular = 0.58
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mmxdh"]
+size = Vector3(4, 0.5, 4)
+
+[node name="CityBlocking" type="Node3D"]
+script = ExtResource("2_script")
+
+[node name="SceneCollision" type="StaticBody3D" parent="."]
+script = ExtResource("4_collision")
+
+[node name="SimpleScene" parent="SceneCollision" instance=ExtResource("1_h4eow")]
+
+[node name="PlayerSpawn" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.361303, -1.0570796, 0)
+
+[node name="PlayerController" parent="." instance=ExtResource("3_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.361303, 2, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="UI" parent="." instance=ExtResource("5_ui")]
+
+[node name="KillZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -15, 0)
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="KillZone"]
+shape = SubResource("BoxShape3D_killzone")
+
+[node name="StaticHDRIEnvironment" parent="." instance=ExtResource("6_hdri")]
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="Platform1" type="StaticBody3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.971222, 0.45234013, -11.074921)
+script = ExtResource("7_kh763")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Platform1"]
+mesh = SubResource("BoxMesh_28gdf")
+surface_material_override/0 = SubResource("StandardMaterial3D_tbdpr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Platform1"]
+shape = SubResource("BoxShape3D_mmxdh")
+
+[node name="Platform2" type="StaticBody3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40.67182, 0.5374546, -9.005753)
+script = ExtResource("7_kh763")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Platform2"]
+mesh = SubResource("BoxMesh_28gdf")
+surface_material_override/0 = SubResource("StandardMaterial3D_tbdpr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Platform2"]
+shape = SubResource("BoxShape3D_mmxdh")
+
+[node name="Platform3" type="StaticBody3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.186012, 5.449301, 4.837269)
+script = ExtResource("7_kh763")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/Platform3"]
+mesh = SubResource("BoxMesh_28gdf")
+surface_material_override/0 = SubResource("StandardMaterial3D_tbdpr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Platform3"]
+shape = SubResource("BoxShape3D_mmxdh")

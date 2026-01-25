@@ -1,6 +1,30 @@
 extends Control
 
+## =============================================================================
+## CardVisual - Card UI Representation
+## =============================================================================
 ## UI representation of a card. Displays card data and handles interactions.
+## Used in hand, lanes, and backrow for consistent card appearance.
+##
+## Visual Features:
+## - Cost display with colored pips (R/B/G)
+## - Background color based on dominant energy type
+## - Rarity border color (Common/Uncommon/Rare/Legendary)
+## - Tribe-based artwork placeholder colors
+## - Summoning sickness swirl overlay
+##
+## Interactions:
+## - Hover: Scale up, glow effect, raise z-index
+## - Drag: Create preview, return CardInstance as data
+## - Click: Select creature or play spell
+##
+## Context-Aware Behavior:
+## - In Hand: Full interaction (drag, click, hover scale)
+## - In Lane: Reduced interaction (pass events to lane)
+## - In Backrow: No drag, hover scale preserved at 0.7x
+##
+## HARDCODED: Color constants for energy types defined below.
+## =============================================================================
 
 signal card_clicked(card: CardInstance)
 

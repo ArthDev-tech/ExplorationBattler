@@ -1,6 +1,20 @@
 extends Node3D
 
-## Test room script - handles kill zone and player reset.
+## =============================================================================
+## TestRoom - Test Level Controller
+## =============================================================================
+## Test room script - handles kill zone and player respawn.
+## This is the primary development/testing level.
+##
+## Features:
+## - Kill zone at bottom to respawn fallen players
+## - Player spawn point for initial/respawn position
+## - Contains various test enemies and props
+##
+## Kill Zone:
+## - Area3D at bottom of level
+## - When player enters, resets position and velocity
+## =============================================================================
 
 @onready var _kill_zone: Area3D = $Environment/KillZone
 @onready var _player_spawn: Marker3D = $PlayerSpawn

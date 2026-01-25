@@ -1,6 +1,27 @@
 extends CanvasLayer
 
-## Inventory menu overlay that pauses the game and displays player stats, equipment, and inventory.
+## =============================================================================
+## InventoryMenu - Player Inventory and Equipment Screen
+## =============================================================================
+## Inventory menu overlay that pauses the game and displays player stats,
+## equipment, and inventory.
+##
+## Features:
+## - Stats panel: Health, level, XP, attack, defense, currency
+## - Equipment slots: Weapon, armor, accessory (right-click to unequip)
+## - Inventory grid: 6x8 grid-based item storage
+## - Drag-and-drop item management
+## - Cards button to open deck builder
+##
+## Input:
+## - Tab key or "inventory" action to toggle
+## - Right-click on inventory item to equip
+## - Right-click on equipment slot to unequip
+##
+## Pause Behavior:
+## - Opens: pauses game, shows mouse cursor
+## - Closes: unpauses game, captures mouse
+## =============================================================================
 
 var _is_open: bool = false
 var _inventory_slots: Array[Control] = []

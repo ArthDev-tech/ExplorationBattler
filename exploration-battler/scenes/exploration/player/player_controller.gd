@@ -1,6 +1,29 @@
 extends CharacterBody3D
 
-## First-person player controller for 3D exploration.
+## =============================================================================
+## PlayerController - First-Person Movement Controller
+## =============================================================================
+## First-person player controller for 3D exploration with advanced movement.
+##
+## Movement Features:
+## - Standard WASD movement with sprint (Shift)
+## - Jump with double-jump (max_jumps = 2)
+## - Dash ability with cooldown
+## - Ledge grab and climb mechanics
+## - Auto-run toggle
+##
+## State Machine:
+## - NORMAL: Standard ground/air movement
+## - LEDGE_GRABBING: Holding onto a ledge
+## - CLIMBING: Climbing over a ledge
+##
+## Input Actions Expected:
+## - move_forward, move_backward, move_left, move_right
+## - ui_accept (jump), sprint, dash
+## - mouse look (handled via _input)
+##
+## HARDCODED: Movement parameters exported below - adjust for different feel.
+## =============================================================================
 
 const ClimbableScript = preload("res://scripts/components/climbable.gd")
 

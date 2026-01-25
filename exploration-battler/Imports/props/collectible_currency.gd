@@ -1,5 +1,25 @@
 extends Node3D
 
+## =============================================================================
+## CollectibleCurrency - Floating Currency Pickup
+## =============================================================================
+## Floating, spinning currency collectible that adds gold when touched.
+## Emits currency_gained signal for popup display.
+##
+## Animation:
+## - Continuous Y-axis spin (spin_speed_rad)
+## - Sinusoidal vertical bob (bob_height, bob_speed)
+##
+## Pickup:
+## - Triggers on CharacterBody3D collision (assumes player)
+## - Adds currency via GameManager.add_currency()
+## - Emits EventBus.currency_gained for UI popup
+## - Self-destructs after pickup
+##
+## HARDCODED: Default values below - amount can be set per instance.
+## =============================================================================
+
+## Currency amount given when collected
 @export var amount: int = 1
 @export var spin_speed_rad: float = 2.0
 @export var bob_height: float = 0.15

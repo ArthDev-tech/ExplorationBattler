@@ -1,5 +1,22 @@
 extends Node3D
 
+## =============================================================================
+## Item - Collectible Item Pickup
+## =============================================================================
+## Floating, spinning item prop that can be picked up by the player.
+## Adds item to player inventory when touched.
+##
+## Animation:
+## - Continuous Y-axis spin (spin_speed_rad)
+## - Sinusoidal vertical bob (bob_height, bob_speed)
+##
+## Settings:
+## - Can use shared ItemFloatSettings resource or override with per-instance values
+## - Set override_settings=true to use exported values instead of settings resource
+##
+## HARDCODED: Default animation values below - adjust for different feel.
+## =============================================================================
+
 const ItemFloatSettingsScript = preload("res://scripts/core/item_float_settings.gd")
 
 @export var settings: Resource = preload("res://resources/props/item_float_settings_default.tres")

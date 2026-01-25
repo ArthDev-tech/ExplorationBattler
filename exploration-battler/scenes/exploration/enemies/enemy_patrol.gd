@@ -1,6 +1,26 @@
 extends CharacterBody3D
 
-## Basic patrol enemy that triggers battle on contact. Stub for Phase 3.
+## =============================================================================
+## EnemyPatrol - Patrolling Enemy Controller
+## =============================================================================
+## Basic patrol enemy that triggers battle on player contact.
+## Handles patrol movement, player pursuit, and battle initiation.
+##
+## Behavior:
+## - Patrol: Moves between patrol_points in ping-pong pattern
+## - Pursue: Chases player when within detection_range
+## - Battle: Triggers encounter when colliding with player
+##
+## Animation:
+## - Idle bob/sway while moving
+## - Fall animation when defeated
+##
+## Enemy Data:
+## - Loads from enemy_data export or defaults to lost_wanderer.tres
+## - Different scenes may have different mesh structures (handled dynamically)
+##
+## HARDCODED: Movement speeds, detection range, animation parameters below.
+## =============================================================================
 
 @export var patrol_speed: float = 2.0
 @export var pursuit_speed: float = 3.5
@@ -26,7 +46,7 @@ var _is_pursuing: bool = false
 var _patrol_start_position: Vector3 = Vector3.ZERO
 
 @onready var _area: Area3D = $Area3D
-@onready var _mesh_instance: MeshInstance3D = $MeshInstance3D
+var _mesh_instance: Node3D = null  # Found dynamically in _ready
 var _raycast: RayCast3D = null
 var _player: CharacterBody3D = null
 
@@ -39,6 +59,23 @@ var _base_mesh_rotation: Vector3 = Vector3.ZERO
 func _ready() -> void:
 	_area.body_entered.connect(_on_body_entered)
 	_last_position = global_position
+	
+	# Find mesh dynamically - different enemy scenes have different structures
+	_mesh_instance = get_node_or_null("MeshInstance3D")
+	if not _mesh_instance:
+		_mesh_instance = get_node_or_null("Area3D/EyeBallMonste")
+	if not _mesh_instance:
+		# Try to find any MeshInstance3D or Node3D visual child
+		for child in get_children():
+			if child is MeshInstance3D:
+				_mesh_instance = child
+				break
+		# Also check under Area3D
+		if not _mesh_instance and _area:
+			for child in _area.get_children():
+				if child is Node3D and not child is CollisionShape3D:
+					_mesh_instance = child
+					break
 	
 	# Store base mesh transform for animation
 	if _mesh_instance:

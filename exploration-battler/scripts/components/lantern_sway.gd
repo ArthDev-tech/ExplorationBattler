@@ -1,7 +1,23 @@
 extends Node3D
 
+## =============================================================================
+## LanternSway - Procedural Lantern Animation Component
+## =============================================================================
 ## Simple procedural lantern motion (bob + sway) driven by player movement and turning.
 ## Intended to be attached to the root of `Lanturn.tscn` (instanced under the player's Head).
+##
+## Motion Types:
+## - Vertical bob: Sinusoidal bounce scaled by movement speed
+## - Move sway: Roll/pitch based on strafe/forward movement
+## - Turn sway: Roll/pitch based on mouse look rotation
+##
+## Collision Detection:
+## - Raycasts from head to target position
+## - Pulls lantern back if it would clip into geometry
+## - Adjustable padding to prevent z-fighting
+##
+## HARDCODED: Animation parameters exported below - adjust for different feel.
+## =============================================================================
 
 @export var max_speed_for_full_effect: float = 8.0
 

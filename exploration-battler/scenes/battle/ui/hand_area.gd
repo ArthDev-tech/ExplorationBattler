@@ -1,6 +1,24 @@
 extends Control
 
-## Hand area component that displays player's hand cards in an arc.
+## =============================================================================
+## HandArea - Player Hand Display Controller
+## =============================================================================
+## Displays the player's hand cards in a curved arc layout.
+## Handles card positioning, hover effects, and draw animations.
+##
+## Arc Layout:
+## - Cards are positioned along a circular arc for a natural "hand" appearance
+## - Hovering a card pops it up and straightens it for better visibility
+## - Cards spread more as hand size increases (up to MAX_SPREAD_ANGLE)
+##
+## Draw Animation:
+## - New cards slide up from below the hand area
+## - Staggered timing for multiple cards drawn at once
+## - Uses TRANS_BACK easing for a satisfying "snap into place" effect
+##
+## HARDCODED: Arc parameters defined as constants below - adjust for different
+## card sizes or hand positions.
+## =============================================================================
 
 @onready var _card_container: Control = $CardContainer
 

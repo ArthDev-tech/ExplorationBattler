@@ -1,7 +1,19 @@
 class_name DamageEffect
 extends CardEffect
 
-## Deals damage to a target.
+## =============================================================================
+## DamageEffect - Damage Dealing Effect
+## =============================================================================
+## Deals damage to a target creature or directly to opponent.
+##
+## Parameters:
+## - amount: Damage dealt (HARDCODED default 1)
+## - can_target_opponent: If true, can deal direct damage when no target
+##
+## Targeting:
+## - If target specified in context: damages that creature
+## - If no target and can_target_opponent: damages opponent life
+## =============================================================================
 
 @export var amount: int = 1
 @export var can_target_opponent: bool = false  # Can deal direct damage to opponent
