@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://bbckhx202xkna"]
+[gd_scene load_steps=38 format=3 uid="uid://bbckhx202xkna"]
 
 [ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b15kp0tx43v6a" path="res://scenes/exploration/enemies/enemy_patrol.tscn" id="2"]
@@ -16,6 +16,8 @@
 [ext_resource type="Script" uid="uid://bkg8npc403ars" path="res://scripts/components/background_music.gd" id="10_bgmusic"]
 [ext_resource type="PackedScene" uid="uid://deki12ot3ip2g" path="res://Imports/TreeA/TreeAProp.tscn" id="15_ltsvc"]
 [ext_resource type="PackedScene" uid="uid://d3v3th3dfy347" path="res://Imports/Terrain/TallBuilding.tscn" id="16_t20v2"]
+[ext_resource type="PackedScene" uid="uid://dfxj6ttbssa7a" path="res://Imports/CheryCardTree/CherryCardTree.tscn" id="17_n5wks"]
+[ext_resource type="PackedScene" uid="uid://4g2xgqedcv6" path="res://Imports/MountainBoard/MountainBoard.tscn" id="18_7hsim"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_301dv"]
 size = Vector3(100.57, 1, 100.2)
@@ -365,3 +367,36 @@ transform = Transform3D(0.96665823, 0, -0.25607005, 0, 1, 0, 0.25607005, 0, 0.96
 
 [node name="Test2" parent="." instance=ExtResource("16_t20v2")]
 transform = Transform3D(0.60902447, 0, -0.79315144, 0, 1, 0, 0.79315144, 0, 0.60902447, 9.262024, -18.495459, 64.00329)
+
+[node name="CherryCardTree" parent="." instance=ExtResource("17_n5wks")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 185.6955, -24.776428, -469.34488)
+
+[node name="CherryCardTree2" parent="." instance=ExtResource("17_n5wks")]
+transform = Transform3D(-0.630439, 0, -0.66643536, 0, 0.7655886, 0, 0.46791518, 0, -0.8979124, -159.39853, -24.776428, -360.77646)
+
+[node name="MountainBoard" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -123.07161, 27.415379, -619.79834)
+
+[node name="MountainBoard3" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(0.96028394, 0, 0.2790246, 0, 1, 0, -0.2790246, 0, 0.96028394, -584.6234, 27.415379, -471.79852)
+
+[node name="MountainBoard4" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(0.13232562, 0, 0.9912063, 0, 1, 0, -0.9912063, 0, 0.13232562, -708.0779, 27.415318, -149.45978)
+
+[node name="MountainBoard2" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(0.9816605, 0, -0.19063766, 0, 1, 0, 0.19063766, 0, 0.9816605, 652.05383, 27.415379, -559.87836)
+
+[node name="MountainBoard5" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(0.34907907, 0, -0.9370933, 0, 1, 0, 0.9370933, 0, 0.34907907, 822.21747, 27.415379, -218.39844)
+
+[node name="MountainBoard6" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(-0.50944704, 0, -0.86050206, 0, 1, 0, 0.86050206, 0, -0.50944704, 822.21747, 38.011295, 278.7224)
+
+[node name="MountainBoard7" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(-0.9974357, 0, -0.07156703, 0, 1, 0, 0.07156703, 0, -0.9974357, 257.0462, 46.122135, 594.9812)
+
+[node name="MountainBoard8" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(-0.96604306, 0, 0.2583807, 0, 1, 0, -0.2583807, 0, -0.96604306, -178.72046, 38.011295, 615.6388)
+
+[node name="MountainBoard9" parent="." instance=ExtResource("18_7hsim")]
+transform = Transform3D(-0.64847857, 0, 0.76123273, 0, 1, 0, -0.76123273, 0, -0.64847857, -555.69196, 38.011356, 411.36475)

@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://4g2xgqedcv6"]
+
+[ext_resource type="Texture2D" uid="uid://b1bu07ellynkt" path="res://Imports/MountainBoard/lucid-origin_Toweringly_majestic_peaks_rise_from_the_earth_their_rugged_slopes_kissed_by_the_-0.png" id="1_3w30k"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_i8upn"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_imj7b"]
+transparency = 1
+albedo_color = Color(0.15055558, 0.15055558, 0.15055558, 1)
+albedo_texture = ExtResource("1_3w30k")
+
+[node name="MountainBoard" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(394.81152, 0, 0, 0, -8.419906e-06, -157.65324, 0, 192.625, -6.8912423e-06, 0, 0, 0)
+mesh = SubResource("PlaneMesh_i8upn")
+surface_material_override/0 = SubResource("StandardMaterial3D_imj7b")

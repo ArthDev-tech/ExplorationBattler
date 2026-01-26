@@ -1,0 +1,25 @@
+[gd_scene load_steps=7 format=3 uid="uid://dfxj6ttbssa7a"]
+
+[ext_resource type="ArrayMesh" uid="uid://du2oq66x4ac62" path="res://Imports/CheryCardTree/CheeryCardTree.obj" id="1_b8oph"]
+[ext_resource type="Texture2D" uid="uid://clhgsnf2spyp6" path="res://Imports/CheryCardTree/shaded.png" id="2_o0m1g"]
+[ext_resource type="Texture2D" uid="uid://ldbl7hmma5ex" path="res://Imports/CheryCardTree/texture_metallic.png" id="3_8pvys"]
+[ext_resource type="Texture2D" uid="uid://cyrlou3yfuf6p" path="res://Imports/CheryCardTree/texture_normal.png" id="4_s2o33"]
+[ext_resource type="Texture2D" uid="uid://duei5ibxjgqaq" path="res://Imports/CheryCardTree/texture_roughness.png" id="5_mug11"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ldmav"]
+albedo_texture = ExtResource("2_o0m1g")
+metallic = 1.0
+metallic_specular = 0.13
+metallic_texture = ExtResource("3_8pvys")
+roughness = 0.06
+roughness_texture = ExtResource("5_mug11")
+normal_enabled = true
+normal_scale = -6.62
+normal_texture = ExtResource("4_s2o33")
+
+[node name="CherryCardTree" type="Node3D"]
+
+[node name="CheeryCardTree" type="MeshInstance3D" parent="."]
+transform = Transform3D(200, 0, 0, 0, 200, 0, 0, 0, 200, 0, 0, 0)
+mesh = ExtResource("1_b8oph")
+surface_material_override/0 = SubResource("StandardMaterial3D_ldmav")
