@@ -76,10 +76,12 @@ func _ready() -> void:
 	if _cards_button:
 		_cards_button.pressed.connect(_on_cards_button_pressed)
 	
-	EventBus.stats_changed.connect(_on_stats_changed)
-	EventBus.currency_changed.connect(_on_currency_changed)
-	EventBus.item_collected.connect(_on_item_collected)
-	EventBus.player_health_changed.connect(_on_player_health_changed)
+	# Only connect signals at runtime, not in editor
+	if not Engine.is_editor_hint():
+		EventBus.stats_changed.connect(_on_stats_changed)
+		EventBus.currency_changed.connect(_on_currency_changed)
+		EventBus.item_collected.connect(_on_item_collected)
+		EventBus.player_health_changed.connect(_on_player_health_changed)
 	_update_stats_display()
 
 func _input(event: InputEvent) -> void:
@@ -205,7 +207,10 @@ func _setup_inventory_grid() -> void:
 				var slot_scene: PackedScene = load("res://scenes/exploration/ui/components/inventory_slot.tscn")
 				if slot_scene:
 					var slot: Control = slot_scene.instantiate()
-					slot.slot_position = Vector2i(col, row)
+					_inventory_grid.add_child(slot)
+					# Set position after adding to tree (ensures script is loaded)
+					# Use set() method which works even if property isn't directly accessible in @tool mode
+					slot.set("slot_position", Vector2i(col, row))
 					
 					# Only connect signals at runtime, not in editor
 					if not Engine.is_editor_hint():
@@ -213,7 +218,6 @@ func _setup_inventory_grid() -> void:
 						if slot.has_signal("slot_drag_started"):
 							slot.slot_drag_started.connect(_on_slot_drag_started)
 					
-					_inventory_grid.add_child(slot)
 					_inventory_slots.append(slot)
 	else:
 		# Slots already exist, just populate the array
@@ -380,11 +384,13 @@ func _on_player_health_changed(current: int, maximum: int) -> void:
 	_update_stats_display()
 
 func _exit_tree() -> void:
-	if EventBus.stats_changed.is_connected(_on_stats_changed):
-		EventBus.stats_changed.disconnect(_on_stats_changed)
-	if EventBus.currency_changed.is_connected(_on_currency_changed):
-		EventBus.currency_changed.disconnect(_on_currency_changed)
-	if EventBus.item_collected.is_connected(_on_item_collected):
-		EventBus.item_collected.disconnect(_on_item_collected)
-	if EventBus.player_health_changed.is_connected(_on_player_health_changed):
-		EventBus.player_health_changed.disconnect(_on_player_health_changed)
+	# Only disconnect signals at runtime, not in editor
+	if not Engine.is_editor_hint():
+		if EventBus.stats_changed.is_connected(_on_stats_changed):
+			EventBus.stats_changed.disconnect(_on_stats_changed)
+		if EventBus.currency_changed.is_connected(_on_currency_changed):
+			EventBus.currency_changed.disconnect(_on_currency_changed)
+		if EventBus.item_collected.is_connected(_on_item_collected):
+			EventBus.item_collected.disconnect(_on_item_collected)
+		if EventBus.player_health_changed.is_connected(_on_player_health_changed):
+			EventBus.player_health_changed.disconnect(_on_player_health_changed)

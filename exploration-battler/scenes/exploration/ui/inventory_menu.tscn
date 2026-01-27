@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ccaibe6k13mhu" path="res://scenes/exploration/ui/UIAssets/UIArt/Profile.png" id="3_rvq2w"]
 
 [node name="InventoryMenu" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1")
 
 [node name="EquipmentTitle" type="Label" parent="."]
@@ -144,7 +145,6 @@ layout_mode = 2
 text = "View Card Collection"
 
 [node name="BackgroundOverlay" type="ColorRect" parent="."]
-visible = false
 z_index = -4
 anchors_preset = 15
 anchor_right = 1.0
