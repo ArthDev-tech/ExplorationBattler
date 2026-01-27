@@ -1,3 +1,4 @@
+@tool
 extends CanvasLayer
 
 ## =============================================================================
@@ -9,7 +10,7 @@ extends CanvasLayer
 ## Features:
 ## - Stats panel: Health, level, XP, attack, defense, currency
 ## - Equipment slots: Weapon, armor, accessory (right-click to unequip)
-## - Inventory grid: 6x8 grid-based item storage
+## - Inventory grid: Configurable grid-based item storage (see INVENTORY_GRID_COLUMNS and INVENTORY_GRID_ROWS constants)
 ## - Drag-and-drop item management
 ## - Cards button to open deck builder
 ##
@@ -27,29 +28,46 @@ var _is_open: bool = false
 var _inventory_slots: Array[Control] = []
 var _equipment_slots: Dictionary = {}  # {ItemData.ItemType: EquipmentSlot}
 
+# Inventory grid configuration
+const INVENTORY_GRID_COLUMNS: int = 12
+const INVENTORY_GRID_ROWS: int = 8
+const INVENTORY_GRID_TOTAL_SLOTS: int = INVENTORY_GRID_COLUMNS * INVENTORY_GRID_ROWS
+
 func _init() -> void:
 	# Ensure this node processes even when paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 @onready var _background_overlay: ColorRect = $BackgroundOverlay
-@onready var _menu_panel: Control = $MenuPanel
-@onready var _stats_panel: VBoxContainer = $MenuPanel/MainContainer/LeftPanel/StatsPanel
-@onready var _equipment_container: VBoxContainer = $MenuPanel/MainContainer/RightPanel/EquipmentContainer
-@onready var _inventory_grid: GridContainer = $MenuPanel/MainContainer/RightPanel/InventoryGrid
-@onready var _close_button: Button = $MenuPanel/Header/CloseButton
-@onready var _cards_button: Button = $MenuPanel/MainContainer/RightPanel/CardsButton
-@onready var _health_label: Label = $MenuPanel/MainContainer/LeftPanel/StatsPanel/HealthLabel
-@onready var _level_label: Label = $MenuPanel/MainContainer/LeftPanel/StatsPanel/LevelLabel
-@onready var _xp_label: Label = $MenuPanel/MainContainer/LeftPanel/StatsPanel/XPLabel
-@onready var _attack_label: Label = $MenuPanel/MainContainer/LeftPanel/StatsPanel/AttackLabel
-@onready var _defense_label: Label = $MenuPanel/MainContainer/LeftPanel/StatsPanel/DefenseLabel
-@onready var _currency_label: Label = $MenuPanel/MainContainer/LeftPanel/StatsPanel/CurrencyLabel
-@onready var _equipment_slots_container: HBoxContainer = $MenuPanel/MainContainer/RightPanel/EquipmentContainer/EquipmentSlots
+@onready var _inventory_grid: GridContainer = $RightPanel/InventoryGrid
+@onready var _close_button: Button = $Header/CloseButton
+@onready var _cards_button: Button = $RightPanel/CardsButton
+@onready var _health_label: Label = $StatsPanel/HealthLabel
+@onready var _level_label: Label = $StatsPanel/LevelLabel
+@onready var _xp_label: Label = $StatsPanel/XPLabel
+@onready var _attack_label: Label = $StatsPanel/AttackLabel
+@onready var _defense_label: Label = $StatsPanel/DefenseLabel
+@onready var _currency_label: Label = $StatsPanel/CurrencyLabel
+@onready var _equipment_slots_container: Control = $EquipmentTitle/EquipmentSlots
+@onready var _profile_sprite: Sprite2D = $Profile
+@onready var _stats_panel_container: VBoxContainer = $StatsPanel
+@onready var _right_panel_container: VBoxContainer = $RightPanel
+@onready var _header_container: HBoxContainer = $Header
+@onready var _equipment_title_label: Label = $EquipmentTitle
 
 func _ready() -> void:
-	_menu_panel.visible = false
+	# Hide all UI elements by default
 	if _background_overlay:
 		_background_overlay.visible = false
+	if _stats_panel_container:
+		_stats_panel_container.visible = false
+	if _right_panel_container:
+		_right_panel_container.visible = false
+	if _header_container:
+		_header_container.visible = false
+	if _equipment_title_label:
+		_equipment_title_label.visible = false
+	if _profile_sprite:
+		_profile_sprite.visible = false
 	_setup_equipment_slots()
 	_setup_inventory_grid()
 	
@@ -97,7 +115,16 @@ func open_inventory() -> void:
 	_is_open = true
 	if _background_overlay:
 		_background_overlay.visible = true
-	_menu_panel.visible = true
+	if _stats_panel_container:
+		_stats_panel_container.visible = true
+	if _right_panel_container:
+		_right_panel_container.visible = true
+	if _header_container:
+		_header_container.visible = true
+	if _equipment_title_label:
+		_equipment_title_label.visible = true
+	if _profile_sprite:
+		_profile_sprite.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().paused = true
 	EventBus.inventory_opened.emit()
@@ -111,9 +138,18 @@ func close_inventory() -> void:
 		return
 	
 	_is_open = false
-	_menu_panel.visible = false
 	if _background_overlay:
 		_background_overlay.visible = false
+	if _stats_panel_container:
+		_stats_panel_container.visible = false
+	if _right_panel_container:
+		_right_panel_container.visible = false
+	if _header_container:
+		_header_container.visible = false
+	if _equipment_title_label:
+		_equipment_title_label.visible = false
+	if _profile_sprite:
+		_profile_sprite.visible = false
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	get_tree().paused = false
 	EventBus.inventory_closed.emit()
@@ -124,46 +160,67 @@ func _setup_equipment_slots() -> void:
 	if not _equipment_slots_container:
 		return
 	
-	var weapon_slot: Control = _equipment_slots_container.get_node_or_null("WeaponSlot")
-	var armor_slot: Control = _equipment_slots_container.get_node_or_null("ArmorSlot")
-	var acc1_slot: Control = _equipment_slots_container.get_node_or_null("Accessory1Slot")
+	# Setup function to configure a slot
+	var setup_slot = func(slot_name: String, slot_type: ItemData.ItemType) -> void:
+		var slot: Control = _equipment_slots_container.get_node_or_null(slot_name)
+		if slot and slot.has_method("set_slot_type"):
+			slot.set_slot_type(slot_type)
+			if not slot.slot_clicked.is_connected(_on_equipment_slot_clicked):
+				slot.slot_clicked.connect(_on_equipment_slot_clicked)
+			_equipment_slots[slot_type] = slot
 	
-	if weapon_slot and weapon_slot.has_method("set_slot_type"):
-		weapon_slot.set_slot_type(ItemData.ItemType.WEAPON)
-		if not weapon_slot.slot_clicked.is_connected(_on_equipment_slot_clicked):
-			weapon_slot.slot_clicked.connect(_on_equipment_slot_clicked)
-		_equipment_slots[ItemData.ItemType.WEAPON] = weapon_slot
-	
-	if armor_slot and armor_slot.has_method("set_slot_type"):
-		armor_slot.set_slot_type(ItemData.ItemType.ARMOR)
-		if not armor_slot.slot_clicked.is_connected(_on_equipment_slot_clicked):
-			armor_slot.slot_clicked.connect(_on_equipment_slot_clicked)
-		_equipment_slots[ItemData.ItemType.ARMOR] = armor_slot
-	
-	if acc1_slot and acc1_slot.has_method("set_slot_type"):
-		acc1_slot.set_slot_type(ItemData.ItemType.ACCESSORY)
-		if not acc1_slot.slot_clicked.is_connected(_on_equipment_slot_clicked):
-			acc1_slot.slot_clicked.connect(_on_equipment_slot_clicked)
-		_equipment_slots[ItemData.ItemType.ACCESSORY] = acc1_slot
-	
-	# For now, use first accessory slot for all accessories
-	# In full implementation, would have separate accessory slots
+	# Setup all equipment slots
+	setup_slot.call("WeaponSlot", ItemData.ItemType.WEAPON)
+	setup_slot.call("ArmorSlot", ItemData.ItemType.ARMOR)
+	setup_slot.call("HelmSlot", ItemData.ItemType.HELM)
+	setup_slot.call("BootsSlot", ItemData.ItemType.BOOTS)
+	setup_slot.call("BeltSlot", ItemData.ItemType.BELT)
+	setup_slot.call("LegsSlot", ItemData.ItemType.LEGS)
+	setup_slot.call("PauldronsSlot", ItemData.ItemType.PAULDRONS)
+	setup_slot.call("GlovesSlot", ItemData.ItemType.GLOVES)
+	setup_slot.call("Ring1Slot", ItemData.ItemType.RING)
+	setup_slot.call("Ring2Slot", ItemData.ItemType.RING)
+	setup_slot.call("Accessory1Slot", ItemData.ItemType.ACCESSORY)
 
 func _setup_inventory_grid() -> void:
-	# Create inventory slots (6x8 = 48 slots)
-	_inventory_slots.clear()
+	if not _inventory_grid:
+		return
 	
-	for row in range(8):
-		for col in range(6):
-			var slot_scene: PackedScene = load("res://scenes/exploration/ui/components/inventory_slot.tscn")
-			if slot_scene:
-				var slot: Control = slot_scene.instantiate()
-				slot.slot_position = Vector2i(col, row)
-				slot.slot_clicked.connect(_on_inventory_slot_clicked)
-				if slot.has_signal("slot_drag_started"):
-					slot.slot_drag_started.connect(_on_slot_drag_started)
-				_inventory_grid.add_child(slot)
-				_inventory_slots.append(slot)
+	# Check if slots already exist (editor scenario)
+	var existing_slots: int = _inventory_grid.get_child_count()
+	var expected_slots: int = INVENTORY_GRID_TOTAL_SLOTS
+	
+	# Only create slots if they don't exist or count doesn't match
+	if existing_slots != expected_slots:
+		# Clear existing slots if count doesn't match
+		if existing_slots > 0:
+			for child in _inventory_grid.get_children():
+				child.queue_free()
+		
+		_inventory_slots.clear()
+		
+		# Create inventory slots
+		for row in range(INVENTORY_GRID_ROWS):
+			for col in range(INVENTORY_GRID_COLUMNS):
+				var slot_scene: PackedScene = load("res://scenes/exploration/ui/components/inventory_slot.tscn")
+				if slot_scene:
+					var slot: Control = slot_scene.instantiate()
+					slot.slot_position = Vector2i(col, row)
+					
+					# Only connect signals at runtime, not in editor
+					if not Engine.is_editor_hint():
+						slot.slot_clicked.connect(_on_inventory_slot_clicked)
+						if slot.has_signal("slot_drag_started"):
+							slot.slot_drag_started.connect(_on_slot_drag_started)
+					
+					_inventory_grid.add_child(slot)
+					_inventory_slots.append(slot)
+	else:
+		# Slots already exist, just populate the array
+		_inventory_slots.clear()
+		for child in _inventory_grid.get_children():
+			if child is Control:
+				_inventory_slots.append(child)
 
 func _refresh_inventory_display() -> void:
 	if not GameManager.player_inventory:
@@ -178,8 +235,8 @@ func _refresh_inventory_display() -> void:
 	var inventory: Inventory = GameManager.player_inventory
 	
 	# Map items to their grid positions
-	for row in range(8):
-		for col in range(6):
+	for row in range(INVENTORY_GRID_ROWS):
+		for col in range(INVENTORY_GRID_COLUMNS):
 			var grid_pos: Vector2i = Vector2i(col, row)
 			var item_at_pos: ItemInstance = inventory.get_item_at(grid_pos)
 			
@@ -292,7 +349,19 @@ func _on_cards_button_pressed() -> void:
 	var card_menu: CanvasLayer = get_tree().current_scene.get_node_or_null("UI/CardCollectionMenu")
 	if card_menu and card_menu.has_method("open_menu"):
 		card_menu.open_menu()
-		_menu_panel.visible = false
+		# Hide all inventory menu elements
+		if _background_overlay:
+			_background_overlay.visible = false
+		if _stats_panel_container:
+			_stats_panel_container.visible = false
+		if _right_panel_container:
+			_right_panel_container.visible = false
+		if _header_container:
+			_header_container.visible = false
+		if _equipment_title_label:
+			_equipment_title_label.visible = false
+		if _profile_sprite:
+			_profile_sprite.visible = false
 
 func _on_stats_changed() -> void:
 	_update_stats_display()

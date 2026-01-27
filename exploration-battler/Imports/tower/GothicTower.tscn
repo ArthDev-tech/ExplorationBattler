@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bt117vid2mi2f"]
+
+[ext_resource type="PackedScene" uid="uid://cmkk7prmme86q" path="res://Imports/tower/GothicTower.fbx" id="1_12via"]
+
+[node name="GothicTower" type="Node3D"]
+
+[node name="GothicTower" parent="." instance=ExtResource("1_12via")]

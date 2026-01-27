@@ -101,6 +101,13 @@ func _ready() -> void:
 	equipped_items = {
 		ItemData.ItemType.WEAPON: null,
 		ItemData.ItemType.ARMOR: null,
+		ItemData.ItemType.HELM: null,
+		ItemData.ItemType.BOOTS: null,
+		ItemData.ItemType.BELT: null,
+		ItemData.ItemType.LEGS: null,
+		ItemData.ItemType.PAULDRONS: null,
+		ItemData.ItemType.GLOVES: null,
+		ItemData.ItemType.RING: null,
 		ItemData.ItemType.ACCESSORY: null
 	}
 	

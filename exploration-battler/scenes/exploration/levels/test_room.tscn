@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://bbckhx202xkna"]
+[gd_scene load_steps=37 format=3 uid="uid://bbckhx202xkna"]
 
 [ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://b15kp0tx43v6a" path="res://scenes/exploration/enemies/enemy_patrol.tscn" id="2"]
@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://cgmy3vwljghat" path="res://scripts/components/mesh_collision_sync.gd" id="4"]
 [ext_resource type="PackedScene" uid="uid://dars72atp7vap" path="res://scenes/exploration/enemies/WardenPatrol.tscn" id="4_301dv"]
 [ext_resource type="Script" uid="uid://bwyhoebq0j2oy" path="res://scripts/components/climbable.gd" id="4_ltsvc"]
-[ext_resource type="Material" uid="uid://d14ol7drqkcx2" path="res://materials/materials/distance_visualization_material.tres" id="4_oi2s7"]
 [ext_resource type="PackedScene" uid="uid://b6o56b8r2cfy7" path="res://Imports/props/BasicArmor.tscn" id="6_dj340"]
 [ext_resource type="Material" uid="uid://b8yu6xaa8r3u" path="res://materials/materials/glass_refraction_material.tres" id="7_g4wn3"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/environment/static_hdri_environment.tscn" id="7_j65ic"]
@@ -18,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://d3v3th3dfy347" path="res://Imports/Terrain/TallBuilding.tscn" id="16_t20v2"]
 [ext_resource type="PackedScene" uid="uid://dfxj6ttbssa7a" path="res://Imports/CheryCardTree/CherryCardTree.tscn" id="17_n5wks"]
 [ext_resource type="PackedScene" uid="uid://4g2xgqedcv6" path="res://Imports/MountainBoard/MountainBoard.tscn" id="18_7hsim"]
+[ext_resource type="PackedScene" uid="uid://bt117vid2mi2f" path="res://Imports/tower/GothicTower.tscn" id="19_g8cfc"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_301dv"]
 size = Vector3(100.57, 1, 100.2)
@@ -36,12 +36,6 @@ albedo_color = Color(0.6, 0.6, 0.8, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_2"]
 size = Vector3(100, 4, 0.3)
-
-[sub_resource type="BoxMesh" id="BoxMesh_2"]
-size = Vector3(0.3, 4, 100)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
-size = Vector3(0.3, 4, 100)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4"]
 size = Vector3(150, 1, 150)
@@ -68,8 +62,13 @@ size = Vector3(4, 0.5, 4)
 [sub_resource type="BoxShape3D" id="BoxShape3D_exiqo"]
 size = Vector3(20, 1, 30)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7hsim"]
+albedo_color = Color(0.583304, 0.5716683, 0.5795896, 1)
+emission_enabled = true
+emission = Color(0.730119, 0.52233136, 0.2671159, 1)
+emission_energy_multiplier = 0.05
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_o6cdt"]
-material = ExtResource("7_g4wn3")
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_g4wn3"]
 custom_solver_bias = 1.0
@@ -85,6 +84,7 @@ script = ExtResource("3")
 script = ExtResource("4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/Floor"]
+transform = Transform3D(1.7871094, 0, 0, 0, 1, 0, 0, 0, 1, -38.80879, -0.014483452, -0.8350258)
 mesh = SubResource("BoxMesh_301dv")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
@@ -128,16 +128,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WallSouth"]
 shape = SubResource("BoxShape3D_2")
-
-[node name="WallWest" type="StaticBody3D" parent="Environment"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 2, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/WallWest"]
-mesh = SubResource("BoxMesh_2")
-surface_material_override/0 = SubResource("StandardMaterial3D_2")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/WallWest"]
-shape = SubResource("BoxShape3D_3")
 
 [node name="KillZone" type="Area3D" parent="Environment"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
@@ -271,7 +261,7 @@ metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform"]
 transform = Transform3D(25, 0, 0, 0, 0.5, 0, 0, 0, 25, 0, 0, 0)
-material_override = ExtResource("4_oi2s7")
+material_override = SubResource("StandardMaterial3D_7hsim")
 mesh = SubResource("CylinderMesh_o6cdt")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/JumpPuzzle/FloatingCirclePlatform"]
@@ -280,7 +270,7 @@ shape = SubResource("CylinderShape3D_g4wn3")
 debug_color = Color(0.27215096, 0.5987574, 0.5755123, 0.41960785)
 
 [node name="FloatingCirclePlatform2" type="StaticBody3D" parent="Environment/JumpPuzzle"]
-transform = Transform3D(0.75581783, 0.21198119, -0.6195188, -0.27004597, 0.96284753, 0, 0.596502, 0.16729853, 0.78498185, -11.6796665, 12.023125, -28.094618)
+transform = Transform3D(0.99901783, 0.024170235, -0.037135534, -0.024536759, 0.99965435, -0.009445726, 0.036894348, 0.010347604, 0.9992655, -11.6796665, 12.023125, -28.094618)
 script = ExtResource("4_ltsvc")
 metadata/_edit_group_ = true
 
@@ -400,3 +390,6 @@ transform = Transform3D(-0.96604306, 0, 0.2583807, 0, 1, 0, -0.2583807, 0, -0.96
 
 [node name="MountainBoard9" parent="." instance=ExtResource("18_7hsim")]
 transform = Transform3D(-0.64847857, 0, 0.76123273, 0, 1, 0, -0.76123273, 0, -0.64847857, -555.69196, 38.011356, 411.36475)
+
+[node name="GothicTower" parent="." instance=ExtResource("19_g8cfc")]
+transform = Transform3D(0.21176827, 0, -0.97731984, 0, 1, 0, 0.97731984, 0, 0.21176827, -74.35663, 3.3792708, 10.026951)

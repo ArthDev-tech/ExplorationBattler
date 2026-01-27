@@ -1,3 +1,4 @@
+@tool
 extends Control
 
 ## Equipment slot UI component for weapon, armor, and accessories.
@@ -5,7 +6,16 @@ extends Control
 signal slot_clicked(slot: Control, button_index: int)
 signal slot_drag_started(slot: Control, item: ItemInstance)
 
-var slot_type: ItemData.ItemType = ItemData.ItemType.WEAPON
+var _slot_type: ItemData.ItemType = ItemData.ItemType.WEAPON
+
+@export var slot_type: ItemData.ItemType = ItemData.ItemType.WEAPON:
+	set(value):
+		_slot_type = value
+		# Update label immediately when changed (works in editor and runtime)
+		_update_label()
+	get:
+		return _slot_type
+
 var item: ItemInstance = null
 
 var _is_hovered: bool = false
@@ -17,16 +27,17 @@ var _current_stylebox: StyleBoxFlat = null
 @onready var _item_name_label: Label = $ItemNameLabel
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	mouse_entered.connect(_on_mouse_entered)
-	mouse_exited.connect(_on_mouse_exited)
+	# Only connect signals at runtime, not in editor
+	if not Engine.is_editor_hint():
+		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_entered.connect(_on_mouse_entered)
+		mouse_exited.connect(_on_mouse_exited)
+	
 	# Ensure child nodes don't block mouse events
 	if _item_icon:
 		_item_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _slot_label:
 		_slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if _item_name_label:
-		_item_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _background:
 		_background.mouse_filter = Control.MOUSE_FILTER_PASS
 		# Create a unique StyleBoxFlat instance for this slot to avoid shared state
@@ -34,8 +45,13 @@ func _ready() -> void:
 		if existing_style:
 			var new_style: StyleBoxFlat = existing_style.duplicate()
 			_background.add_theme_stylebox_override("panel", new_style)
-	_update_display()
+	
+	# Update label in both editor and runtime
 	_update_label()
+	
+	# Only update display at runtime (item is null in editor)
+	if not Engine.is_editor_hint():
+		_update_display()
 
 func set_item(new_item: ItemInstance) -> void:
 	item = new_item
@@ -47,18 +63,44 @@ func clear_item() -> void:
 
 func set_slot_type(new_type: ItemData.ItemType) -> void:
 	slot_type = new_type
-	_update_label()
 
 func _update_label() -> void:
-	match slot_type:
+	# Get label node - works in both editor and runtime
+	var label: Label = null
+	if Engine.is_editor_hint():
+		label = get_node_or_null("SlotLabel")
+	else:
+		label = _slot_label
+	
+	if not label:
+		return
+	
+	_update_label_text(label, _slot_type)
+
+func _update_label_text(label: Label, type: ItemData.ItemType) -> void:
+	match type:
 		ItemData.ItemType.WEAPON:
-			_slot_label.text = "Weapon"
+			label.text = "Weapon"
 		ItemData.ItemType.ARMOR:
-			_slot_label.text = "Armor"
+			label.text = "Armor"
+		ItemData.ItemType.HELM:
+			label.text = "Helm"
+		ItemData.ItemType.BOOTS:
+			label.text = "Boots"
+		ItemData.ItemType.BELT:
+			label.text = "Belt"
+		ItemData.ItemType.LEGS:
+			label.text = "Legs"
+		ItemData.ItemType.PAULDRONS:
+			label.text = "Pauldrons"
+		ItemData.ItemType.GLOVES:
+			label.text = "Gloves"
+		ItemData.ItemType.RING:
+			label.text = "Ring"
 		ItemData.ItemType.ACCESSORY:
-			_slot_label.text = "Accessory"
+			label.text = "Accessory"
 		_:
-			_slot_label.text = "Slot"
+			label.text = "Slot"
 
 func _set_background_color(color: Color) -> void:
 	if not _background:

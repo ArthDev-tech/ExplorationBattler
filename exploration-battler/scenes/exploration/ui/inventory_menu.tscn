@@ -1,156 +1,219 @@
-[gd_scene load_steps=4 format=3 uid="uid://inventory_menu"]
+[gd_scene load_steps=4 format=3 uid="uid://cm5eqvy0ednmo"]
 
-[ext_resource type="Script" path="res://scenes/exploration/ui/inventory_menu.gd" id="1"]
+[ext_resource type="Script" uid="uid://b4t7w58brlc4l" path="res://scenes/exploration/ui/inventory_menu.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/components/equipment_slot.tscn" id="2"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
-bg_color = Color(0.1, 0.1, 0.1, 0.95)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.3, 0.3, 0.5, 1)
+[ext_resource type="Texture2D" uid="uid://ccaibe6k13mhu" path="res://scenes/exploration/ui/UIAssets/UIArt/Profile.png" id="3_rvq2w"]
 
 [node name="InventoryMenu" type="CanvasLayer"]
 script = ExtResource("1")
 
+[node name="EquipmentTitle" type="Label" parent="."]
+offset_left = 1423.0
+offset_top = 49.0
+offset_right = 2383.0
+offset_bottom = 72.0
+theme_override_font_sizes/font_size = 16
+text = "Equipment"
+
+[node name="EquipmentSlots" type="Control" parent="EquipmentTitle"]
+anchors_preset = 0
+offset_left = -1142.0
+offset_top = 137.0
+offset_right = -182.0
+offset_bottom = 137.0
+
+[node name="WeaponSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 914.0
+offset_top = 279.0
+offset_right = 1028.0
+offset_bottom = 415.0
+
+[node name="ArmorSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1190.0
+offset_top = 29.0
+offset_right = 1293.0
+offset_bottom = 175.0
+slot_type = 1
+
+[node name="HelmSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1034.0
+offset_top = -134.0
+offset_right = 1128.0
+offset_bottom = -24.0
+slot_type = 2
+
+[node name="BootsSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1153.0
+offset_top = 618.0
+offset_right = 1272.0
+offset_bottom = 739.0
+slot_type = 3
+
+[node name="BeltSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1162.0
+offset_top = 205.0
+offset_right = 1299.0
+offset_bottom = 285.0
+slot_type = 4
+
+[node name="LegsSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1167.0
+offset_top = 335.0
+offset_right = 1271.0
+offset_bottom = 503.0
+slot_type = 5
+
+[node name="PauldronsSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1375.0
+offset_top = -66.0
+offset_right = 1486.0
+offset_bottom = 46.0
+slot_type = 6
+
+[node name="GlovesSlot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1413.0
+offset_top = 284.0
+offset_right = 1510.0
+offset_bottom = 386.0
+slot_type = 7
+
+[node name="Ring1Slot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1424.0
+offset_top = 195.0
+offset_right = 1504.0
+offset_bottom = 275.0
+slot_type = 8
+
+[node name="Ring2Slot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 959.0
+offset_top = 186.0
+offset_right = 1039.0
+offset_bottom = 266.0
+slot_type = 8
+
+[node name="Accessory1Slot" parent="EquipmentTitle/EquipmentSlots" instance=ExtResource("2")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 1015.0
+offset_top = 8.0
+offset_right = 1095.0
+offset_bottom = 88.0
+slot_type = 9
+
+[node name="RightPanel" type="VBoxContainer" parent="."]
+offset_left = 250.0
+offset_top = 83.0
+offset_right = 1173.0
+offset_bottom = 1018.0
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="InventoryTitle" type="Label" parent="RightPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Inventory"
+horizontal_alignment = 1
+
+[node name="InventoryGrid" type="GridContainer" parent="RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 12
+
+[node name="CardsButton" type="Button" parent="RightPanel"]
+layout_mode = 2
+text = "View Card Collection"
+
 [node name="BackgroundOverlay" type="ColorRect" parent="."]
-layout_mode = 3
+visible = false
+z_index = -4
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.7)
+scale = Vector2(1.0021596, 1.0009909)
 mouse_filter = 2
+color = Color(0.75200003, 0.7864, 0.8, 0.6431373)
 
-[node name="MenuPanel" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -600.0
-offset_top = -400.0
-offset_right = 600.0
-offset_bottom = 400.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+[node name="Profile" type="Sprite2D" parent="."]
+z_index = -3
+position = Vector2(1502, 512.00006)
+scale = Vector2(0.878, 0.853)
+texture = ExtResource("3_rvq2w")
 
-[node name="Header" type="HBoxContainer" parent="MenuPanel"]
-layout_mode = 1
+[node name="StatsPanel" type="VBoxContainer" parent="."]
+offset_left = 25.0
+offset_top = 85.0
+offset_right = 225.0
+offset_bottom = 785.0
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="StatsTitle" type="Label" parent="StatsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player Stats"
+
+[node name="HealthLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Health: 20/20"
+
+[node name="LevelLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Level: 1"
+
+[node name="XPLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "XP: 0/100"
+
+[node name="AttackLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Attack: 5"
+
+[node name="DefenseLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Defense: 3"
+
+[node name="CurrencyLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Currency: 0"
+
+[node name="Header" type="HBoxContainer" parent="."]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = -40.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 25.0
+offset_top = -140.0
+offset_right = 211.0
+offset_bottom = -89.0
 grow_vertical = 0
 
-[node name="Title" type="Label" parent="MenuPanel/Header"]
+[node name="Title" type="Label" parent="Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 text = "Inventory"
 
-[node name="CloseButton" type="Button" parent="MenuPanel/Header"]
+[node name="CloseButton" type="Button" parent="Header"]
 layout_mode = 2
 text = "X"
-
-[node name="MainContainer" type="HBoxContainer" parent="MenuPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 50.0
-offset_right = -10.0
-offset_bottom = -50.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 20
-
-[node name="LeftPanel" type="VBoxContainer" parent="MenuPanel/MainContainer"]
-layout_mode = 2
-custom_minimum_size = Vector2(200, 0)
-size_flags_horizontal = 0
-
-[node name="StatsPanel" type="VBoxContainer" parent="MenuPanel/MainContainer/LeftPanel"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 10
-
-[node name="StatsTitle" type="Label" parent="MenuPanel/MainContainer/LeftPanel/StatsPanel"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Player Stats"
-
-[node name="HealthLabel" type="Label" parent="MenuPanel/MainContainer/LeftPanel/StatsPanel"]
-layout_mode = 2
-text = "Health: 20/20"
-
-[node name="LevelLabel" type="Label" parent="MenuPanel/MainContainer/LeftPanel/StatsPanel"]
-layout_mode = 2
-text = "Level: 1"
-
-[node name="XPLabel" type="Label" parent="MenuPanel/MainContainer/LeftPanel/StatsPanel"]
-layout_mode = 2
-text = "XP: 0/100"
-
-[node name="AttackLabel" type="Label" parent="MenuPanel/MainContainer/LeftPanel/StatsPanel"]
-layout_mode = 2
-text = "Attack: 5"
-
-[node name="DefenseLabel" type="Label" parent="MenuPanel/MainContainer/LeftPanel/StatsPanel"]
-layout_mode = 2
-text = "Defense: 3"
-
-[node name="CurrencyLabel" type="Label" parent="MenuPanel/MainContainer/LeftPanel/StatsPanel"]
-layout_mode = 2
-text = "Currency: 0"
-
-[node name="RightPanel" type="VBoxContainer" parent="MenuPanel/MainContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 10
-
-[node name="EquipmentContainer" type="VBoxContainer" parent="MenuPanel/MainContainer/RightPanel"]
-layout_mode = 2
-size_flags_vertical = 0
-
-[node name="EquipmentTitle" type="Label" parent="MenuPanel/MainContainer/RightPanel/EquipmentContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Equipment"
-
-[node name="EquipmentSlots" type="HBoxContainer" parent="MenuPanel/MainContainer/RightPanel/EquipmentContainer"]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_constants/separation = 10
-
-[node name="WeaponSlot" parent="MenuPanel/MainContainer/RightPanel/EquipmentContainer/EquipmentSlots" instance=ExtResource("2")]
-
-[node name="ArmorSlot" parent="MenuPanel/MainContainer/RightPanel/EquipmentContainer/EquipmentSlots" instance=ExtResource("2")]
-
-[node name="Accessory1Slot" parent="MenuPanel/MainContainer/RightPanel/EquipmentContainer/EquipmentSlots" instance=ExtResource("2")]
-
-[node name="Accessory2Slot" parent="MenuPanel/MainContainer/RightPanel/EquipmentContainer/EquipmentSlots" instance=ExtResource("2")]
-
-[node name="Accessory3Slot" parent="MenuPanel/MainContainer/RightPanel/EquipmentContainer/EquipmentSlots" instance=ExtResource("2")]
-
-[node name="InventoryTitle" type="Label" parent="MenuPanel/MainContainer/RightPanel"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Inventory"
-
-[node name="InventoryGrid" type="GridContainer" parent="MenuPanel/MainContainer/RightPanel"]
-layout_mode = 2
-size_flags_vertical = 3
-columns = 6
-
-[node name="CardsButton" type="Button" parent="MenuPanel/MainContainer/RightPanel"]
-layout_mode = 2
-text = "View Card Collection"

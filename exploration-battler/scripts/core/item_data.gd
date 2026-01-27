@@ -22,9 +22,16 @@ extends Resource
 
 ## Equipment slot this item occupies when equipped.
 enum ItemType {
-	WEAPON,    # Attack-focused equipment
-	ARMOR,     # Defense/health equipment
-	ACCESSORY  # Utility equipment (rings, amulets, etc.)
+	WEAPON,     # Attack-focused equipment
+	ARMOR,      # Defense/health equipment
+	HELM,       # Head protection
+	BOOTS,      # Foot protection
+	BELT,       # Waist equipment
+	LEGS,       # Leg protection
+	PAULDRONS,  # Shoulder protection
+	GLOVES,     # Hand protection
+	RING,       # Finger equipment
+	ACCESSORY   # Utility equipment (amulets, etc.)
 }
 
 # -----------------------------------------------------------------------------
