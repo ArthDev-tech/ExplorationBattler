@@ -84,7 +84,33 @@ func _ready() -> void:
 		EventBus.player_health_changed.connect(_on_player_health_changed)
 	_update_stats_display()
 
+func _is_battle_active() -> bool:
+	# Check if BattleArena exists in the scene tree (battle is active)
+	# Battle scenes are added to root when active
+	var battle_arena: Node = get_tree().root.get_node_or_null("BattleArena")
+	if battle_arena:
+		return true
+	
+	# Alternative: Check for BattleManager specifically
+	# BattleManager extends Node2D, GameManager extends Node
+	# Only check Node2D nodes with start_battle method
+	for child in get_tree().root.get_children():
+		# Skip known autoloads (GameManager, EventBus, etc.)
+		if child == GameManager or child.name == "EventBus" or child.name == "CardRegistry" or child.name == "SaveManager":
+			continue
+		
+		# BattleManager is Node2D, GameManager is Node
+		if child is Node2D and child.has_method("start_battle"):
+			return true
+	
+	return false
+
 func _input(event: InputEvent) -> void:
+	# Don't open inventory during battle
+	var battle_active: bool = _is_battle_active()
+	if battle_active:
+		return
+	
 	# Check if card collection menu is open - if so, don't process inventory input
 	var card_menu: CanvasLayer = get_tree().current_scene.get_node_or_null("UI/CardCollectionMenu")
 	if card_menu and card_menu.get_node("MenuPanel").visible:
@@ -105,6 +131,11 @@ func _input(event: InputEvent) -> void:
 		toggle_inventory()
 
 func toggle_inventory() -> void:
+	# Don't allow opening inventory during battle
+	var battle_active: bool = _is_battle_active()
+	if not _is_open and battle_active:
+		return
+	
 	if _is_open:
 		close_inventory()
 	else:
@@ -302,6 +333,10 @@ func _swap_items(source_slot: Control, target_slot: Control) -> void:
 	_refresh_inventory_display()
 
 func _update_stats_display() -> void:
+	# Don't access GameManager in editor mode
+	if Engine.is_editor_hint():
+		return
+	
 	if not GameManager.player_stats:
 		return
 	

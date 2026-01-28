@@ -1,0 +1,40 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=4 uid="uid://c3qt5lwiyl5qk"]
+
+[ext_resource type="Shader" uid="uid://b4523mqgm81rd" path="res://materials/shaders/stylized_grass.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://cxos0cbk5grv5" path="res://Imports/Terrain/TallGrass.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://bs4xiagn3ipba" path="res://Imports/Terrain/QuickGrassShader.png" id="3_ocup1"]
+[ext_resource type="Texture2D" uid="uid://dh73xao0p8pp3" path="res://Imports/NoiseTextures/NoiseA.jpg" id="5_bo1ro"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/albedo_texture = ExtResource("3_ocup1")
+shader_parameter/wind_noise_texture = ExtResource("5_bo1ro")
+shader_parameter/color_patch_noise_texture = ExtResource("5_bo1ro")
+shader_parameter/accent_texture = ExtResource("2")
+shader_parameter/wind_direction = Vector2(1, 0)
+shader_parameter/wind_speed = 0.2790000132525
+shader_parameter/wind_strength = 0.1330000063175
+shader_parameter/wind_noise_scale = 0.330000015675
+shader_parameter/wind_divergence_angle = 0.30800001463
+shader_parameter/wind_divergence_scale = 1.5
+shader_parameter/wind_brightness_offset = 0.1
+shader_parameter/wind_frame_time = 0.08333
+shader_parameter/wind_phase_scale = 0.5
+shader_parameter/perspective_scale = 0.5
+shader_parameter/perspective_wind_alignment = 1.0
+shader_parameter/color_patch_threshold = 0.5
+shader_parameter/grass_color_1 = Color(0.11619001, 0.31382892, 0.08251069, 1)
+shader_parameter/grass_color_2 = Color(0.12788174, 0.24874702, 0.0999889, 1)
+shader_parameter/color_patch_noise_scale = 0.07200000342
+shader_parameter/accent_threshold = 0.08
+shader_parameter/accent_color = Color(0.73799294, 0.66299874, 0.1378926, 1)
+shader_parameter/accent_height_scale = 1.0850000277875
+shader_parameter/accent_size_scale = 0.8600000171
+shader_parameter/character_positions = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/displacement_strength = 0.5
+shader_parameter/displacement_radius_falloff_exponent = 2.0
+shader_parameter/toon_bands = 3
+shader_parameter/toon_gradient_size = 0.15
+shader_parameter/use_hybrid_toon = true
+shader_parameter/alpha_cutout = 0.5

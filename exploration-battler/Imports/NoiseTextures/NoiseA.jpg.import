@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bccdgq3u0qqdm"
-path.s3tc="res://.godot/imported/texture_diffuse.png-9f7bff2b4018aedb8cd49b9d51970aed.s3tc.ctex"
+uid="uid://dh73xao0p8pp3"
+path.s3tc="res://.godot/imported/NoiseA.jpg-2fcd253b736e3b966bfa605cd8ad51c0.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Imports/CheryCardTree/texture_diffuse.png"
-dest_files=["res://.godot/imported/texture_diffuse.png-9f7bff2b4018aedb8cd49b9d51970aed.s3tc.ctex"]
+source_file="res://Imports/NoiseTextures/NoiseA.jpg"
+dest_files=["res://.godot/imported/NoiseA.jpg-2fcd253b736e3b966bfa605cd8ad51c0.s3tc.ctex"]
 
 [params]
 

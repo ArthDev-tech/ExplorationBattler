@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bccdgq3u0qqdm"
-path.s3tc="res://.godot/imported/texture_diffuse.png-9f7bff2b4018aedb8cd49b9d51970aed.s3tc.ctex"
+uid="uid://bs4xiagn3ipba"
+path.s3tc="res://.godot/imported/QuickGrassShader.png-adeaa2ae100d7ec5a7562c2f918fe30f.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Imports/CheryCardTree/texture_diffuse.png"
-dest_files=["res://.godot/imported/texture_diffuse.png-9f7bff2b4018aedb8cd49b9d51970aed.s3tc.ctex"]
+source_file="res://Imports/Terrain/QuickGrassShader.png"
+dest_files=["res://.godot/imported/QuickGrassShader.png-adeaa2ae100d7ec5a7562c2f918fe30f.s3tc.ctex"]
 
 [params]
 

@@ -335,23 +335,24 @@ func equip_item(item: ItemInstance, slot_type: ItemData.ItemType) -> bool:
 	if not item or item.data.item_type != slot_type:
 		return false
 	
-	# Store old max_life before equipment change (for proportional health scaling)
-	var old_max_life: int = player_max_life
-	
 	# Unequip current item if any
 	var current_item: ItemInstance = equipped_items.get(slot_type)
 	if current_item:
 		unequip_item(slot_type)
+	
+	# Get HP bonus from item before equipping
+	var hp_bonus: int = item.get_total_health_bonus()
 	
 	# Equip new item
 	equipped_items[slot_type] = item
 	player_inventory.remove_item(item)
 	player_stats.update_equipment_bonuses(equipped_items)
 	
-	# Update health proportionally if max_life changed
-	var new_max_life: int = player_max_life
-	if old_max_life != new_max_life:
-		_update_health_on_max_change(old_max_life, new_max_life)
+	# Add HP bonus directly to current health (symmetric with unequip)
+	if hp_bonus > 0 and player_current_life >= 0:
+		player_current_life += hp_bonus
+		# Cap at new max life (can't exceed maximum)
+		player_current_life = mini(player_current_life, player_max_life)
 	
 	EventBus.item_equipped.emit(item, slot_type)
 	EventBus.stats_changed.emit()
@@ -365,18 +366,19 @@ func unequip_item(slot_type: ItemData.ItemType) -> bool:
 	if not item:
 		return false
 	
-	# Store old max_life before equipment change
-	var old_max_life: int = player_max_life
+	# Get HP bonus from item before unequipping
+	var hp_bonus: int = item.get_total_health_bonus()
 	
 	# Try to add back to inventory
 	if player_inventory.add_item(item):
 		equipped_items[slot_type] = null
 		player_stats.update_equipment_bonuses(equipped_items)
 		
-		# Update health proportionally if max_life changed
-		var new_max_life: int = player_max_life
-		if old_max_life != new_max_life:
-			_update_health_on_max_change(old_max_life, new_max_life)
+		# Reduce current health by the HP bonus amount
+		if hp_bonus > 0 and player_current_life >= 0:
+			player_current_life -= hp_bonus
+			# Ensure health never goes below 1 HP
+			player_current_life = maxi(1, player_current_life)
 		
 		EventBus.item_unequipped.emit(item, slot_type)
 		EventBus.stats_changed.emit()
