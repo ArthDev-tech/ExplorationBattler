@@ -26,6 +26,7 @@ extends CharacterBody3D
 ## =============================================================================
 
 const ClimbableScript = preload("res://scripts/components/climbable.gd")
+const MovingPlatformScript = preload("res://scripts/components/moving_platform.gd")
 
 enum PlayerState {
 	NORMAL,
@@ -63,6 +64,7 @@ var _climb_target_position: Vector3 = Vector3.ZERO
 var _climb_progress: float = 0.0
 var _ledge_normal: Vector3 = Vector3.ZERO
 var _ledge_point: Vector3 = Vector3.ZERO
+var _ledge_collider: Node = null
 
 var _dash_cooldown_timer: float = 0.0
 var _is_dashing: bool = false
@@ -207,13 +209,13 @@ func _check_ledge_grab() -> void:
 		var collision_point: Vector3 = _ledge_detector.get_collision_point()
 		var collision_normal: Vector3 = _ledge_detector.get_collision_normal()
 		
-		# Check if the collider is a climbable StaticBody3D
+		# Check if the collider is a climbable (StaticBody3D or AnimatableBody3D with climbable script)
 		var collider: Node = _ledge_detector.get_collider()
-		if not collider or not collider is StaticBody3D:
+		if not collider or not (collider is StaticBody3D or collider is AnimatableBody3D):
 			return
 		
 		var collider_script: Script = collider.get_script()
-		if not collider_script or collider_script != ClimbableScript:
+		if not collider_script or (collider_script != ClimbableScript and collider_script != MovingPlatformScript):
 			return
 		
 		# Check if there's space above the ledge using a temporary raycast
@@ -241,13 +243,14 @@ func _check_ledge_grab() -> void:
 		var height_diff: float = collision_point.y - global_position.y
 		if height_diff > 0.5 and height_diff < 2.5:
 			# Start ledge grab
-			_start_ledge_grab(collision_point, collision_normal)
+			_start_ledge_grab(collision_point, collision_normal, collider)
 
-func _start_ledge_grab(ledge_point: Vector3, ledge_normal: Vector3) -> void:
+func _start_ledge_grab(ledge_point: Vector3, ledge_normal: Vector3, collider: Node) -> void:
 	_current_state = PlayerState.LEDGE_GRABBING
 	_grab_timer = 0.0
 	_ledge_point = ledge_point
 	_ledge_normal = ledge_normal
+	_ledge_collider = collider
 	
 	# Stop vertical velocity
 	velocity.y = 0.0
@@ -296,8 +299,26 @@ func _handle_climbing(delta: float) -> void:
 
 func _finish_climbing() -> void:
 	_current_state = PlayerState.NORMAL
-	velocity = Vector3.ZERO
 	_climb_progress = 0.0
+	
+	# Inherit moving platform velocity so player does not fall off
+	var platform: AnimatableBody3D = null
+	if _ledge_collider:
+		if _ledge_collider.get_script() == MovingPlatformScript and _ledge_collider is AnimatableBody3D:
+			platform = _ledge_collider as AnimatableBody3D
+		elif _ledge_collider.get_parent() is AnimatableBody3D:
+			var parent: Node = _ledge_collider.get_parent()
+			if parent.get_script() == MovingPlatformScript:
+				platform = parent as AnimatableBody3D
+		_ledge_collider = null
+	
+	if platform and platform.get_rid().is_valid():
+		var platform_vel: Vector3 = PhysicsServer3D.body_get_state(platform.get_rid(), PhysicsServer3D.BODY_STATE_LINEAR_VELOCITY) as Vector3
+		velocity.x = platform_vel.x
+		velocity.z = platform_vel.z
+		velocity.y = 0.0
+	else:
+		velocity = Vector3.ZERO
 
 func _handle_dash_cooldown(delta: float) -> void:
 	if _dash_cooldown_timer > 0.0:

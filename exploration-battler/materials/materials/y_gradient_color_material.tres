@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dvl14oc45my7x"]
+
+[ext_resource type="Shader" uid="uid://d11a6anoe0l5l" path="res://materials/shaders/y_gradient_color.gdshader" id="1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/color_low = Color(0.28166673, 2.030516e-07, 1.0829419e-07, 1)
+shader_parameter/color_high = Color(0.13945964, 0.374668, 1, 1)
+shader_parameter/y_min = 0.0
+shader_parameter/y_max = 58.188014638929985

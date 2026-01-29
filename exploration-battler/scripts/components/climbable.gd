@@ -9,9 +9,6 @@ extends StaticBody3D
 ## The PlayerController's ledge grab system checks for this component
 ## to determine if a surface can be grabbed and climbed.
 ##
-## Currently a stub - no additional logic needed.
-## Future expansion could add:
-## - Climb speed modifiers
-## - One-way climb restrictions
-## - Stamina cost modifiers
+## For moving climbable platforms, use AnimatableBody3D with the
+## MovingPlatform script (res://scripts/components/moving_platform.gd) instead.
 ## =============================================================================

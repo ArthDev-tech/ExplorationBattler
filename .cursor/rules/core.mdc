@@ -36,11 +36,13 @@ Hybrid 2D/3D card battler: players explore 3D environments, transition to 2D car
 ## File Organization
 
 ```
-/autoloads/          → GameManager, EventBus, SaveManager
-/scenes/exploration/ → player/, enemies/, levels/
-/scenes/battle/      → battle_arena.tscn, card_ui/, lanes/
-/scenes/ui/          → menus, HUD
-/resources/          → cards/, effects/, enemies/ (.tres files)
-/scripts/core/       → Non-node classes (RefCounted)
-/scripts/components/ → Reusable node scripts
+/autoloads/                    → GameManager, EventBus, SaveManager, CardRegistry
+/scenes/exploration/           → player/, enemies/, levels/, environment/, ui/ (menus and widgets under ui/)
+/scenes/battle/                → battle_arena, card_ui/, lanes/, ui/, scripts/ (battle_manager, battle_overlay_manager, combat_resolver, card_pool)
+/scenes/exploration/ui/widgets/ → UI building blocks (inventory_slot, deck_drop_zone, compact_card_visual, etc.)
+/resources/                    → cards/, effects/, enemies/, items/, player/, props/
+/scripts/core/                 → Non-node classes (RefCounted): card_data, deck, enemy_data, etc.
+/scripts/components/           → Reusable gameplay node scripts (health, climbable, etc.)
 ```
+
+No top-level `/scenes/ui/`; UI lives under `scenes/exploration/ui/` and `scenes/battle/ui/`.

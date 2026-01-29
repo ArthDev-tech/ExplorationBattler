@@ -42,6 +42,7 @@ func _init() -> void:
 ]
 
 var _dragging_card: Dictionary = {}  # Track current drag operation (reserved)
+var _mana_filter_callables: Array[Callable] = []
 
 func _ready() -> void:
 	_menu_panel.visible = false
@@ -141,7 +142,9 @@ func _setup_mana_filters() -> void:
 		var button: Button = _filter_buttons[i]
 		if button:
 			var mana_cost: int = i if i < 7 else 7  # 7+ for last button
-			button.toggled.connect(func(pressed: bool): _on_mana_filter_toggled(mana_cost, pressed))
+			var c: Callable = _on_mana_filter_toggled.bind(mana_cost)
+			button.toggled.connect(c)
+			_mana_filter_callables.append(c)
 
 func _setup_search() -> void:
 	if _search_line_edit:
@@ -317,7 +320,7 @@ func _refresh_collection_display() -> void:
 	if _collection_grid:
 		_collection_grid.mouse_filter = Control.MOUSE_FILTER_STOP
 		# Add drop zone script to collection grid
-		var drop_zone_script: GDScript = load("res://scenes/exploration/ui/components/collection_drop_zone.gd")
+		var drop_zone_script: GDScript = load("res://scenes/exploration/ui/widgets/collection_drop_zone.gd")
 		if drop_zone_script and not _collection_grid.get_script():
 			_collection_grid.set_script(drop_zone_script)
 	
@@ -391,7 +394,7 @@ func _on_next_page_pressed() -> void:
 func _create_card_with_quantity(card_visual: Control, card_instance: CardInstance, _collection_count: int, _deck_count: int, available_count: int) -> Control:
 	# Create a wrapper Control that contains the card visual and quantity indicator
 	# Load draggable wrapper script
-	var wrapper_script: GDScript = load("res://scenes/exploration/ui/components/draggable_card_wrapper.gd")
+	var wrapper_script: GDScript = load("res://scenes/exploration/ui/widgets/draggable_card_wrapper.gd")
 	var wrapper: Control = Control.new()
 	if wrapper_script:
 		wrapper.set_script(wrapper_script)
@@ -543,7 +546,7 @@ func _refresh_deck_display() -> void:
 				deck_card_data_by_id[cid] = card_data
 	
 	# Load compact card visual scene
-	var compact_card_scene: PackedScene = load("res://scenes/exploration/ui/components/compact_card_visual.tscn")
+	var compact_card_scene: PackedScene = load("res://scenes/exploration/ui/widgets/compact_card_visual.tscn")
 	if not compact_card_scene:
 		push_error("Failed to load compact_card_visual.tscn for deck display")
 		return
@@ -595,7 +598,7 @@ func _refresh_deck_display() -> void:
 	if _deck_list:
 		_deck_list.mouse_filter = Control.MOUSE_FILTER_STOP
 		# Add drop zone script to deck list
-		var drop_zone_script: GDScript = load("res://scenes/exploration/ui/components/deck_drop_zone.gd")
+		var drop_zone_script: GDScript = load("res://scenes/exploration/ui/widgets/deck_drop_zone.gd")
 		if drop_zone_script and not _deck_list.get_script():
 			_deck_list.set_script(drop_zone_script)
 
@@ -651,3 +654,8 @@ func _exit_tree() -> void:
 	# Safety: never leave the screen dimmed if this node exits unexpectedly.
 	if _background_overlay:
 		_background_overlay.visible = false
+	# Disconnect mana filter toggles so no signal fires after menu is freed
+	for i in range(mini(_filter_buttons.size(), _mana_filter_callables.size())):
+		var btn: Button = _filter_buttons[i]
+		if btn and btn.toggled.is_connected(_mana_filter_callables[i]):
+			btn.toggled.disconnect(_mana_filter_callables[i])

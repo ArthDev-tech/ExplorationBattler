@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cm5eqvy0ednmo"]
 
 [ext_resource type="Script" uid="uid://b4t7w58brlc4l" path="res://scenes/exploration/ui/inventory_menu.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/exploration/ui/components/equipment_slot.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/ui/widgets/equipment_slot.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://ccaibe6k13mhu" path="res://scenes/exploration/ui/UIAssets/UIArt/Profile.png" id="3_rvq2w"]
 
 [node name="InventoryMenu" type="CanvasLayer"]

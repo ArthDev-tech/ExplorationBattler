@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://b6o56b8r2cfy7"]
 
-[ext_resource type="ArrayMesh" uid="uid://ne0x8qn77m4e" path="res://Imports/ArmorMesh.res" id="1_w36hx"]
+[ext_resource type="ArrayMesh" uid="uid://ne0x8qn77m4e" path="res://Imports/props/ArmorMesh.res" id="1_w36hx"]
 [ext_resource type="Script" uid="uid://bo7o5rjaeniov" path="res://Imports/props/Item.gd" id="2_nanyq"]
-[ext_resource type="Resource" path="res://resources/items/basic_armor.tres" id="3_armor_data"]
+[ext_resource type="Resource" uid="uid://rr552kph1ho" path="res://resources/items/basic_armor.tres" id="3_armor_data"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_pickup"]
 size = Vector3(1.665, 2.125, 1.5)

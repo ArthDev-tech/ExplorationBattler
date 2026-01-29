@@ -235,7 +235,7 @@ func _setup_inventory_grid() -> void:
 		# Create inventory slots
 		for row in range(INVENTORY_GRID_ROWS):
 			for col in range(INVENTORY_GRID_COLUMNS):
-				var slot_scene: PackedScene = load("res://scenes/exploration/ui/components/inventory_slot.tscn")
+				var slot_scene: PackedScene = load("res://scenes/exploration/ui/widgets/inventory_slot.tscn")
 				if slot_scene:
 					var slot: Control = slot_scene.instantiate()
 					_inventory_grid.add_child(slot)

@@ -13,12 +13,11 @@ You explore a 3D level, encounter enemies, and transition into lane-based card b
 
 ## Project Structure (high level)
 - `exploration-battler/scenes/`
-  - `exploration/` – 3D exploration levels, player, enemies, exploration UI
-  - `battle/` – battle arena, lanes, card UI
+  - `exploration/` – 3D exploration levels, player, enemies, exploration UI (menus and `ui/widgets/` for UI building blocks)
+  - `battle/` – battle arena, lanes, card UI, and `scripts/` (battle_manager, battle_overlay_manager, combat_resolver, card_pool)
 - `exploration-battler/scripts/`
   - `core/` – data/runtime classes (cards, enemies, inventory, etc.)
-  - `battle/` – battle flow and resolution
-  - `components/` – reusable components
+  - `components/` – reusable gameplay components (health, climbable, etc.)
 - `exploration-battler/resources/` – card/enemy resources (`.tres`)
 - `exploration-battler/autoloads/` – global singletons (EventBus, GameManager, SaveManager, etc.)
 

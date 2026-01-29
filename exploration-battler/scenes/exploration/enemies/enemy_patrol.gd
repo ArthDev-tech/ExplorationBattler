@@ -7,7 +7,8 @@ extends CharacterBody3D
 ## Handles patrol movement, player pursuit, and battle initiation.
 ##
 ## Behavior:
-## - Patrol: Moves between patrol_points in ping-pong pattern
+## - Patrol: Moves between patrol_points in ping-pong pattern (when patrol_enabled is true)
+## - Idle: When patrol_enabled is false, stands still when not pursuing (for state machines / per-enemy toggle)
 ## - Pursue: Chases player when within detection_range
 ## - Battle: Triggers encounter when colliding with player
 ##
@@ -19,9 +20,14 @@ extends CharacterBody3D
 ## - Loads from enemy_data export or defaults to lost_wanderer.tres
 ## - Different scenes may have different mesh structures (handled dynamically)
 ##
+## Patrol path (optional): Add a child Node3D named "PatrolPath" and add
+## Marker3D children for each waypoint. Order = scene tree order. If present,
+## this overrides the patrol_points export. Otherwise patrol_points or default applies.
+##
 ## HARDCODED: Movement speeds, detection range, animation parameters below.
 ## =============================================================================
 
+@export var patrol_enabled: bool = true  ## When false, enemy does not move between waypoints (idle when not pursuing). Toggle from state machines or per-enemy in editor.
 @export var patrol_speed: float = 2.0
 @export var pursuit_speed: float = 3.5
 @export var detection_range: float = 15.0
@@ -30,10 +36,12 @@ extends CharacterBody3D
 
 # Animation parameters
 @export var bob_amplitude: float = 0.05  # Vertical bob distance
-@export var bob_frequency: float = 2.0  # Bob speed
+@export var bob_frequency: float = 2.0  # Bob frequency in cycles per second (Hz). 1.0 = 1 cycle/sec
 @export var sway_amplitude: float = 0.03  # Horizontal sway distance (rotation)
-@export var sway_frequency: float = 1.5  # Sway speed
+@export var sway_frequency: float = 1.5  # Sway frequency in cycles per second (Hz). 1.0 = 1 cycle/sec
 @export var scale_variation: float = 0.05  # Scale grow/shrink amount (0.05 = 5% variation)
+
+var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 var _current_patrol_index: int = 0
 var _patrol_direction: int = 1
@@ -55,6 +63,8 @@ var _animation_time: float = 0.0
 var _base_scale: Vector3 = Vector3.ONE
 var _base_mesh_position: Vector3 = Vector3.ZERO
 var _base_mesh_rotation: Vector3 = Vector3.ZERO
+var _smoothed_speed: float = 0.0  # Smoothed velocity magnitude to avoid moving/idle flicker
+var _was_moving: bool = false  # Hysteresis: hold state when between thresholds
 
 func _ready() -> void:
 	_area.body_entered.connect(_on_body_entered)
@@ -94,12 +104,8 @@ func _ready() -> void:
 		_raycast.target_position = Vector3(0, 0, -2.0)  # Check 2 units ahead
 		add_child(_raycast)
 	
-	if patrol_points.is_empty():
-		# Default patrol: back and forth
-		patrol_points = [global_position, global_position + Vector3(5, 0, 0)]
-	
-	# Validate patrol points are reasonable
-	_validate_patrol_points()
+	# Build patrol path (deferred so instance-override children like PatrolPath are in the tree)
+	call_deferred("_build_patrol_path")
 	
 	# Wait a frame for exported resources to load, then check
 	await get_tree().process_frame
@@ -179,18 +185,24 @@ func _physics_process(delta: float) -> void:
 		# Set velocity
 		velocity.x = direction.x * pursuit_speed
 		velocity.z = direction.z * pursuit_speed
-		velocity.y = 0.0  # Keep on ground level
+		
+		# Apply gravity
+		if is_on_floor():
+			velocity.y = -0.1  # Small downward force to keep on floor
+		else:
+			velocity.y -= _gravity * delta  # Apply gravity when falling
 		
 		# Move
 		move_and_slide()
 		
-		# Check for collisions after movement
+		# Only stop on wall/obstacle, not floor (floor contact every frame)
 		var collision_count: int = get_slide_collision_count()
-		if collision_count > 0:
-			# Hit a wall or obstacle, could try to navigate around
-			# For now, just stop
-			velocity.x = 0.0
-			velocity.z = 0.0
+		for i in range(collision_count):
+			var col: KinematicCollision3D = get_slide_collision(i)
+			if abs(col.get_normal().y) < 0.7:
+				velocity.x = 0.0
+				velocity.z = 0.0
+				break
 		
 		# Update stuck tracking
 		var movement_distance: float = global_position.distance_to(_last_position)
@@ -200,51 +212,67 @@ func _physics_process(delta: float) -> void:
 			_stuck_timer = 0.0
 			_last_position = global_position
 		
-		# Face player
-		look_at(_player.global_position, Vector3.UP)
+		# Face player (smooth rotation to avoid snap)
+		_look_at_smooth(_player.global_position, delta)
 		
 	else:
-		# Player out of range or not found - patrol
+		# Player out of range or not found - patrol or idle
 		if _is_pursuing:
 			_is_pursuing = false
 			# Return to patrol - continue from current patrol point
 		
+		if not patrol_enabled:
+			# Idle: no patrol movement (e.g. for state machines or per-enemy toggle)
+			velocity.x = 0.0
+			velocity.z = 0.0
+			if is_on_floor():
+				velocity.y = -0.1
+			else:
+				velocity.y -= _gravity * delta
+			move_and_slide()
+			if _player:
+				_look_at_smooth(_player.global_position, delta)
+			return
+		
 		if patrol_points.is_empty():
 			return
 		
-		var target: Vector3 = patrol_points[_current_patrol_index]
+		# Use XZ only; target stays coplanar with enemy (same Y as enemy)
+		var target: Vector3 = _target_in_plane(patrol_points[_current_patrol_index])
 		var direction: Vector3 = (target - global_position).normalized()
 		
-		# Check if reached target
-		if global_position.distance_to(target) < 0.5:
+		# Reached target when horizontal distance is within threshold (ignore Y)
+		if _distance_xz(global_position, target) < 0.5:
 			_advance_patrol_point()
-			target = patrol_points[_current_patrol_index]
+			target = _target_in_plane(patrol_points[_current_patrol_index])
 			direction = (target - global_position).normalized()
 		
-		# Check for obstacles ahead using raycast
-		if _raycast:
-			_raycast.target_position = direction * 2.0  # Check 2 units in movement direction
-			_raycast.force_raycast_update()
-			if _raycast.is_colliding():
-				# Obstacle ahead, skip to next point
-				_advance_patrol_point()
-				target = patrol_points[_current_patrol_index]
-				direction = (target - global_position).normalized()
+		# Do not use raycast to advance during patrol: the ray can hit the enemy's own
+		# collision (same layer) and cause constant advancing / jitter in place.
+		# Advance only on reached target, slide collision, or stuck timer below.
 		
-		# Set velocity
+		# Set velocity (XZ only; Y handled by gravity/floor)
 		velocity.x = direction.x * patrol_speed
 		velocity.z = direction.z * patrol_speed
-		velocity.y = 0.0  # Keep on ground level
+		
+		# Apply gravity
+		if is_on_floor():
+			velocity.y = -0.1  # Small downward force to keep on floor
+		else:
+			velocity.y -= _gravity * delta  # Apply gravity when falling
 		
 		# Move
 		move_and_slide()
 		
-		# Check for collisions after movement
+		# Only advance when we hit a wall/obstacle, not the floor (floor contact every frame)
 		var collision_count: int = get_slide_collision_count()
-		if collision_count > 0:
-			# Hit a wall or obstacle, advance to next patrol point
-			_advance_patrol_point()
-			return
+		for i in range(collision_count):
+			var col: KinematicCollision3D = get_slide_collision(i)
+			var n: Vector3 = col.get_normal()
+			# Floor has normal roughly up; wall has horizontal normal
+			if abs(n.y) < 0.7:
+				_advance_patrol_point()
+				return
 		
 		# Check if stuck (not moving toward target)
 		var movement_distance: float = global_position.distance_to(_last_position)
@@ -259,15 +287,12 @@ func _physics_process(delta: float) -> void:
 			_stuck_timer = 0.0
 			_last_position = global_position
 		
-		# Face the player if found, otherwise face movement direction
+		# Face the player if found, otherwise face movement direction (smooth rotation)
 		if _player:
-			var player_pos: Vector3 = _player.global_position
-			# Make enemy look at player (Y-up convention)
-			look_at(player_pos, Vector3.UP)
+			_look_at_smooth(_player.global_position, delta)
 		elif direction.length() > 0.01:
-			# Fallback: face movement direction if no player found
 			var target_pos: Vector3 = global_position + direction
-			look_at(target_pos, Vector3.UP)
+			_look_at_smooth(target_pos, delta)
 
 func _process(delta: float) -> void:
 	# Don't animate if defeated
@@ -282,8 +307,17 @@ func _process(delta: float) -> void:
 	# Update animation time
 	_animation_time += delta
 	
-	# Check if enemy is moving (has velocity)
-	var is_moving: bool = velocity.length() > 0.1
+	# Smoothed speed and hysteresis to avoid moving/idle flicker when velocity hovers near threshold
+	_smoothed_speed = lerpf(_smoothed_speed, velocity.length(), delta * 10.0)
+	var is_moving: bool
+	if _smoothed_speed > 0.15:
+		is_moving = true
+		_was_moving = true
+	elif _smoothed_speed < 0.08:
+		is_moving = false
+		_was_moving = false
+	else:
+		is_moving = _was_moving
 	
 	if is_moving:
 		# Calculate bob (vertical movement)
@@ -327,6 +361,16 @@ func _start_battle_deferred(data: EnemyData) -> void:
 	# Pass self as triggering enemy so it can be marked defeated if player wins
 	GameManager.start_battle(data, self)
 
+func _look_at_smooth(target_world_pos: Vector3, delta: float) -> void:
+	var to_target: Vector3 = (target_world_pos - global_position).normalized()
+	if to_target.length_squared() < 0.0001:
+		return
+	var target_basis: Basis = Basis.looking_at(to_target, Vector3.UP)
+	var target_quat: Quaternion = target_basis.get_rotation_quaternion()
+	var current_quat: Quaternion = global_transform.basis.get_rotation_quaternion()
+	var new_quat: Quaternion = current_quat.slerp(target_quat, clampf(delta * 5.0, 0.0, 1.0))
+	global_rotation = new_quat.get_euler()
+
 func _advance_patrol_point() -> void:
 	_current_patrol_index += _patrol_direction
 	if _current_patrol_index >= patrol_points.size():
@@ -356,11 +400,34 @@ func _on_fall_complete() -> void:
 	# For now, just keep the enemy fallen
 	pass
 
+func _build_patrol_path() -> void:
+	# Optional: build patrol_points from PatrolPath child (Marker3D children = waypoints in order)
+	var path_node: Node3D = get_node_or_null("PatrolPath") as Node3D
+	if path_node:
+		var points_from_path: Array[Vector3] = []
+		for child in path_node.get_children():
+			if child is Node3D:
+				points_from_path.append((child as Node3D).global_position)
+		if points_from_path.size() >= 2:
+			patrol_points = points_from_path
+	if patrol_points.is_empty():
+		# Default patrol: back and forth
+		patrol_points = [global_position, global_position + Vector3(5, 0, 0)]
+	_validate_patrol_points()
+
 func _validate_patrol_points() -> void:
-	# Ensure patrol points are at reasonable height (same as spawn)
+	# Set initial Y to spawn so points are stored; at runtime we use enemy's Y (coplanar) via _target_in_plane().
 	if not patrol_points.is_empty():
 		for i in range(patrol_points.size()):
-			patrol_points[i].y = global_position.y
+			var p: Vector3 = patrol_points[i]
+			patrol_points[i] = Vector3(p.x, global_position.y, p.z)
+
+## Patrol path uses only X and Z; waypoints stay coplanar with the enemy (same Y as enemy).
+func _target_in_plane(point: Vector3) -> Vector3:
+	return Vector3(point.x, global_position.y, point.z)
+
+func _distance_xz(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
 
 func _find_player() -> void:
 	var root: Node = get_tree().current_scene

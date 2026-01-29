@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dmmrdko8dwcpl"]
 
-[ext_resource type="PackedScene" uid="uid://ctfw7u2direuv" path="res://Imports/ArmorImport1.fbx" id="1_h0xnq"]
+[ext_resource type="PackedScene" uid="uid://ctfw7u2direuv" path="res://Imports/props/ArmorImport1.fbx" id="1_h0xnq"]
 
 [node name="lod_basic_shaded" instance=ExtResource("1_h0xnq")]
 

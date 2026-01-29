@@ -21,7 +21,7 @@ config/run/main_scene="res://scenes/exploration/levels/test_room.tscn"
 EventBus="*res://autoloads/event_bus.gd"
 GameManager="*res://autoloads/game_manager.gd"
 SaveManager="*res://autoloads/save_manager.gd"
-BattleOverlayManager="*res://scripts/battle/battle_overlay_manager.gd"
+BattleOverlayManager="*res://scenes/battle/scripts/battle_overlay_manager.gd"
 CardRegistry="*res://autoloads/card_registry.gd"
 
 [display]

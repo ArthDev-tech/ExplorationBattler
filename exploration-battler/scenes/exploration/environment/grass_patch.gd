@@ -48,8 +48,10 @@ func _apply_grass_texture() -> void:
 func _ready() -> void:
 	_build_multimesh()
 	if not Engine.is_editor_hint():
-		if not EventBus.player_moved.is_connected(_on_player_moved):
-			EventBus.player_moved.connect(_on_player_moved)
+		# Safely check EventBus and signal before connecting
+		if EventBus and EventBus.has_signal("player_moved"):
+			if not EventBus.player_moved.is_connected(_on_player_moved):
+				EventBus.player_moved.connect(_on_player_moved)
 
 func _on_player_moved(pos: Vector3) -> void:
 	_last_player_position = pos
@@ -74,8 +76,10 @@ func _process(_delta: float) -> void:
 	mat.set_shader_parameter("character_positions", arr)
 
 func _exit_tree() -> void:
-	if EventBus.player_moved.is_connected(_on_player_moved):
-		EventBus.player_moved.disconnect(_on_player_moved)
+	# Safely check EventBus and signal before disconnecting
+	if EventBus and EventBus.has_signal("player_moved"):
+		if EventBus.player_moved.is_connected(_on_player_moved):
+			EventBus.player_moved.disconnect(_on_player_moved)
 
 func _build_multimesh() -> void:
 	if not _grass:

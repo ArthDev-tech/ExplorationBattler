@@ -16,7 +16,7 @@ extends Node3D
 ## - When player enters, resets position and velocity
 ## =============================================================================
 
-@onready var _kill_zone: Area3D = $Environment/KillZone
+@onready var _kill_zone: Area3D = $PlatformsFloorECT/KillZone
 @onready var _player_spawn: Marker3D = $PlayerSpawn
 @onready var _player: CharacterBody3D = $PlayerController
 
