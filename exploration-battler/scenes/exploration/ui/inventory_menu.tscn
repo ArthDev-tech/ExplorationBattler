@@ -194,6 +194,18 @@ text = "Attack: 5"
 layout_mode = 2
 text = "Defense: 3"
 
+[node name="IntelligenceLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Intelligence: 5"
+
+[node name="StrengthLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Strength: 5"
+
+[node name="AgilityLabel" type="Label" parent="StatsPanel"]
+layout_mode = 2
+text = "Agility: 5"
+
 [node name="CurrencyLabel" type="Label" parent="StatsPanel"]
 layout_mode = 2
 text = "Currency: 0"

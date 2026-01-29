@@ -1,3 +1,4 @@
+@tool
 extends AnimatableBody3D
 
 ## =============================================================================
@@ -8,12 +9,13 @@ extends AnimatableBody3D
 ##
 ## Set move_enabled = true and add waypoints via export move_points or a child
 ## Node3D named "MovementPath" with Marker3D children. Platform moves between
-## waypoints at move_speed, ping-pong style.
+## waypoints at move_speed. Use loop_path = true to wrap last-to-first; false = ping-pong (reverse at ends).
 ## =============================================================================
 
 @export var move_enabled: bool = false
 @export var move_speed: float = 2.0
 @export var move_points: Array[Vector3] = []
+@export var loop_path: bool = false  ## If true, wrap from last to first (and first to last when going back). If false, ping-pong (reverse at ends).
 @export var pause_on_reverse_seconds: float = 0.0  ## Pause at first/last waypoint before reversing. 0 = no pause.
 @export var pause_at_waypoint_seconds: float = 0.0  ## Pause at every waypoint (e.g. elevator floors). 0 = no pause.
 @export var slow_near_waypoint_radius: float = 0.0  ## Within this distance of target, speed scales down linearly. 0 = no slowdown.
@@ -22,11 +24,28 @@ extends AnimatableBody3D
 var _move_index: int = 0
 var _move_direction: int = 1
 var _pause_timer: float = 0.0
+var _editor_last_move_points_size: int = -1
 
 func _ready() -> void:
+	if Engine.is_editor_hint():
+		_editor_last_move_points_size = move_points.size()
 	if not move_enabled:
 		return
 	call_deferred("_build_move_path")
+
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint() or not is_inside_tree():
+		return
+	var n: int = move_points.size()
+	if _editor_last_move_points_size < 0:
+		_editor_last_move_points_size = n
+		return
+	if n > _editor_last_move_points_size:
+		for i in range(_editor_last_move_points_size, n):
+			move_points[i] = global_position
+		_editor_last_move_points_size = n
+	elif n < _editor_last_move_points_size:
+		_editor_last_move_points_size = n
 
 func _build_move_path() -> void:
 	var path_node: Node3D = get_node_or_null("MovementPath") as Node3D
@@ -58,12 +77,18 @@ func _physics_process(delta: float) -> void:
 			_pause_timer = pause_at_waypoint_seconds
 			return
 		_move_index += _move_direction
-		if _move_index >= move_points.size():
-			_move_index = move_points.size() - 1
-			_move_direction = -1
-		elif _move_index < 0:
-			_move_index = 0
-			_move_direction = 1
+		if loop_path:
+			if _move_index >= move_points.size():
+				_move_index = 0
+			elif _move_index < 0:
+				_move_index = move_points.size() - 1
+		else:
+			if _move_index >= move_points.size():
+				_move_index = move_points.size() - 1
+				_move_direction = -1
+			elif _move_index < 0:
+				_move_index = 0
+				_move_direction = 1
 		return
 	var effective_speed: float = move_speed
 	if slow_near_waypoint_radius > 0.0 and dist < slow_near_waypoint_radius:
@@ -79,11 +104,17 @@ func _physics_process(delta: float) -> void:
 			_pause_timer = pause_at_waypoint_seconds
 			return
 		_move_index += _move_direction
-		if _move_index >= move_points.size():
-			_move_index = move_points.size() - 1
-			_move_direction = -1
-		elif _move_index < 0:
-			_move_index = 0
-			_move_direction = 1
+		if loop_path:
+			if _move_index >= move_points.size():
+				_move_index = 0
+			elif _move_index < 0:
+				_move_index = move_points.size() - 1
+		else:
+			if _move_index >= move_points.size():
+				_move_index = move_points.size() - 1
+				_move_direction = -1
+			elif _move_index < 0:
+				_move_index = 0
+				_move_direction = 1
 	else:
 		global_position += to_target.normalized() * step

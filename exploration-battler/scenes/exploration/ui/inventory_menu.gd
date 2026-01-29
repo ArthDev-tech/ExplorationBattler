@@ -46,6 +46,9 @@ func _init() -> void:
 @onready var _xp_label: Label = $StatsPanel/XPLabel
 @onready var _attack_label: Label = $StatsPanel/AttackLabel
 @onready var _defense_label: Label = $StatsPanel/DefenseLabel
+@onready var _intelligence_label: Label = $StatsPanel/IntelligenceLabel
+@onready var _strength_label: Label = $StatsPanel/StrengthLabel
+@onready var _agility_label: Label = $StatsPanel/AgilityLabel
 @onready var _currency_label: Label = $StatsPanel/CurrencyLabel
 @onready var _equipment_slots_container: Control = $EquipmentTitle/EquipmentSlots
 @onready var _profile_sprite: Sprite2D = $Profile
@@ -356,6 +359,12 @@ func _update_stats_display() -> void:
 		_attack_label.text = "Attack: " + str(stats.get_total_attack())
 	if _defense_label:
 		_defense_label.text = "Defense: " + str(stats.get_total_defense())
+	if _intelligence_label:
+		_intelligence_label.text = "Intelligence: " + str(stats.get_total_intelligence())
+	if _strength_label:
+		_strength_label.text = "Strength: " + str(stats.get_total_strength())
+	if _agility_label:
+		_agility_label.text = "Agility: " + str(stats.get_total_agility())
 	if _currency_label:
 		_currency_label.text = "Currency: " + str(GameManager.player_currency)
 

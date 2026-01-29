@@ -37,12 +37,18 @@ var experience_to_next: int = 100
 var base_attack: int = 5
 var base_defense: int = 3
 var base_health: int = 20
+var base_intelligence: int = 5
+var base_strength: int = 5
+var base_agility: int = 5
 
 ## Bonuses from equipped items, calculated by update_equipment_bonuses().
 var equipment_bonuses: Dictionary = {
 	"attack": 0,
 	"defense": 0,
-	"health": 0
+	"health": 0,
+	"intelligence": 0,
+	"strength": 0,
+	"agility": 0
 }
 
 # -----------------------------------------------------------------------------
@@ -69,11 +75,23 @@ func initialize(data: Resource) -> void:
 	var health_val = data.get("max_life")
 	base_health = health_val if health_val != null else 20
 	
+	var int_val = data.get("base_intelligence")
+	base_intelligence = int_val if int_val != null else 5
+	
+	var str_val = data.get("base_strength")
+	base_strength = str_val if str_val != null else 5
+	
+	var agi_val = data.get("base_agility")
+	base_agility = agi_val if agi_val != null else 5
+	
 	# Reset equipment bonuses
 	equipment_bonuses = {
 		"attack": 0,
 		"defense": 0,
-		"health": 0
+		"health": 0,
+		"intelligence": 0,
+		"strength": 0,
+		"agility": 0
 	}
 
 # -----------------------------------------------------------------------------
@@ -91,6 +109,18 @@ func get_total_defense() -> int:
 ## Returns total health/max life (base + equipment).
 func get_total_health() -> int:
 	return base_health + equipment_bonuses.get("health", 0)
+
+## Returns total intelligence (base + equipment).
+func get_total_intelligence() -> int:
+	return base_intelligence + equipment_bonuses.get("intelligence", 0)
+
+## Returns total strength (base + equipment).
+func get_total_strength() -> int:
+	return base_strength + equipment_bonuses.get("strength", 0)
+
+## Returns total agility (base + equipment).
+func get_total_agility() -> int:
+	return base_agility + equipment_bonuses.get("agility", 0)
 
 # -----------------------------------------------------------------------------
 # EQUIPMENT

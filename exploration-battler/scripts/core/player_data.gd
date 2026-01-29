@@ -36,6 +36,15 @@ extends Resource
 ## HARDCODED: Default 3 - reserved for future use
 @export var base_defense: int = 3
 
+## Base intelligence (displayed in inventory; equipment bonuses reserved for future use).
+@export var base_intelligence: int = 5
+
+## Base strength (displayed in inventory; equipment bonuses reserved for future use).
+@export var base_strength: int = 5
+
+## Base agility (displayed in inventory; equipment bonuses reserved for future use).
+@export var base_agility: int = 5
+
 ## Starting currency/gold.
 ## HARDCODED: Default 0 - set higher for easier starts
 @export var starting_gold: int = 0

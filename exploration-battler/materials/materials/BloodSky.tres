@@ -1,0 +1,6 @@
+[gd_resource type="PanoramaSkyMaterial" load_steps=2 format=3 uid="uid://cy4w8lfpmfq0d"]
+
+[ext_resource type="Texture2D" uid="uid://cjivox2ajcbl" path="res://assets/HDRIs/HDRIBloodSky.png" id="1_mhsy4"]
+
+[resource]
+panorama = ExtResource("1_mhsy4")

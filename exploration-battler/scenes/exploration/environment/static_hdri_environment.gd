@@ -47,4 +47,3 @@ func _setup_environment() -> void:
 	_environment.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
 	_environment.ambient_light_sky_contribution = 1.0
 	_environment.reflected_light_source = Environment.ReflectionSource.REFLECTION_SOURCE_SKY
-
