@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bq0wwu270m6l0"]
+[gd_scene load_steps=32 format=3 uid="uid://bq0wwu270m6l0"]
 
 [ext_resource type="Script" uid="uid://bkg8npc403ars" path="res://scripts/components/background_music.gd" id="2_k15a0"]
 [ext_resource type="PackedScene" uid="uid://dfxj6ttbssa7a" path="res://Imports/CheryCardTree/CherryCardTree.tscn" id="4_vyrj3"]
@@ -20,7 +20,6 @@
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="18_kxlmy"]
 [ext_resource type="Material" uid="uid://cy4w8lfpmfq0d" path="res://materials/materials/BloodSky.tres" id="18_vyrj3"]
 [ext_resource type="PackedScene" uid="uid://bxin1pibe11l" path="res://Imports/tower/Tower.tscn" id="19_k15a0"]
-[ext_resource type="PackedScene" uid="uid://cpnophlkrr1ll" path="res://scenes/exploration/environment/Ladder.tscn" id="20_ymmha"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_301dv"]
 size = Vector3(100.57, 1, 100.2)
@@ -58,6 +57,13 @@ sky_material = ExtResource("18_vyrj3")
 background_mode = 2
 sky = SubResource("Sky_ptfrn")
 reflected_light_source = 2
+fog_enabled = true
+fog_light_color = Color(0.21517473, 0, 0.033928443, 1)
+fog_light_energy = 0.63
+fog_density = 0.001
+fog_sky_affect = 0.26
+volumetric_fog_albedo = Color(0.28769487, 0.056281902, 0.07975643, 1)
+volumetric_fog_anisotropy = -0.05
 
 [node name="TestRoom" type="Node3D"]
 
@@ -164,7 +170,7 @@ shape = SubResource("BoxShape3D_1")
 [node name="JumpPuzzle" type="Node3D" parent="PlatformsFloorECT"]
 
 [node name="MovingClimbablePlatform" type="AnimatableBody3D" parent="PlatformsFloorECT/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6658831, -1.9987421, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.31723, -0.00025770793, 0)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(0, 0, 0), Vector3(5, 0, 0), Vector3(5, -2, 0), Vector3(0, -2, 0)])
@@ -273,7 +279,7 @@ transform = Transform3D(11.126199, 0, 0, 0, 1, 0, 0, 0, 9.713882, 0, -32.587715,
 shape = SubResource("BoxShape3D_4")
 
 [node name="MovingClimbablePlatform" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2.6509738, -26.021685)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 4.6751513, -26.089067)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_speed = 1.5
@@ -290,7 +296,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="MovingClimbablePlatform2" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.233006, 1.9007233, -30.068508)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.233006, 1.0240608, -32.25491)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(42.233223, 4.998416, -39.256905), Vector3(42.233, 1, -39.257), Vector3(42.233, 1, -30), Vector3(42.233, 5, -30)])
@@ -306,7 +312,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="MovingClimbablePlatform3" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.246578, 4.0429845, -38.683075)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.829817, 10.06813, -38.683075)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(29.486, 0.92630625, -38.683086), Vector3(29.486, 3.813387, -38.683086), Vector3(27.156467, 3.813387, -38.683086), Vector3(27.156467, 7.9096966, -38.683086), Vector3(31.831432, 7.9096966, -38.683086), Vector3(31.831432, 12.057932, -38.683086), Vector3(31.831432, 3.7974243, -38.683086)])
@@ -910,9 +916,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.118584, 0.8821449, -15.971
 
 [node name="Collectible" parent="." instance=ExtResource("8_d87jq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.862595, 2.3210135, 3.911745)
-
-[node name="Ladder" parent="." instance=ExtResource("20_ymmha")]
-transform = Transform3D(0.6698177, 0.021121167, -0.74222517, -8.883939e-10, 0.9995954, 0.028445035, 0.7425256, -0.01905299, 0.66954666, 55.61891, 1.042153, -17.55141)
 
 [node name="LightDesignElemtns" type="Node" parent="."]
 
