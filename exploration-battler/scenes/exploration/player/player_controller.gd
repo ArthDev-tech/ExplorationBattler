@@ -31,7 +31,9 @@ const MovingPlatformScript = preload("res://scripts/components/moving_platform.g
 enum PlayerState {
 	NORMAL,
 	LEDGE_GRABBING,
-	CLIMBING
+	CLIMBING,
+	LADDER_APPROACHING,
+	LADDER_CLIMBING
 }
 
 @export var speed: float = 5.0
@@ -73,6 +75,10 @@ var _dash_direction: Vector3 = Vector3.ZERO
 var _jump_count: int = 0
 var _auto_run_enabled: bool = false
 
+var _near_ladder: Node = null
+var _ladder_ref: Node = null
+var _ladder_approach_target: Vector3 = Vector3.ZERO
+
 @onready var _head: Node3D = $Head
 @onready var _camera: Camera3D = $Head/Camera3D
 @onready var _ledge_detector: RayCast3D = $LedgeDetector
@@ -103,6 +109,10 @@ func _physics_process(delta: float) -> void:
 			_handle_ledge_grab(delta)
 		PlayerState.CLIMBING:
 			_handle_climbing(delta)
+		PlayerState.LADDER_APPROACHING:
+			_handle_ladder_approaching(delta)
+		PlayerState.LADDER_CLIMBING:
+			_handle_ladder_climbing(delta)
 	
 	move_and_slide()
 
@@ -191,6 +201,15 @@ func _input(event: InputEvent) -> void:
 	# Toggle auto-run on numpad period press
 	if event.is_action_pressed("autorun"):
 		_auto_run_enabled = not _auto_run_enabled
+	
+	# Interact (e.g. climb ladder) when near and not paused
+	if not get_tree().paused and event.is_action_pressed("interact") and _near_ladder:
+		start_ladder_climb(_near_ladder)
+		_near_ladder = null
+		EventBus.interact_prompt_hidden.emit()
+
+func set_near_ladder(ladder: Node) -> void:
+	_near_ladder = ladder
 
 func _check_ledge_grab() -> void:
 	# Only check for ledge grab when in air
@@ -319,6 +338,40 @@ func _finish_climbing() -> void:
 		velocity.y = 0.0
 	else:
 		velocity = Vector3.ZERO
+
+const LADDER_APPROACH_SPEED: float = 4.0
+const LADDER_APPROACH_THRESHOLD: float = 0.15
+
+func start_ladder_climb(ladder: Node) -> void:
+	if not ladder.has_method("get_approach_position") or not ladder.has_method("get_climb_top_position"):
+		return
+	_ladder_ref = ladder
+	velocity = Vector3.ZERO
+	_ladder_approach_target = ladder.get_approach_position(global_position)
+	_current_state = PlayerState.LADDER_APPROACHING
+
+func _handle_ladder_approaching(delta: float) -> void:
+	var to_target: Vector3 = _ladder_approach_target - global_position
+	var dist: float = to_target.length()
+	if dist <= LADDER_APPROACH_THRESHOLD:
+		_climb_start_position = global_position
+		_climb_target_position = _ladder_ref.get_climb_top_position()
+		_climb_progress = 0.0
+		_current_state = PlayerState.LADDER_CLIMBING
+		return
+	var step: float = LADDER_APPROACH_SPEED * delta
+	if step >= dist:
+		global_position = _ladder_approach_target
+	else:
+		global_position += to_target.normalized() * step
+
+func _handle_ladder_climbing(delta: float) -> void:
+	_climb_progress += climb_speed * delta
+	global_position = _climb_start_position.lerp(_climb_target_position, _climb_progress)
+	if _climb_progress >= 1.0:
+		global_position = _climb_target_position
+		_ladder_ref = null
+		_finish_climbing()
 
 func _handle_dash_cooldown(delta: float) -> void:
 	if _dash_cooldown_timer > 0.0:

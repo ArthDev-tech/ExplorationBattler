@@ -105,6 +105,13 @@ signal dash_cooldown_changed(cooldown: float, max_cooldown: float)
 ## @param max: Maximum jumps allowed
 signal jump_count_changed(current: int, max: int)
 
+## Emitted when an interactable prompt should be shown (e.g. "Press E to climb").
+## @param prompt_text: Text to display
+signal interact_prompt_shown(prompt_text: String)
+
+## Emitted when the interact prompt should be hidden.
+signal interact_prompt_hidden()
+
 # -----------------------------------------------------------------------------
 # UI SIGNALS
 # -----------------------------------------------------------------------------

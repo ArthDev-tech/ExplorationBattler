@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3 uid="uid://cpnophlkrr1ll"]
+
+[ext_resource type="Texture2D" uid="uid://bvly411e65e8w" path="res://Imports/Ladder/TiledLadder.png" id="1_36hvf"]
+[ext_resource type="Script" uid="uid://5pb3kcdyl1ql" path="res://scripts/components/ladder.gd" id="2_ladder"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qcy3i"]
+transparency = 1
+cull_mode = 2
+albedo_texture = ExtResource("1_36hvf")
+
+[sub_resource type="QuadMesh" id="QuadMesh_uerns"]
+material = SubResource("StandardMaterial3D_qcy3i")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_36hvf"]
+size = Vector3(0.35913086, 1, 0.062805176)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_zone"]
+radius = 4.0
+
+[node name="Ladder" type="Node3D"]
+script = ExtResource("2_ladder")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47721052, 0)
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+transform = Transform3D(0.46730435, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("QuadMesh_uerns")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0025634766, 0, 0.014373779)
+shape = SubResource("BoxShape3D_36hvf")
+
+[node name="LadderZone" type="Area3D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LadderZone"]
+shape = SubResource("SphereShape3D_zone")

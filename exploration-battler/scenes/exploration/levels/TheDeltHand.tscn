@@ -1,14 +1,14 @@
-[gd_scene load_steps=29 format=3 uid="uid://bq0wwu270m6l0"]
+[gd_scene load_steps=33 format=3 uid="uid://bq0wwu270m6l0"]
 
 [ext_resource type="Script" uid="uid://bkg8npc403ars" path="res://scripts/components/background_music.gd" id="2_k15a0"]
 [ext_resource type="PackedScene" uid="uid://dfxj6ttbssa7a" path="res://Imports/CheryCardTree/CherryCardTree.tscn" id="4_vyrj3"]
 [ext_resource type="PackedScene" uid="uid://4g2xgqedcv6" path="res://Imports/MountainBoard/MountainBoard.tscn" id="5_ptfrn"]
-[ext_resource type="PackedScene" path="res://scenes/exploration/environment/static_hdri_environment.tscn" id="6_fl3xc"]
 [ext_resource type="Script" uid="uid://cgmy3vwljghat" path="res://scripts/components/mesh_collision_sync.gd" id="7_254m8"]
 [ext_resource type="Script" uid="uid://btkaq0cxvxvkk" path="res://scripts/components/moving_platform.gd" id="7_743h6"]
 [ext_resource type="PackedScene" uid="uid://btwockurhrmtj" path="res://Imports/props/currency_pickup.tscn" id="8_d87jq"]
 [ext_resource type="Material" uid="uid://dvl14oc45my7x" path="res://materials/materials/y_gradient_color_material.tres" id="8_yv803"]
 [ext_resource type="Script" uid="uid://bwyhoebq0j2oy" path="res://scripts/components/climbable.gd" id="9_wmqul"]
+[ext_resource type="PackedScene" uid="uid://dq518ysjb3q1e" path="res://Imports/props/LampPost/LampPost.tscn" id="10_vyrj3"]
 [ext_resource type="PackedScene" uid="uid://cq03ht80poawi" path="res://scenes/exploration/environment/grass_patch.tscn" id="10_ymmha"]
 [ext_resource type="PackedScene" uid="uid://b15kp0tx43v6a" path="res://scenes/exploration/enemies/enemy_patrol.tscn" id="11_h50x8"]
 [ext_resource type="PackedScene" uid="uid://dars72atp7vap" path="res://scenes/exploration/enemies/WardenPatrol.tscn" id="12_ma1fw"]
@@ -18,7 +18,9 @@
 [ext_resource type="PackedScene" uid="uid://c4lyr4r6pv8lu" path="res://scenes/exploration/player/player_controller.tscn" id="17_a2o0j"]
 [ext_resource type="PackedScene" uid="uid://clun0sl6srwd5" path="res://Imports/tower/HouseBlocking.tscn" id="17_yv803"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="18_kxlmy"]
+[ext_resource type="Material" uid="uid://cy4w8lfpmfq0d" path="res://materials/materials/BloodSky.tres" id="18_vyrj3"]
 [ext_resource type="PackedScene" uid="uid://bxin1pibe11l" path="res://Imports/tower/Tower.tscn" id="19_k15a0"]
+[ext_resource type="PackedScene" uid="uid://cpnophlkrr1ll" path="res://scenes/exploration/environment/Ladder.tscn" id="20_ymmha"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_301dv"]
 size = Vector3(100.57, 1, 100.2)
@@ -49,6 +51,14 @@ radius = 12.608398
 [sub_resource type="BoxShape3D" id="BoxShape3D_4"]
 size = Vector3(150, 1, 150)
 
+[sub_resource type="Sky" id="Sky_ptfrn"]
+sky_material = ExtResource("18_vyrj3")
+
+[sub_resource type="Environment" id="Environment_fl3xc"]
+background_mode = 2
+sky = SubResource("Sky_ptfrn")
+reflected_light_source = 2
+
 [node name="TestRoom" type="Node3D"]
 
 [node name="Background" type="Node" parent="."]
@@ -59,7 +69,7 @@ pitch_scale = 0.85
 script = ExtResource("2_k15a0")
 
 [node name="CherryCardTree" parent="Background" instance=ExtResource("4_vyrj3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 185.6955, 1.3106995, -469.34488)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 185.6955, -2.8493767, -469.34488)
 
 [node name="CherryCardTree2" parent="Background" instance=ExtResource("4_vyrj3")]
 transform = Transform3D(-0.630439, 0, -0.66643536, 0, 0.7655886, 0, 0.46791518, 0, -0.8979124, -159.39853, -5.4602966, -360.77646)
@@ -91,11 +101,6 @@ transform = Transform3D(-0.96604306, 0, 0.2583807, 0, 1, 0, -0.2583807, 0, -0.96
 [node name="MountainBoard9" parent="Background" instance=ExtResource("5_ptfrn")]
 transform = Transform3D(-0.64847857, 0, 0.76123273, 0, 1, 0, -0.76123273, 0, -0.64847857, -555.69196, 38.011356, 411.36475)
 
-[node name="StaticHDRIEnvironment" parent="Background" instance=ExtResource("6_fl3xc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.902466, 0.05001831, 2.8898773)
-visible = false
-hdri_path = "res://assets/HDRIs/HDRIBloodSky.png"
-
 [node name="Tower" parent="Background" instance=ExtResource("19_k15a0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -118.64874, 0, -108.213844)
 
@@ -117,8 +122,14 @@ transform = Transform3D(0.5476946, 0, 0.8366783, 0, 1, 0, -0.8366783, 0, 0.54769
 [node name="Tower8" parent="Background" instance=ExtResource("19_k15a0")]
 transform = Transform3D(0.5476946, 0, 0.8366783, 0, 1, 0, -0.8366783, 0, 0.5476946, 61.519722, 0, 56.804398)
 
+[node name="Tower14" parent="Background" instance=ExtResource("19_k15a0")]
+transform = Transform3D(0.9976665, 0, 0.068276525, 0, 1, 0, -0.068276525, 0, 0.9976665, -8.944668, 0, -61.501705)
+
 [node name="Tower10" parent="Background" instance=ExtResource("19_k15a0")]
 transform = Transform3D(0.6458842, 0, -0.7634354, 0, 1, 0, 0.7634354, 0, 0.6458842, 121.05103, 0, -37.88629)
+
+[node name="Tower15" parent="Background" instance=ExtResource("19_k15a0")]
+transform = Transform3D(1.2917683, 0, -1.5268708, 0, 2, 0, 1.5268708, 0, 1.2917683, 72.996086, 0, -9.828802)
 
 [node name="Tower9" parent="Background" instance=ExtResource("19_k15a0")]
 transform = Transform3D(0.5476946, 0, 0.8366783, 0, 1, 0, -0.8366783, 0, 0.5476946, 214.8464, 0, -39.947205)
@@ -153,7 +164,7 @@ shape = SubResource("BoxShape3D_1")
 [node name="JumpPuzzle" type="Node3D" parent="PlatformsFloorECT"]
 
 [node name="MovingClimbablePlatform" type="AnimatableBody3D" parent="PlatformsFloorECT/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7292237, -1.9304721, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6658831, -1.9987421, 0)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(0, 0, 0), Vector3(5, 0, 0), Vector3(5, -2, 0), Vector3(0, -2, 0)])
@@ -171,6 +182,19 @@ mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/JumpPuzzle/Platform2"]
+shape = SubResource("BoxShape3D_6")
+
+[node name="Platform7" type="StaticBody3D" parent="PlatformsFloorECT/JumpPuzzle"]
+transform = Transform3D(1.361037, 0, 1.2632864, 0, 1, 0, -1.1802566, 0, 1.4567844, 83.1523, 99.45777, -12.2618685)
+script = ExtResource("9_wmqul")
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/JumpPuzzle/Platform7"]
+material_override = ExtResource("8_yv803")
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("StandardMaterial3D_4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/JumpPuzzle/Platform7"]
 shape = SubResource("BoxShape3D_6")
 
 [node name="Platform3" type="StaticBody3D" parent="PlatformsFloorECT/JumpPuzzle"]
@@ -249,7 +273,7 @@ transform = Transform3D(11.126199, 0, 0, 0, 1, 0, 0, 0, 9.713882, 0, -32.587715,
 shape = SubResource("BoxShape3D_4")
 
 [node name="MovingClimbablePlatform" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 4.9109197, -26.525019)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2.6509738, -26.021685)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_speed = 1.5
@@ -266,7 +290,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="MovingClimbablePlatform2" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.233006, 3.367032, -30.036114)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.233006, 1.9007233, -30.068508)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(42.233223, 4.998416, -39.256905), Vector3(42.233, 1, -39.257), Vector3(42.233, 1, -30), Vector3(42.233, 5, -30)])
@@ -282,7 +306,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="MovingClimbablePlatform3" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.625103, 7.8437033, -38.683075)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.246578, 4.0429845, -38.683075)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(29.486, 0.92630625, -38.683086), Vector3(29.486, 3.813387, -38.683086), Vector3(27.156467, 3.813387, -38.683086), Vector3(27.156467, 7.9096966, -38.683086), Vector3(31.831432, 7.9096966, -38.683086), Vector3(31.831432, 12.057932, -38.683086), Vector3(31.831432, 3.7974243, -38.683086)])
@@ -308,13 +332,54 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.748521, 0.45250115, -25.65
 [node name="GrassPatch3" parent="PlatformsFloorECT" instance=ExtResource("10_ymmha")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.461548, 0.4525002, -24.60797)
 
+[node name="MovingClimbablePlatform4" type="AnimatableBody3D" parent="PlatformsFloorECT"]
+transform = Transform3D(0.6488507, 0, -0.7609158, 0, 1, 0, 0.7609158, 0, 0.6488507, 55.16712, 9.12971, -9.6046095)
+script = ExtResource("7_743h6")
+move_enabled = true
+move_speed = 6.0
+move_points = Array[Vector3]([Vector3(71.83596, 59.177532, -11.013602), Vector3(76.30814, 59.177532, -9.960544), Vector3(79.57997, 59.177532, -6.375308), Vector3(60.7345, 29.605396, -2.8279228), Vector3(51.525448, 17.015564, -6.766617), Vector3(51.525448, 2.5267792, -6.766617), Vector3(51.525448, 0.86905575, -6.766617), Vector3(55.16712, 9.12971, -9.6046095)])
+move_rotations = Array[Vector3]([Vector3(0, -24.118996, 0), Vector3(0, -36.521996, 0), Vector3(0, -54.232998, 0), Vector3(0, -54.232998, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -49.545, 0)])
+loop_path = true
+slow_near_waypoint_radius = 3.0
+slow_min_speed_percent = 0.105
+animate_in_editor = false
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform4"]
+material_override = ExtResource("8_yv803")
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("StandardMaterial3D_4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/MovingClimbablePlatform4"]
+shape = SubResource("BoxShape3D_6")
+
+[node name="MovingClimbablePlatform5" type="AnimatableBody3D" parent="PlatformsFloorECT"]
+transform = Transform3D(0.64902323, 0, -0.76076853, 0, 1, 0, 0.76076853, 0, 0.64902323, 87.32781, 99.30302, -15.815966)
+script = ExtResource("7_743h6")
+move_enabled = true
+move_speed = 6.0
+move_points = Array[Vector3]([Vector3(88.22815, 58.473324, -16.83906), Vector3(89.73783, 58.473324, -18.009062), Vector3(87.32781, 99.30302, -15.815966)])
+move_rotations = Array[Vector3]([Vector3(0, -49.531998, 0), Vector3(0, -49.531998, 0), Vector3(0, -49.531998, 0)])
+slow_near_waypoint_radius = 3.0
+slow_min_speed_percent = 0.09
+animate_in_editor = false
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform5"]
+material_override = ExtResource("8_yv803")
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("StandardMaterial3D_4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/MovingClimbablePlatform5"]
+shape = SubResource("BoxShape3D_6")
+
 [node name="Collectables" type="Node" parent="."]
 
 [node name="BasicArmor" parent="Collectables" instance=ExtResource("13_fofsx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.555634, 18.018467, -53.015263)
 
 [node name="Hammer" parent="Collectables" instance=ExtResource("15_yrkys")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.681732, 0.81348085, 18.224592)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.102356, 99.72457, -12.3242855)
 
 [node name="CurrencyPickup" parent="Collectables" instance=ExtResource("8_d87jq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.432789, 1.5021702, -24.535063)
@@ -429,7 +494,7 @@ transform = Transform3D(1.6806982, 0, -1.4195964, 0, 2.2000003, 0, 1.4195964, 0,
 transform = Transform3D(1.9287993, 0, 1.0581756, 0, 2.2, 0, -1.0581756, 0, 1.9287993, 169.67009, 0, -171.216)
 
 [node name="HouseBlocking138" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
-transform = Transform3D(1.9861176, 0, 0.94622356, 0, 2.2, 0, -0.94622356, 0, 1.9861176, 25.35379, 0, -99.47503)
+transform = Transform3D(1.9861176, 0, 0.94622356, 0, 2.2, 0, -0.94622356, 0, 1.9861176, 28.536232, 0, -89.9277)
 
 [node name="HouseBlocking139" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
 transform = Transform3D(2.09359, 0, -0.67592883, 0, 2.1999998, 0, 0.67592883, 0, 2.09359, 41.42402, 0, -120.34169)
@@ -482,6 +547,18 @@ transform = Transform3D(0.24389601, 0, 2.186439, 0, 2.2000003, 0, -2.186439, 0, 
 [node name="HouseBlocking92" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
 transform = Transform3D(-1.9526818, 0, 1.0134282, 0, 2.2, 0, -1.0134282, 0, -1.9526818, 53.649086, 0, 69.44914)
 
+[node name="HouseBlocking144" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
+transform = Transform3D(-1.6343021, 0, -1.4727727, 0, 2.2, 0, 1.4727727, 0, -1.6343021, 8.309725, 0, -81.78465)
+
+[node name="HouseBlocking145" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
+transform = Transform3D(1.8905175, 0, 1.1251419, 0, 2.2, 0, -1.1251419, 0, 1.8905175, -26.823616, 0, -80.50888)
+
+[node name="HouseBlocking146" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
+transform = Transform3D(1.8905175, 0, 1.1251419, 0, 2.2, 0, -1.1251419, 0, 1.8905175, -3.4693336, 0, -40.407955)
+
+[node name="HouseBlocking147" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
+transform = Transform3D(-0.37048763, 0, 2.1685805, 0, 2.2000003, 0, -2.1685805, 0, -0.37048763, -23.776978, 0, -60.145573)
+
 [node name="HouseBlocking99" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
 transform = Transform3D(1.2610499, 0, 1.8027067, 0, 2.1999993, 0, -1.8027067, 0, 1.2610499, 149.88846, 0, -73.19764)
 
@@ -496,6 +573,12 @@ transform = Transform3D(2.0262492, 0, -0.85692143, 0, 2.1999998, 0, 0.85692143, 
 
 [node name="HouseBlocking103" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
 transform = Transform3D(1.5279174, 0, 1.5828681, 0, 2.2, 0, -1.5828681, 0, 1.5279174, 111.17386, 0, -49.034286)
+
+[node name="HouseBlocking148" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
+transform = Transform3D(1.9251521, 0, -2.3008237, 0, 3, 0, 2.3008237, 0, 1.9251521, 63.690674, 0, 4.2885885)
+
+[node name="HouseBlocking149" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
+transform = Transform3D(-1.6325788, 0, -1.4746825, 0, 2.2, 0, 1.4746825, 0, -1.6325788, 68.03944, 0, -28.896868)
 
 [node name="HouseBlocking93" parent="HouseBlcokingWall" instance=ExtResource("17_yv803")]
 transform = Transform3D(-2.1749654, 0, 0.33095157, 0, 2.2, 0, -0.33095157, 0, -2.1749654, 218.3522, 0, -70.564575)
@@ -811,6 +894,9 @@ shadow_enabled = true
 [node name="GothicTower" parent="Environment" instance=ExtResource("16_22881")]
 transform = Transform3D(-2.9337547, 0, -0.626961, 0, 2.9999995, 0, 0.626961, 0, -2.9337547, 31.018723, 6.2242413, -264.07642)
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
+environment = SubResource("Environment_fl3xc")
+
 [node name="PlayerSpawn" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.347755, 1, -14.976971)
 
@@ -824,3 +910,23 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.118584, 0.8821449, -15.971
 
 [node name="Collectible" parent="." instance=ExtResource("8_d87jq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.862595, 2.3210135, 3.911745)
+
+[node name="Ladder" parent="." instance=ExtResource("20_ymmha")]
+transform = Transform3D(0.6698177, 0.021121167, -0.74222517, -8.883939e-10, 0.9995954, 0.028445035, 0.7425256, -0.01905299, 0.66954666, 55.61891, 1.042153, -17.55141)
+
+[node name="LightDesignElemtns" type="Node" parent="."]
+
+[node name="LampPost" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.73895, 0.08082795, -16.64867)
+
+[node name="LampPost2" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.408989, 0.08082795, -45.261932)
+
+[node name="LampPost3" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.913363, 0.08082795, -83.87627)
+
+[node name="LampPost4" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53.349358, 0.08082795, -116.53819)
+
+[node name="LampPost5" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.463478, 0.08082795, -172.35275)
