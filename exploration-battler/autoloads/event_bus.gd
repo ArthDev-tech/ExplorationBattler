@@ -112,6 +112,17 @@ signal interact_prompt_shown(prompt_text: String)
 ## Emitted when the interact prompt should be hidden.
 signal interact_prompt_hidden()
 
+## Emitted when an NPC (or anything) wants to open dialogue.
+## @param dialogue_tree: DialogueTreeData or Resource with entry_id and nodes
+signal dialogue_requested(dialogue_tree: Resource)
+
+## Emitted when the player closes or finishes a dialogue tree.
+signal dialogue_ended()
+
+## Emitted when dialogue (or anything) wants to open the card shop.
+## @param shop_inventory: ShopInventoryData or Resource with cards array
+signal shop_requested(shop_inventory: Resource)
+
 # -----------------------------------------------------------------------------
 # UI SIGNALS
 # -----------------------------------------------------------------------------

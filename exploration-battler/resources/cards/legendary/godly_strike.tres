@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_id = &"godly_strike"
+display_name = "Godly Strike"
+cost = 0
+cost_red = 1
+cost_green = 0
+cost_blue = 0
+card_type = 1
+rarity = 3
+currency_cost = 350
+attack = 0
+health = 0
+tribe = 0
+keywords = [&"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &"", &""]
+description = "Deal damage equal to 1.5 times your attack minimum 5"
+is_token = false
+sacrifice_value = 0

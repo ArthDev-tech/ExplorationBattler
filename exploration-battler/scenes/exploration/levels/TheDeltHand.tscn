@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://bq0wwu270m6l0"]
+[gd_scene load_steps=34 format=3 uid="uid://bq0wwu270m6l0"]
 
 [ext_resource type="Script" uid="uid://bkg8npc403ars" path="res://scripts/components/background_music.gd" id="2_k15a0"]
 [ext_resource type="PackedScene" uid="uid://dfxj6ttbssa7a" path="res://Imports/CheryCardTree/CherryCardTree.tscn" id="4_vyrj3"]
@@ -20,6 +20,8 @@
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/exploration_ui.tscn" id="18_kxlmy"]
 [ext_resource type="Material" uid="uid://cy4w8lfpmfq0d" path="res://materials/materials/BloodSky.tres" id="18_vyrj3"]
 [ext_resource type="PackedScene" uid="uid://bxin1pibe11l" path="res://Imports/tower/Tower.tscn" id="19_k15a0"]
+[ext_resource type="PackedScene" uid="uid://dg7ht1s1lx5k0" path="res://Imports/NPC/MysteriousStranger/MysteriousStranger.tscn" id="19_ptfrn"]
+[ext_resource type="PackedScene" uid="uid://br3eml5gjqeev" path="res://Imports/props/HouseA/HouseA.tscn" id="21_vyrj3"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_301dv"]
 size = Vector3(100.57, 1, 100.2)
@@ -66,6 +68,38 @@ volumetric_fog_albedo = Color(0.28769487, 0.056281902, 0.07975643, 1)
 volumetric_fog_anisotropy = -0.05
 
 [node name="TestRoom" type="Node3D"]
+
+[node name="LightDesignElemtns" type="Node" parent="."]
+
+[node name="LampPost" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.73895, 0.08082795, -16.64867)
+
+[node name="LampPost2" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.408989, 0.08082795, -45.261932)
+
+[node name="LampPost6" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.813362, 0.08082795, -57.250774)
+
+[node name="LampPost7" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -85.879684, 0.08082795, -37.622124)
+
+[node name="LampPost8" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -61.55121, 0.08082795, 72.61639)
+
+[node name="LampPost9" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 123.39641, 0.08082795, -1.541353)
+
+[node name="LampPost10" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149.04134, 0.08082795, -138.51195)
+
+[node name="LampPost3" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.913363, 0.08082795, -83.87627)
+
+[node name="LampPost4" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(0.9541829, 0, -0.29922402, 0, 1, 0, 0.29922402, 0, 0.9541829, 51.392826, 0.08082795, -114.74622)
+
+[node name="LampPost5" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.463478, 0.08082795, -172.35275)
 
 [node name="Background" type="Node" parent="."]
 
@@ -170,7 +204,7 @@ shape = SubResource("BoxShape3D_1")
 [node name="JumpPuzzle" type="Node3D" parent="PlatformsFloorECT"]
 
 [node name="MovingClimbablePlatform" type="AnimatableBody3D" parent="PlatformsFloorECT/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.31723, -0.00025770793, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.990442, -1.7943457, 0)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(0, 0, 0), Vector3(5, 0, 0), Vector3(5, -2, 0), Vector3(0, -2, 0)])
@@ -279,12 +313,13 @@ transform = Transform3D(11.126199, 0, 0, 0, 1, 0, 0, 0, 9.713882, 0, -32.587715,
 shape = SubResource("BoxShape3D_4")
 
 [node name="MovingClimbablePlatform" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 4.6751513, -26.089067)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 4.9955263, -31.724852)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_speed = 1.5
 move_points = Array[Vector3]([Vector3(25, 2, -26), Vector3(25, 5, -26), Vector3(25, 5, -32)])
 slow_near_waypoint_radius = 1.0
+animate_in_editor = false
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform"]
@@ -296,11 +331,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="MovingClimbablePlatform2" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.233006, 1.0240608, -32.25491)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42.233006, 3.0671053, -30.04274)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(42.233223, 4.998416, -39.256905), Vector3(42.233, 1, -39.257), Vector3(42.233, 1, -30), Vector3(42.233, 5, -30)])
 loop_path = true
+animate_in_editor = false
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform2"]
@@ -312,13 +348,14 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 shape = SubResource("BoxShape3D_6")
 
 [node name="MovingClimbablePlatform3" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.829817, 10.06813, -38.683075)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.826971, 1.3578525, -38.683075)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(29.486, 0.92630625, -38.683086), Vector3(29.486, 3.813387, -38.683086), Vector3(27.156467, 3.813387, -38.683086), Vector3(27.156467, 7.9096966, -38.683086), Vector3(31.831432, 7.9096966, -38.683086), Vector3(31.831432, 12.057932, -38.683086), Vector3(31.831432, 3.7974243, -38.683086)])
 loop_path = true
 slow_near_waypoint_radius = 0.3
 slow_min_speed_percent = 0.101
+animate_in_editor = false
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform3"]
@@ -329,17 +366,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/MovingClimbablePlatform3"]
 shape = SubResource("BoxShape3D_6")
 
-[node name="GrassPatch" parent="PlatformsFloorECT" instance=ExtResource("10_ymmha")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.1263, 0.45249924, -29.17462)
-
-[node name="GrassPatch2" parent="PlatformsFloorECT" instance=ExtResource("10_ymmha")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.748521, 0.45250115, -25.652058)
-
-[node name="GrassPatch3" parent="PlatformsFloorECT" instance=ExtResource("10_ymmha")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.461548, 0.4525002, -24.60797)
-
 [node name="MovingClimbablePlatform4" type="AnimatableBody3D" parent="PlatformsFloorECT"]
-transform = Transform3D(0.6488507, 0, -0.7609158, 0, 1, 0, 0.7609158, 0, 0.6488507, 55.16712, 9.12971, -9.6046095)
+transform = Transform3D(0.7994655, 0, -0.600712, 0, 1, 0, 0.600712, 0, 0.7994655, 71.730675, 59, -11.384998)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_speed = 6.0
@@ -357,6 +385,69 @@ mesh = SubResource("BoxMesh_4")
 surface_material_override/0 = SubResource("StandardMaterial3D_4")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/MovingClimbablePlatform4"]
+shape = SubResource("BoxShape3D_6")
+
+[node name="MovingClimbablePlatform6" type="AnimatableBody3D" parent="PlatformsFloorECT"]
+transform = Transform3D(0.6894022, 0, -0.7243787, 0, 1, 0, 0.7243787, 0, 0.6894022, -6.5733166, 59, -102.87223)
+script = ExtResource("7_743h6")
+move_enabled = true
+move_speed = 6.0
+move_points = Array[Vector3]([Vector3(71.83596, 59.177532, -11.013602), Vector3(76.30814, 59.177532, -9.960544), Vector3(79.57997, 59.177532, -6.375308), Vector3(60.7345, 29.605396, -2.8279228), Vector3(51.525448, 17.015564, -6.766617), Vector3(51.525448, 2.5267792, -6.766617), Vector3(51.525448, 0.86905575, -6.766617), Vector3(55.16712, 9.12971, -9.6046095)])
+move_rotations = Array[Vector3]([Vector3(0, -24.118996, 0), Vector3(0, -36.521996, 0), Vector3(0, -54.232998, 0), Vector3(0, -54.232998, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -49.545, 0)])
+loop_path = true
+slow_near_waypoint_radius = 3.0
+slow_min_speed_percent = 0.105
+animate_in_editor = false
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform6"]
+material_override = ExtResource("8_yv803")
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("StandardMaterial3D_4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/MovingClimbablePlatform6"]
+shape = SubResource("BoxShape3D_6")
+
+[node name="MovingClimbablePlatform7" type="AnimatableBody3D" parent="PlatformsFloorECT"]
+transform = Transform3D(0.6373416, 0, -0.7705814, 0, 1, 0, 0.7705814, 0, 0.6373416, 17.790012, 59, -73.729645)
+script = ExtResource("7_743h6")
+move_enabled = true
+move_speed = 6.0
+move_points = Array[Vector3]([Vector3(71.83596, 59.177532, -11.013602), Vector3(76.30814, 59.177532, -9.960544), Vector3(79.57997, 59.177532, -6.375308), Vector3(60.7345, 29.605396, -2.8279228), Vector3(51.525448, 17.015564, -6.766617), Vector3(51.525448, 2.5267792, -6.766617), Vector3(51.525448, 0.86905575, -6.766617), Vector3(55.16712, 9.12971, -9.6046095)])
+move_rotations = Array[Vector3]([Vector3(0, -24.118996, 0), Vector3(0, -36.521996, 0), Vector3(0, -54.232998, 0), Vector3(0, -54.232998, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -49.545, 0)])
+loop_path = true
+slow_near_waypoint_radius = 3.0
+slow_min_speed_percent = 0.105
+animate_in_editor = false
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform7"]
+material_override = ExtResource("8_yv803")
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("StandardMaterial3D_4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/MovingClimbablePlatform7"]
+shape = SubResource("BoxShape3D_6")
+
+[node name="MovingClimbablePlatform8" type="AnimatableBody3D" parent="PlatformsFloorECT"]
+transform = Transform3D(0.6796462, 0, -0.73354006, 0, 1, 0, 0.73354006, 0, 0.6796462, 42.322414, 59, -45.10284)
+script = ExtResource("7_743h6")
+move_enabled = true
+move_speed = 6.0
+move_points = Array[Vector3]([Vector3(71.83596, 59.177532, -11.013602), Vector3(76.30814, 59.177532, -9.960544), Vector3(79.57997, 59.177532, -6.375308), Vector3(60.7345, 29.605396, -2.8279228), Vector3(51.525448, 17.015564, -6.766617), Vector3(51.525448, 2.5267792, -6.766617), Vector3(51.525448, 0.86905575, -6.766617), Vector3(55.16712, 9.12971, -9.6046095)])
+move_rotations = Array[Vector3]([Vector3(0, -24.118996, 0), Vector3(0, -36.521996, 0), Vector3(0, -54.232998, 0), Vector3(0, -54.232998, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -46.024, 0), Vector3(0, -49.545, 0)])
+loop_path = true
+slow_near_waypoint_radius = 3.0
+slow_min_speed_percent = 0.105
+animate_in_editor = false
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlatformsFloorECT/MovingClimbablePlatform8"]
+material_override = ExtResource("8_yv803")
+mesh = SubResource("BoxMesh_4")
+surface_material_override/0 = SubResource("StandardMaterial3D_4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlatformsFloorECT/MovingClimbablePlatform8"]
 shape = SubResource("BoxShape3D_6")
 
 [node name="MovingClimbablePlatform5" type="AnimatableBody3D" parent="PlatformsFloorECT"]
@@ -382,7 +473,7 @@ shape = SubResource("BoxShape3D_6")
 [node name="Collectables" type="Node" parent="."]
 
 [node name="BasicArmor" parent="Collectables" instance=ExtResource("13_fofsx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.555634, 18.018467, -53.015263)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46.555634, 17.328136, -53.015263)
 
 [node name="Hammer" parent="Collectables" instance=ExtResource("15_yrkys")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 83.102356, 99.72457, -12.3242855)
@@ -890,7 +981,6 @@ transform = Transform3D(2.0421116, 0, 0.81839955, 0, 2.2, 0, -0.81839955, 0, 2.0
 
 [node name="Lighting" type="DirectionalLight3D" parent="Environment"]
 transform = Transform3D(-0.9059793, -0.4039028, 0.1267446, 0.4193564, -0.8972073, 0.13841754, 0.05780889, 0.1785546, 0.9822303, 0, 27.70203, 0)
-visible = false
 light_color = Color(0.6241424, 0.3624398, 0.38844866, 1)
 light_energy = 0.272
 light_indirect_energy = 1.325
@@ -903,6 +993,23 @@ transform = Transform3D(-2.9337547, 0, -0.626961, 0, 2.9999995, 0, 0.626961, 0, 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
 environment = SubResource("Environment_fl3xc")
 
+[node name="SceneElements" type="Node" parent="Environment"]
+
+[node name="GrassPatch" parent="Environment/SceneElements" instance=ExtResource("10_ymmha")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 63.651993, 0.45249924, -71.592545)
+extent_x = 30.0
+extent_z = 30.0
+instance_count = 2400
+
+[node name="GrassPatch2" parent="Environment/SceneElements" instance=ExtResource("10_ymmha")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.748521, 0.45250115, -25.652058)
+
+[node name="GrassPatch3" parent="Environment/SceneElements" instance=ExtResource("10_ymmha")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.461548, 0.4525002, -24.60797)
+
+[node name="MysteriousStranger" parent="Environment/SceneElements" instance=ExtResource("19_ptfrn")]
+transform = Transform3D(0.921809, 0, 0.3876443, 0, 1, 0, -0.3876443, 0, 0.921809, 20.460283, 0.5555556, -79.71521)
+
 [node name="PlayerSpawn" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.347755, 1, -14.976971)
 
@@ -910,26 +1017,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.347755, 1, -14.976971)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 1, 5)
 
 [node name="PlayerController" parent="." instance=ExtResource("17_a2o0j")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.118584, 0.8821449, -15.971525)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.190329, 0.51644325, -24.99505)
 
 [node name="UI" parent="." instance=ExtResource("18_kxlmy")]
 
 [node name="Collectible" parent="." instance=ExtResource("8_d87jq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.862595, 2.3210135, 3.911745)
 
-[node name="LightDesignElemtns" type="Node" parent="."]
-
-[node name="LampPost" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.73895, 0.08082795, -16.64867)
-
-[node name="LampPost2" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.408989, 0.08082795, -45.261932)
-
-[node name="LampPost3" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.913363, 0.08082795, -83.87627)
-
-[node name="LampPost4" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 53.349358, 0.08082795, -116.53819)
-
-[node name="LampPost5" parent="LightDesignElemtns" instance=ExtResource("10_vyrj3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.463478, 0.08082795, -172.35275)
+[node name="HouseA" parent="." instance=ExtResource("21_vyrj3")]
+transform = Transform3D(-4.2464924, 0, 4.0743747, 0, 5.885, 0, -4.0743747, 0, -4.2464924, -32.22487, 0.05000031, 21.949144)

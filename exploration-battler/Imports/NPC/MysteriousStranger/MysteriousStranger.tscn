@@ -1,0 +1,42 @@
+[gd_scene load_steps=12 format=3 uid="uid://dg7ht1s1lx5k0"]
+
+[ext_resource type="Script" uid="uid://c0vdcp12o2ei1" path="res://scripts/components/interactable_npc.gd" id="1_npc"]
+[ext_resource type="Resource" uid="uid://j3ckn86qdvqp" path="res://resources/dialogue/mysterious_stranger_intro.tres" id="2_tree"]
+[ext_resource type="Resource" path="res://resources/dialogue/mysterious_stranger_shop.tres" id="3_shop"]
+[ext_resource type="ArrayMesh" uid="uid://lfaoe2w6rudv" path="res://Imports/NPC/MysteriousStranger/MysteriousStranger.obj" id="3_ims3m"]
+[ext_resource type="Texture2D" uid="uid://dos882sp7gp55" path="res://Imports/NPC/MysteriousStranger/MysteriousStrangerAlb.png" id="4_dley3"]
+[ext_resource type="Texture2D" uid="uid://cn6gssqok831u" path="res://Imports/NPC/MysteriousStranger/texture_metallicMysteriousStranger.png" id="5_up3u0"]
+[ext_resource type="Texture2D" uid="uid://bdnjcysxs1hf" path="res://Imports/NPC/MysteriousStranger/texture_normalMysteriousStranger.png" id="6_g68nn"]
+[ext_resource type="Texture2D" uid="uid://cfjxp3wfkhepb" path="res://Imports/NPC/MysteriousStranger/texture_roughnessMysteriousStranger.png" id="7_bp450"]
+[ext_resource type="PackedScene" uid="uid://c14o0nkmpx4am" path="res://Imports/props/Lanturn.tscn" id="8_dley3"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_talk"]
+radius = 2.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_61o7i"]
+albedo_texture = ExtResource("4_dley3")
+metallic = 1.0
+metallic_texture = ExtResource("5_up3u0")
+roughness_texture = ExtResource("7_bp450")
+normal_enabled = true
+normal_texture = ExtResource("6_g68nn")
+
+[node name="MysteriousStranger" type="Node3D"]
+script = ExtResource("1_npc")
+dialogue_tree = ExtResource("2_tree")
+shop_inventory = ExtResource("3_shop")
+
+[node name="TalkZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.98453844, 0)
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TalkZone"]
+shape = SubResource("SphereShape3D_talk")
+
+[node name="MysteriousStranger" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.008510947, 0, 0.084388494)
+mesh = ExtResource("3_ims3m")
+surface_material_override/0 = SubResource("StandardMaterial3D_61o7i")
+
+[node name="Lanturn" parent="." instance=ExtResource("8_dley3")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, -0.5056859, 0, 0.48263663)

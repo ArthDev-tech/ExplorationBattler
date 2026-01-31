@@ -7,7 +7,7 @@ extends Node3D
 ## (e.g. "LadderZone") with a CollisionShape3D (SphereShape3D radius 4) so
 ## the player is detected within 4 units. When the player enters, shows
 ## "Press E to climb" via EventBus; when they press E, PlayerController
-## calls get_approach_position and get_climb_top_position to run the climb.
+## calls on_interact; ladder calls player.start_ladder_climb(self).
 ## =============================================================================
 
 @export var approach_distance: float = 0.8
@@ -25,21 +25,28 @@ func _ready() -> void:
 	_zone.body_exited.connect(_on_body_exited)
 
 func _on_body_entered(body: Node3D) -> void:
-	if not body.has_method("set_near_ladder"):
+	if not body.has_method("set_near_interactable"):
 		return
 	if _player != null:
 		return
 	_player = body
-	body.set_near_ladder(self)
-	EventBus.interact_prompt_shown.emit("Press E to climb")
+	body.set_near_interactable(self)
+	EventBus.interact_prompt_shown.emit(get_interact_prompt())
 
 func _on_body_exited(body: Node3D) -> void:
 	if body != _player:
 		return
 	_player = null
-	if body.has_method("set_near_ladder"):
-		body.set_near_ladder(null)
+	if body.has_method("set_near_interactable"):
+		body.set_near_interactable(null)
 	EventBus.interact_prompt_hidden.emit()
+
+func get_interact_prompt() -> String:
+	return "Press E to climb"
+
+func on_interact(player: Node) -> void:
+	if player.has_method("start_ladder_climb"):
+		player.start_ladder_climb(self)
 
 ## Position in front of the ladder at the player's height for approach phase.
 func get_approach_position(player_global_pos: Vector3) -> Vector3:

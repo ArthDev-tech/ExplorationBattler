@@ -80,6 +80,9 @@ var player_currency: int = 0
 ## -1 indicates uninitialized (will use max_life on first battle).
 var player_current_life: int = -1
 
+## Shop inventory for the NPC currently in dialogue (set when dialogue opens, cleared when shop closes).
+var current_shop_inventory: Resource = null
+
 # -----------------------------------------------------------------------------
 # INITIALIZATION
 # -----------------------------------------------------------------------------

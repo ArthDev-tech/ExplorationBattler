@@ -16,9 +16,15 @@ extends Node3D
 @export var scale_jitter: float = 0.0
 
 @export_group("Displacement")
-@export var displacement_radius: float = 2.0
+@export var displacement_radius: float = 1.5
+
+@export_group("Debug")
+@export var debug_bend: bool = false
 
 var _grass_sprite_texture: Texture2D = null
+var _debug_timer: float = 0.0
+var _debug_printed_first_pos: bool = false
+var _debug_warned_no_mat: bool = false
 var _last_player_position: Vector3 = Vector3.ZERO
 var _player_position_received: bool = false
 
@@ -48,14 +54,20 @@ func _apply_grass_texture() -> void:
 func _ready() -> void:
 	_build_multimesh()
 	if not Engine.is_editor_hint():
-		# Safely check EventBus and signal before connecting
-		if EventBus and EventBus.has_signal("player_moved"):
+		var eventbus_ok: bool = EventBus != null and EventBus.has_signal("player_moved")
+		print("GrassPatch '%s' ready (EventBus connected=%s)" % [name, eventbus_ok])
+		if eventbus_ok:
 			if not EventBus.player_moved.is_connected(_on_player_moved):
 				EventBus.player_moved.connect(_on_player_moved)
+		if bool(debug_bend):
+			print("GrassPatch debug: enabled on '%s' (throttled pos/radius every 1s)" % name)
 
 func _on_player_moved(pos: Vector3) -> void:
 	_last_player_position = pos
 	_player_position_received = true
+	if not _debug_printed_first_pos:
+		_debug_printed_first_pos = true
+		print("GrassPatch '%s' received first player position: %s" % [name, pos])
 
 func _process(_delta: float) -> void:
 	if Engine.is_editor_hint():
@@ -64,6 +76,9 @@ func _process(_delta: float) -> void:
 		return
 	var mat: ShaderMaterial = _grass.material_override as ShaderMaterial
 	if mat == null:
+		if not _debug_warned_no_mat:
+			_debug_warned_no_mat = true
+			push_warning("GrassPatch '%s': material_override is null, skipping character_positions." % name)
 		return
 	var arr: PackedVector4Array = PackedVector4Array()
 	arr.resize(64)
@@ -74,6 +89,14 @@ func _process(_delta: float) -> void:
 	for i in range(1, 64):
 		arr[i] = Vector4(0.0, 0.0, 0.0, 0.0)
 	mat.set_shader_parameter("character_positions", arr)
+	var debug_on: bool = bool(debug_bend)
+	mat.set_shader_parameter("debug_bend", debug_on)
+
+	if debug_on:
+		_debug_timer += _delta
+		if _debug_timer >= 1.0:
+			print("GrassPatch debug: player_received=%s pos=%s radius=%s" % [_player_position_received, _last_player_position, displacement_radius])
+			_debug_timer = 0.0
 
 func _exit_tree() -> void:
 	# Safely check EventBus and signal before disconnecting

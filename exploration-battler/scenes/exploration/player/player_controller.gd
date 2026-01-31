@@ -75,7 +75,7 @@ var _dash_direction: Vector3 = Vector3.ZERO
 var _jump_count: int = 0
 var _auto_run_enabled: bool = false
 
-var _near_ladder: Node = null
+var _near_interactable: Node = null
 var _ladder_ref: Node = null
 var _ladder_approach_target: Vector3 = Vector3.ZERO
 
@@ -202,14 +202,15 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("autorun"):
 		_auto_run_enabled = not _auto_run_enabled
 	
-	# Interact (e.g. climb ladder) when near and not paused
-	if not get_tree().paused and event.is_action_pressed("interact") and _near_ladder:
-		start_ladder_climb(_near_ladder)
-		_near_ladder = null
+	# Interact (e.g. climb ladder, talk to NPC) when near and not paused
+	if not get_tree().paused and event.is_action_pressed("interact") and _near_interactable:
+		if _near_interactable.has_method("on_interact"):
+			_near_interactable.on_interact(self)
+		_near_interactable = null
 		EventBus.interact_prompt_hidden.emit()
 
-func set_near_ladder(ladder: Node) -> void:
-	_near_ladder = ladder
+func set_near_interactable(interactable: Node) -> void:
+	_near_interactable = interactable
 
 func _check_ledge_grab() -> void:
 	# Only check for ledge grab when in air

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scenes/exploration/ui/exploration_ui.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/ability_indicators.tscn" id="2"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/card_collection_menu.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/ui/dash_motion_lines.tscn" id="5"]
 [ext_resource type="Script" path="res://scenes/exploration/ui/currency_popup_layer.gd" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/ui/dialogue_panel.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/ui/card_shop_panel.tscn" id="8"]
 
 [node name="ExplorationUI" type="CanvasLayer"]
 script = ExtResource("1")
@@ -26,6 +28,10 @@ script = ExtResource("6")
 [node name="CardCollectionMenu" parent="." instance=ExtResource("4")]
 
 [node name="DashMotionLines" parent="." instance=ExtResource("5")]
+
+[node name="DialoguePanel" parent="." instance=ExtResource("7")]
+
+[node name="CardShopPanel" parent="." instance=ExtResource("8")]
 
 [node name="InteractPrompt" type="Label" parent="."]
 anchors_preset = 7

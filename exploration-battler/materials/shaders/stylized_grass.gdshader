@@ -47,8 +47,16 @@ uniform int toon_bands : hint_range(1, 8) = 3;
 uniform float toon_gradient_size : hint_range(0.0, 1.0) = 0.15;
 uniform bool use_hybrid_toon = false;
 
+// ---- Lighting (fake light, controllable from material) ----
+uniform vec3 light_direction = vec3(0.5, 1.0, 0.3);
+uniform float light_ambient : hint_range(0.0, 1.0) = 0.4;
+uniform float light_diffuse : hint_range(0.0, 1.0) = 0.6;
+
 // ---- Base ----
 uniform float alpha_cutout : hint_range(0.0, 1.0) = 0.5;
+
+// ---- Debug ----
+uniform bool debug_bend = false;
 
 // ---- Varyings ----
 varying vec2 vert_uv;
@@ -56,6 +64,8 @@ varying float vert_wind_noise;
 varying float vert_displacement_perspective;
 varying flat float vert_is_accent;
 varying vec3 vert_world_pos;
+varying float vert_bend_mask;
+varying vec2 vert_bend_axis_xz;
 
 // Hash for instance-based randomness (from instance ID and world pos)
 float hash(vec3 p) {
@@ -116,11 +126,16 @@ void vertex() {
 	vec3 world_v = (MODEL_MATRIX * vec4(local_vertex, 1.0)).xyz;
 	vec3 world_after_wind = world_center + rotate_around_axis(world_v - world_center, wind_axis, wind_angle);
 
-	// Character displacement: view-space X and Z rotation from each character
+	// Character displacement (tutorial: view-space X and Z rotation from each character)
 	float disp_x = 0.0;
 	float disp_z = 0.0;
 	vec3 view_forward = normalize((INV_VIEW_MATRIX * vec4(0.0, 0.0, -1.0, 0.0)).xyz);
 	vec3 view_right = normalize((INV_VIEW_MATRIX * vec4(1.0, 0.0, 0.0, 0.0)).xyz);
+
+	float max_mask = 0.0;
+	vec2 debug_axis_xz = vec2(0.0);
+	vert_bend_mask = 0.0;
+	vert_bend_axis_xz = vec2(0.0);
 
 	for (int i = 0; i < MAX_CHARACTERS; i++) {
 		vec4 ch = character_positions[i];
@@ -136,12 +151,19 @@ void vertex() {
 		float dot_right = dot(to_grass, view_right);
 		disp_x += dot_forward * mask * displacement_strength;
 		disp_z += dot_right * mask * displacement_strength;
+
+		if (mask > max_mask) {
+			max_mask = mask;
+			debug_axis_xz = to_grass.xz;
+		}
 	}
 	disp_x = clamp(disp_x, -1.0, 1.0);
 	disp_z = clamp(disp_z, -1.0, 1.0);
+	vert_bend_mask = max_mask;
+	vert_bend_axis_xz = length(debug_axis_xz) > 0.0001 ? normalize(debug_axis_xz) : vec2(0.0);
 	vert_displacement_perspective = disp_z;
 
-	// Apply character displacement in view space (rotate around blade base, not camera)
+	// Apply character displacement in view space (tutorial: rotate around blade base)
 	vec3 view_center = (VIEW_MATRIX * vec4(world_center, 1.0)).xyz;
 	vec3 view_pos = (VIEW_MATRIX * vec4(world_after_wind, 1.0)).xyz;
 	vec3 view_offset = view_pos - view_center;
@@ -207,8 +229,9 @@ void fragment() {
 
 	// Hybrid toon: smooth steps between lighting bands (fake NdotL when unshaded)
 	vec3 albedo_out = tex_color.rgb;
+	vec3 light_dir_n = length(light_direction) > 0.001 ? normalize(light_direction) : vec3(0.5, 1.0, 0.3);
 	if (use_hybrid_toon && toon_bands > 1) {
-		float ndotl = clamp(dot(NORMAL, normalize(vec3(0.5, 1.0, 0.3))), 0.0, 1.0);
+		float ndotl = clamp(dot(NORMAL, light_dir_n), 0.0, 1.0);
 		float band_width = 1.0 / float(toon_bands);
 		float rounded = floor(ndotl * float(toon_bands) + 0.5) * band_width;
 		float grad_half = toon_gradient_size * band_width * 0.5;
@@ -217,7 +240,15 @@ void fragment() {
 		float lower = max(0.0, rounded - band_width * 0.5);
 		float upper = min(1.0, rounded + band_width * 0.5);
 		float lit = mix(rounded, mix(lower, upper, t), t);
-		albedo_out *= (0.4 + 0.6 * lit);
+		albedo_out *= clamp(light_ambient + light_diffuse * lit, 0.0, 1.0);
+	} else {
+		float ndotl = clamp(dot(NORMAL, light_dir_n), 0.0, 1.0);
+		albedo_out *= clamp(light_ambient + light_diffuse * ndotl, 0.0, 1.0);
+	}
+
+	if (debug_bend) {
+		vec3 debug_color = vec3(vert_bend_mask, vert_bend_axis_xz.x * 0.5 + 0.5, vert_bend_axis_xz.y * 0.5 + 0.5);
+		albedo_out = mix(albedo_out, debug_color, 0.5);
 	}
 
 	ALBEDO = albedo_out;

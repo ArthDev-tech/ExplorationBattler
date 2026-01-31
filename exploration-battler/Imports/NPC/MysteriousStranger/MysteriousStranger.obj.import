@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://lfaoe2w6rudv"
+path="res://.godot/imported/MysteriousStranger.obj-2ac6663e57c88f2221df31c9d24c471e.mesh"
+
+[deps]
+
+files=["res://.godot/imported/MysteriousStranger.obj-2ac6663e57c88f2221df31c9d24c471e.mesh"]
+
+source_file="res://Imports/NPC/MysteriousStranger/MysteriousStranger.obj"
+dest_files=["res://.godot/imported/MysteriousStranger.obj-2ac6663e57c88f2221df31c9d24c471e.mesh", "res://.godot/imported/MysteriousStranger.obj-2ac6663e57c88f2221df31c9d24c471e.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

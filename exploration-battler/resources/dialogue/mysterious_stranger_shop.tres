@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShopInventoryData" load_steps=9 format=3 uid="uid://deermcswbld3n"]
+
+[ext_resource type="Script" path="res://scripts/core/shop_inventory_data.gd" id="1_shop"]
+[ext_resource type="Resource" path="res://resources/cards/common/rager.tres" id="2_rager"]
+[ext_resource type="Resource" path="res://resources/cards/common/quick_slash.tres" id="3_slash"]
+[ext_resource type="Resource" path="res://resources/cards/common/marsh_creeper.tres" id="4_creeper"]
+[ext_resource type="Resource" path="res://resources/cards/common/reinforce.tres" id="5_reinforce"]
+[ext_resource type="Resource" path="res://resources/cards/common/spell_circle.tres" id="6_spell"]
+[ext_resource type="Resource" path="res://resources/cards/common/strike_common.tres" id="7_strike"]
+[ext_resource type="Resource" path="res://resources/cards/common/bramble_sprout.tres" id="8_bramble"]
+
+[resource]
+script = ExtResource("1_shop")
+cards = Array[CardData]([ExtResource("2_rager"), ExtResource("3_slash"), ExtResource("4_creeper"), ExtResource("5_reinforce"), ExtResource("6_spell"), ExtResource("7_strike"), ExtResource("8_bramble")])

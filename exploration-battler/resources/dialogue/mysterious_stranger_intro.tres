@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="DialogueTreeData" load_steps=8 format=3 uid="uid://j3ckn86qdvqp"]
+
+[ext_resource type="Script" uid="uid://dxqi8rs8wy5n1" path="res://scripts/core/dialogue_tree_data.gd" id="1_dtree"]
+[ext_resource type="Script" uid="uid://d3fj8ghsiuylh" path="res://scripts/core/dialogue_node.gd" id="2_node"]
+[ext_resource type="Script" uid="uid://8meie5qqdp2v" path="res://scripts/core/dialogue_choice.gd" id="2_u0rg8"]
+
+[sub_resource type="Resource" id="Choice_shop"]
+script = ExtResource("2_u0rg8")
+label = "Shop"
+next_id = &"__open_shop__"
+
+[sub_resource type="Resource" id="Choice_passing"]
+script = ExtResource("2_u0rg8")
+label = "Just passing through"
+next_id = &"intro2"
+
+[sub_resource type="Resource" id="DialogueNode_intro"]
+script = ExtResource("2_node")
+id = &"intro"
+speaker = "Mysterious Stranger"
+text = "Welcome, traveler."
+next_id = &"intro2"
+choices = Array[ExtResource("2_u0rg8")]([SubResource("Choice_shop"), SubResource("Choice_passing")])
+
+[sub_resource type="Resource" id="DialogueNode_intro2"]
+script = ExtResource("2_node")
+id = &"intro2"
+speaker = "Mysterious Stranger"
+text = "Perhaps we shall meet again."
+
+[resource]
+script = ExtResource("1_dtree")
+entry_id = &"intro"
+nodes = Array[ExtResource("2_node")]([SubResource("DialogueNode_intro"), SubResource("DialogueNode_intro2")])
