@@ -14,6 +14,7 @@ extends CharacterBody3D
 ##
 ## State Machine:
 ## - NORMAL: Standard ground/air movement
+## - SWIMMING: Underwater movement (slower, vertical input, buoyancy)
 ## - LEDGE_GRABBING: Holding onto a ledge
 ## - CLIMBING: Climbing over a ledge
 ##
@@ -30,6 +31,7 @@ const MovingPlatformScript = preload("res://scripts/components/moving_platform.g
 
 enum PlayerState {
 	NORMAL,
+	SWIMMING,
 	LEDGE_GRABBING,
 	CLIMBING,
 	LADDER_APPROACHING,
@@ -53,6 +55,12 @@ enum PlayerState {
 @export var dash_duration: float = 0.2
 @export var dash_cooldown: float = 1.0
 @export var max_jumps: int = 2
+
+@export var swim_speed: float = 3.0
+@export var swim_vertical_speed: float = 2.5
+@export var swim_buoyancy: float = 0.0
+@export var swim_drag: float = 4.0
+@export var swim_acceleration: float = 15.0
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _is_sprinting: bool = false
@@ -79,17 +87,51 @@ var _near_interactable: Node = null
 var _ladder_ref: Node = null
 var _ladder_approach_target: Vector3 = Vector3.ZERO
 
+var _water_volume_count: int = 0
+
 @onready var _head: Node3D = $Head
 @onready var _camera: Camera3D = $Head/Camera3D
 @onready var _ledge_detector: RayCast3D = $LedgeDetector
 @onready var _space_check: RayCast3D = $SpaceCheck
+@onready var _underwater_bubbles: Node = get_node_or_null("Head/UnderwaterBubbles")
 
 func _init() -> void:
 	# Allow input processing even when paused (for debugging and auto-run toggle)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _ready() -> void:
+	add_to_group("player")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+## Called by Water volume (Water.tscn) when this body enters a water Area3D.
+func enter_water() -> void:
+	_water_volume_count += 1
+	if _water_volume_count == 1:
+		_enter_underwater()
+
+## Called by Water volume (Water.tscn) when this body exits a water Area3D.
+func exit_water() -> void:
+	_water_volume_count -= 1
+	if _water_volume_count <= 0:
+		_water_volume_count = 0
+		_exit_underwater()
+
+func _enter_underwater() -> void:
+	_current_state = PlayerState.SWIMMING
+	# Damp existing velocity so we don't keep plummeting
+	velocity *= 0.25
+	velocity.y = clampf(velocity.y, -4.0, 3.0)
+	if _underwater_bubbles and _underwater_bubbles is GPUParticles3D:
+		(_underwater_bubbles as GPUParticles3D).emitting = true
+	elif _underwater_bubbles and _underwater_bubbles is CPUParticles3D:
+		(_underwater_bubbles as CPUParticles3D).emitting = true
+
+func _exit_underwater() -> void:
+	_current_state = PlayerState.NORMAL
+	if _underwater_bubbles and _underwater_bubbles is GPUParticles3D:
+		(_underwater_bubbles as GPUParticles3D).emitting = false
+	elif _underwater_bubbles and _underwater_bubbles is CPUParticles3D:
+		(_underwater_bubbles as CPUParticles3D).emitting = false
 
 func _physics_process(delta: float) -> void:
 	# Don't process if game is paused
@@ -105,6 +147,8 @@ func _physics_process(delta: float) -> void:
 			_handle_gravity(delta)
 			_handle_movement(delta)
 			_handle_stamina(delta)
+		PlayerState.SWIMMING:
+			_handle_swimming(delta)
 		PlayerState.LEDGE_GRABBING:
 			_handle_ledge_grab(delta)
 		PlayerState.CLIMBING:
@@ -137,6 +181,26 @@ func _handle_gravity(delta: float) -> void:
 			_jump_count += 1
 			velocity.y = jump_velocity
 			EventBus.jump_count_changed.emit(_jump_count, max_jumps)
+
+func _handle_swimming(delta: float) -> void:
+	# Full 3D movement in camera direction: W/S = forward/back where you look (including up/down), A/D = strafe
+	# Use camera basis (not head) so pitch (look up/down) is included; head only has yaw.
+	var input_dir: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var direction_3d: Vector3 = _camera.global_transform.basis * Vector3(input_dir.x, 0, input_dir.y)
+	# Up/down in water: Space (swim up), T (swim down)
+	var vertical_input: float = 0.0
+	if Input.is_action_pressed("swim_up"):
+		vertical_input += 1.0
+	if Input.is_action_pressed("swim_down"):
+		vertical_input -= 1.0
+	var target_velocity: Vector3 = Vector3.ZERO
+	if direction_3d.length() > 0.1:
+		direction_3d = direction_3d.normalized()
+		target_velocity = direction_3d * swim_speed
+	target_velocity.y += swim_buoyancy + vertical_input * swim_vertical_speed
+	velocity.x = move_toward(velocity.x, target_velocity.x, swim_acceleration * delta)
+	velocity.y = move_toward(velocity.y, target_velocity.y, swim_acceleration * delta)
+	velocity.z = move_toward(velocity.z, target_velocity.z, swim_acceleration * delta)
 
 func _handle_movement(delta: float) -> void:
 	# Check if W or S is pressed - if so, disable auto-run

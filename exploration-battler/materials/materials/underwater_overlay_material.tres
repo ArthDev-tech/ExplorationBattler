@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/shaders/underwater_overlay.gdshader" id="1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/tint_color = Color(0.15, 0.35, 0.55, 0.45)
+shader_parameter/vignette_strength = 0.6
+shader_parameter/vignette_radius = 0.7
+shader_parameter/intensity = 1.0

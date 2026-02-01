@@ -1,0 +1,34 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://cwaterplane01"]
+
+[ext_resource type="Shader" uid="uid://dhytbyawrpo6j" path="res://materials/shaders/water_plane.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh73xao0p8pp3" path="res://Imports/NoiseTextures/NoiseA.jpg" id="2"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/shallow_color = Color(0.17366013, 0.45651376, 0.64265096, 0.8509804)
+shader_parameter/deep_color = Color(0.05, 0.15, 0.35, 1)
+shader_parameter/foam_color = Color(0.85495776, 0.8865954, 0.89360195, 0.9019608)
+shader_parameter/shallow_depth_falloff = 0.14400000614148
+shader_parameter/wave_amplitude = 0.0830000039425
+shader_parameter/wave_frequency = 0.33100001502398
+shader_parameter/wave_speed = 1.090000051775
+shader_parameter/wave_direction = Vector2(1.49, 11.415)
+shader_parameter/wave2_amplitude = 0.0800000038
+shader_parameter/wave2_frequency = 0.72500003373898
+shader_parameter/wave2_speed = 0.2490000118275
+shader_parameter/wave2_direction = Vector2(0.38, 0.28)
+shader_parameter/wave_noise_texture = ExtResource("2")
+shader_parameter/wave_noise_scale = 0.3210000152475
+shader_parameter/wave_noise_strength = 0.1530000072675
+shader_parameter/fresnel_power = 3.2990001329525
+shader_parameter/fresnel_scale = 1.3250000629375
+shader_parameter/fresnel_bias = -0.101999957345
+shader_parameter/foam_threshold = 0.7910000375725
+shader_parameter/foam_sharpness = 4.9450001873875
+shader_parameter/foam_coverage = 0.15
+shader_parameter/base_alpha = 0.9
+shader_parameter/alpha_at_grazing = 0.4
+shader_parameter/roughness = 0.1
+shader_parameter/metallic = 0.0
+shader_parameter/uv_scale = 1.0

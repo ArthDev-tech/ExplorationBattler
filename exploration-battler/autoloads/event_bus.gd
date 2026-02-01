@@ -112,6 +112,12 @@ signal interact_prompt_shown(prompt_text: String)
 ## Emitted when the interact prompt should be hidden.
 signal interact_prompt_hidden()
 
+## Emitted when the player enters a water volume (body_entered on water Area3D).
+signal player_entered_water()
+
+## Emitted when the player exits a water volume (body_exited on water Area3D).
+signal player_exited_water()
+
 ## Emitted when an NPC (or anything) wants to open dialogue.
 ## @param dialogue_tree: DialogueTreeData or Resource with entry_id and nodes
 signal dialogue_requested(dialogue_tree: Resource)

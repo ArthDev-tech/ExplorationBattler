@@ -204,7 +204,7 @@ shape = SubResource("BoxShape3D_1")
 [node name="JumpPuzzle" type="Node3D" parent="PlatformsFloorECT"]
 
 [node name="MovingClimbablePlatform" type="AnimatableBody3D" parent="PlatformsFloorECT/JumpPuzzle"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.990442, -1.7943457, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.262465, -0.07946848, 0)
 script = ExtResource("7_743h6")
 move_enabled = true
 move_points = Array[Vector3]([Vector3(0, 0, 0), Vector3(5, 0, 0), Vector3(5, -2, 0), Vector3(0, -2, 0)])
@@ -980,12 +980,15 @@ transform = Transform3D(2.0421116, 0, 0.81839955, 0, 2.2, 0, -0.81839955, 0, 2.0
 [node name="Environment" type="Node3D" parent="."]
 
 [node name="Lighting" type="DirectionalLight3D" parent="Environment"]
-transform = Transform3D(-0.9059793, -0.4039028, 0.1267446, 0.4193564, -0.8972073, 0.13841754, 0.05780889, 0.1785546, 0.9822303, 0, 27.70203, 0)
-light_color = Color(0.6241424, 0.3624398, 0.38844866, 1)
-light_energy = 0.272
-light_indirect_energy = 1.325
-light_volumetric_fog_energy = 1.185
+transform = Transform3D(-0.9059793, -0.40390277, 0.12674455, 0.4193564, -0.8972072, 0.13841757, 0.05780889, 0.17855458, 0.9822303, 95.557686, 27.70203, -75.903984)
+light_color = Color(0.31084535, 0.1596252, 0.17637166, 1)
+light_energy = 0.015
+light_indirect_energy = 0.182
+light_volumetric_fog_energy = 1.014
+light_specular = 0.943
 shadow_enabled = true
+directional_shadow_split_1 = 0.069
+directional_shadow_fade_start = 0.725
 
 [node name="GothicTower" parent="Environment" instance=ExtResource("16_22881")]
 transform = Transform3D(-2.9337547, 0, -0.626961, 0, 2.9999995, 0, 0.626961, 0, -2.9337547, 31.018723, 6.2242413, -264.07642)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://c4lyr4r6pv8lu"]
+[gd_scene load_steps=8 format=3 uid="uid://c4lyr4r6pv8lu"]
 
 [ext_resource type="Script" uid="uid://b3ypjd3e46puq" path="res://scenes/exploration/player/player_controller.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://c14o0nkmpx4am" path="res://Imports/props/Lanturn.tscn" id="2_dxhon"]
@@ -6,6 +6,14 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_dxhon"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_bubble"]
+radius = 0.04
+height = 0.08
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bubble"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.6)
 
 [node name="PlayerController" type="CharacterBody3D"]
 script = ExtResource("1")
@@ -17,6 +25,23 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Lanturn" parent="Head" instance=ExtResource("2_dxhon")]
 transform = Transform3D(0.47273678, 0, 0.08318611, 0, 0.48, 0, -0.08318611, 0, 0.47273678, -0.8392774, -0.7503499, -0.57676196)
+
+[node name="UnderwaterBubbles" type="CPUParticles3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+emitting = false
+amount = 28
+lifetime = 1.2
+emission_shape = 2
+emission_box_extents = Vector3(0.3, 0.2, 0.3)
+direction = Vector3(0, 1, 0)
+spread = 25.0
+initial_velocity_min = 0.5
+initial_velocity_max = 1.0
+gravity = Vector3(0, -0.2, 0)
+scale_amount_min = 0.06
+scale_amount_max = 0.12
+mesh = SubResource("SphereMesh_bubble")
+material_override = SubResource("StandardMaterial3D_bubble")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

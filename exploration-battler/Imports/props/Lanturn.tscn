@@ -1,13 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://c14o0nkmpx4am"]
+[gd_scene load_steps=5 format=3 uid="uid://c14o0nkmpx4am"]
 
 [ext_resource type="ArrayMesh" uid="uid://5ww46nld5xej" path="res://Imports/props/BasicLanturn.res" id="1_1nxi8"]
 [ext_resource type="Script" uid="uid://csmu71f327ucy" path="res://scripts/components/lantern_sway.gd" id="2_lantern_sway"]
 [ext_resource type="Texture2D" uid="uid://cnc6cerf4mnvt" path="res://Imports/props/BasicLanturn_0.png" id="3_lanturn_tex"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lanturn"]
-albedo_color = Color(1, 1, 1, 1)
 albedo_texture = ExtResource("3_lanturn_tex")
-emission_enabled = false
 
 [node name="Lanturn" type="Node3D"]
 script = ExtResource("2_lantern_sway")
@@ -18,21 +16,34 @@ mesh = ExtResource("1_1nxi8")
 surface_material_override/0 = SubResource("StandardMaterial3D_lanturn")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77673507, 0.6360887, 0)
-light_color = Color(0.6, 0.59607846, 0.34509805, 1)
-light_energy = 0.54
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.042029142, 0.6360887, 0.0086686015)
+light_color = Color(0.7741473, 0.48271674, 0.16196966, 1)
+light_energy = 0.711
+light_indirect_energy = 0.861
+light_volumetric_fog_energy = 0.886
+light_specular = 0.786
+omni_range = 9.323713
 
-[node name="OmniLight3D2" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75365984, 0.6360887, 0)
-light_color = Color(0.6, 0.59607846, 0.34509805, 1)
-light_energy = 0.54
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.98886055, 0.14884503, 0, -0.14884503, 0.98886055, -0.029847622, 0.81045604, 1.2479811)
+light_color = Color(0.65366054, 0.49954557, 0.21147302, 1)
+spot_range = 1.1321036
+spot_angle = 29.322058
 
-[node name="OmniLight3D3" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07004267, 0.6360887, -0.68051684)
-light_color = Color(0.6, 0.59607846, 0.34509805, 1)
-light_energy = 0.54
+[node name="SpotLight3D2" type="SpotLight3D" parent="."]
+transform = Transform3D(-0.013264123, -0.14883193, 0.9887735, 1.1640679e-10, 0.98886055, 0.14884503, -0.99991196, 0.0019742989, -0.013116369, 1.2337475, 0.81045604, -0.0014286339)
+light_color = Color(0.65366054, 0.49954557, 0.21147302, 1)
+spot_range = 1.1321036
+spot_angle = 29.322058
 
-[node name="OmniLight3D4" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07004267, 0.6360887, 0.6574917)
-light_color = Color(0.6007966, 0.59482884, 0.34320357, 1)
-light_energy = 0.54
+[node name="SpotLight3D3" type="SpotLight3D" parent="."]
+transform = Transform3D(-0.99999607, -0.00041824122, 0.0027786095, 0, 0.98886055, 0.14884505, -0.0028099103, 0.14884445, -0.9888567, 0.012575388, 0.81045604, -1.2455059)
+light_color = Color(0.65366054, 0.49954557, 0.21147302, 1)
+spot_range = 1.1321036
+spot_angle = 29.322058
+
+[node name="SpotLight3D4" type="SpotLight3D" parent="."]
+transform = Transform3D(0.010454409, 0.14883684, -0.98880655, 3.1405767e-10, 0.98886055, 0.14884499, 0.99994534, -0.0015560866, 0.010337953, -1.2545254, 0.81045604, 0.00034826994)
+light_color = Color(0.65366054, 0.49954557, 0.21147302, 1)
+spot_range = 1.1321036
+spot_angle = 29.322058
